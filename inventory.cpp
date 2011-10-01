@@ -727,7 +727,7 @@ QList<Item> Inventory::itemsByActivity(bool active) const {
 QList<Place> Inventory::places() const {
 	QList<Place> result;
 	QSqlQuery query(QSqlDatabase::database(Database::fileName));
-	if(!query.exec("SELECT id FROM Places"))
+	if(!query.exec("SELECT id, name FROM Places ORDER BY name ASC"))
 		throw DBErrorException(query);
 
 	while(query.next())
@@ -739,7 +739,7 @@ QList<Place> Inventory::places() const {
 QList<ItemType> Inventory::itemTypes() const {
 	QList<ItemType> result;
 	QSqlQuery query(QSqlDatabase::database(Database::fileName));
-	if(!query.exec("SELECT id FROM ItemTypes"))
+	if(!query.exec("SELECT id, name FROM ItemTypes ORDER BY name ASC"))
 		throw DBErrorException(query);
 
 	while(query.next())
