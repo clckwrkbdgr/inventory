@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionFilter, SIGNAL(triggered()), this, SLOT(setFilter()));
 	connect(ui.actionHistory, SIGNAL(triggered()), this, SLOT(showHistory()));
 	connect(ui.actionPrint, SIGNAL(triggered()), this, SLOT(print()));
+	connect(ui.actionEdit, SIGNAL(triggered()), this, SLOT(editField()));
 	connect(ui.view, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(popupMenu(QPoint)));
 
 	itemMenu = new QMenu(tr("Item menu"), this);
@@ -89,6 +90,10 @@ void MainWindow::deactivate() {
 		QModelIndex index = model->index(ui.view->currentIndex().row(), 4); // 'Active' field.
 		model->setData(index, false, Qt::EditRole);
 	}
+}
+
+void MainWindow::editField() {
+	ui.view->edit(ui.view->currentIndex());
 }
 
 void MainWindow::editPlaces() {

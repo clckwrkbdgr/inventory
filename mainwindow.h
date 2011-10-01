@@ -25,6 +25,7 @@ public slots:
 	void setFilter();
 	void showHistory();
 	void print();
+	void editField();
 
 	void popupMenu(const QPoint &pos);
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>601</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -65,6 +65,43 @@
    <addaction name="actionFilter"/>
    <addaction name="actionPrint"/>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuMain">
+    <property name="title">
+     <string>Main</string>
+    </property>
+    <addaction name="actionPlaces"/>
+    <addaction name="actionItemTypes"/>
+    <addaction name="separator"/>
+    <addaction name="actionFilter"/>
+    <addaction name="actionPrint"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuItems">
+    <property name="title">
+     <string>Items</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="actionAdd"/>
+    <addaction name="actionEdit"/>
+    <addaction name="actionRemoveItem"/>
+    <addaction name="separator"/>
+    <addaction name="actionDeactivate"/>
+    <addaction name="separator"/>
+    <addaction name="actionHistory"/>
+   </widget>
+   <addaction name="menuMain"/>
+   <addaction name="menuItems"/>
+  </widget>
   <action name="actionAdd">
    <property name="icon">
     <iconset resource="icons.qrc">
@@ -77,13 +114,16 @@
     <string>Add</string>
    </property>
    <property name="toolTip">
-    <string>Add new item (Ctrl+N)</string>
+    <string>Add new item</string>
    </property>
    <property name="statusTip">
     <string>Add new item</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionDeactivate">
@@ -102,6 +142,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionPlaces">
@@ -140,7 +183,7 @@
      <normaloff>:/icons/filter</normaloff>:/icons/filter</iconset>
    </property>
    <property name="text">
-    <string>Filter (Ctrl+F)</string>
+    <string>Filter</string>
    </property>
    <property name="toolTip">
     <string>Set filter on item view</string>
@@ -176,7 +219,7 @@
      <normaloff>:/icons/print</normaloff>:/icons/print</iconset>
    </property>
    <property name="text">
-    <string>Print (Ctrl+P)</string>
+    <string>Print</string>
    </property>
    <property name="toolTip">
     <string>Print current view</string>
@@ -187,6 +230,9 @@
    <property name="shortcut">
     <string>Ctrl+P</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionQuit">
    <property name="icon">
@@ -194,9 +240,12 @@
      <normaloff>:/icons/quit</normaloff>:/icons/quit</iconset>
    </property>
    <property name="text">
-    <string>Quit (Ctrl+Q)</string>
+    <string>Quit</string>
    </property>
    <property name="iconText">
+    <string>Quit</string>
+   </property>
+   <property name="toolTip">
     <string>Quit</string>
    </property>
    <property name="statusTip">
@@ -204,6 +253,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionRemoveItem">
@@ -216,6 +268,27 @@
    </property>
    <property name="shortcut">
     <string>Del</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionEdit">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/edit</normaloff>:/icons/edit</iconset>
+   </property>
+   <property name="text">
+    <string>Edit</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit current field</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
  </widget>
