@@ -12,11 +12,13 @@ ListDialog::ListDialog(bool placeMode, QWidget *parent) : QDialog(parent) {
 
 	ui.setupUi(this);
 	connect(ui.actionAdd, SIGNAL(triggered()), this, SLOT(addItem()));
+	connect(ui.actionRemove, SIGNAL(triggered()), this, SLOT(removeItem()));
 	connect(ui.actionAddList, SIGNAL(triggered()), this, SLOT(addList()));
 
 	QToolBar *toolBar = new QToolBar(tr("Tool bar"));
 	toolBar->addAction(ui.actionAdd);
 	toolBar->addAction(ui.actionAddList);
+	toolBar->addAction(ui.actionRemove);
 	QBoxLayout *box = static_cast<QBoxLayout*>(this->layout());
 	if(box)
 		box->insertWidget(0, toolBar);
@@ -31,6 +33,15 @@ ListDialog::ListDialog(bool placeMode, QWidget *parent) : QDialog(parent) {
 
 ListDialog::~ListDialog() {
 
+}
+
+void ListDialog::removeItem() {
+	if(QMessageBox::question(this, tr("Remove value"), tr("Do you really want to remove selected value?"),
+							QMessageBox::Yes | QMessageBox::Cancel) == QMessageBox::Yes) {
+		if(!model->removeRow(ui.view->currentIndex().row()))
+			QMessageBox::critical(this, tr("Remove value"), tr("Cannot remove selected value.\n"
+						"Probably, there is items in the inventory, that use this value."));
+	}
 }
 
 void ListDialog::addItem() {

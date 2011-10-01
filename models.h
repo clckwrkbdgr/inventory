@@ -26,6 +26,7 @@ public:
 
 	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 	virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
+	virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
 
 	virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
 	virtual QModelIndex parent(const QModelIndex &index) const;
@@ -52,6 +53,7 @@ public:
 
 	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 	virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
+	virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
 
 	virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
 	virtual QModelIndex parent(const QModelIndex &index) const;

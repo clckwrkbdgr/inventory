@@ -51,6 +51,7 @@ public:
 	virtual bool operator==(const Place &other) const;
 
 	static Place add(const QString &newName);
+	static bool remove(int id);
 private:
 	int id;
 };
@@ -69,6 +70,7 @@ public:
 	virtual bool operator==(const ItemType &other) const;
 
 	static ItemType add(const QString &newName);
+	static bool remove(int id);
 private:
 	int id;
 };

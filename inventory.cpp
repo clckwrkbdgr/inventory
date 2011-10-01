@@ -468,6 +468,26 @@ Place Place::add(const QString &newName) {
 	return Place(id);
 }
 
+bool Place::remove(int id) {
+	QSqlQuery query(QSqlDatabase::database(Database::fileName));
+	query.prepare("SELECT COUNT(*) FROM Items WHERE idPlace = :idPlace");
+	query.bindValue(":idPlace", id);
+	if(!query.exec())
+		throw DBErrorException(query);
+	query.next();
+	if(query.value(0).toInt() != 0)
+		return false;
+
+	query.prepare("DELETE FROM Places WHERE id = :idPlace");
+	query.bindValue(":idPlace", id);
+	if(!query.exec())
+		throw DBErrorException(query);
+
+	Log::add(QObject::tr("Place #%1 was removed from database.").
+			arg(id));
+	return true;
+}
+
 //----------------------------------------------------------------------------------------------------
 
 ItemType::ItemType(int id) {
@@ -549,6 +569,26 @@ ItemType ItemType::add(const QString &newName) {
 
 	Log::add(QObject::tr("ItemType #%1 is added with name '%2'").arg(id).arg(newName));
 	return ItemType(id);
+}
+
+bool ItemType::remove(int id) {
+	QSqlQuery query(QSqlDatabase::database(Database::fileName));
+	query.prepare("SELECT COUNT(*) FROM Items WHERE idItemType = :idItemType");
+	query.bindValue(":idItemType", id);
+	if(!query.exec())
+		throw DBErrorException(query);
+	query.next();
+	if(query.value(0).toInt() != 0)
+		return false;
+
+	query.prepare("DELETE FROM ItemTypes WHERE id = :idItemType");
+	query.bindValue(":idItemType", id);
+	if(!query.exec())
+		throw DBErrorException(query);
+
+	Log::add(QObject::tr("Item type #%1 was removed from database.").
+			arg(id));
+	return true;
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -1,3 +1,4 @@
+#include <QtDebug>
 #include <QtGui/QStatusBar>
 #include <QtGui/QMenu>
 #include <QtCore/QSettings>

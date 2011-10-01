@@ -15,6 +15,7 @@ public:
 
 public slots:
 	void addItem();
+	void removeItem();
 	void addList();
 
 private:

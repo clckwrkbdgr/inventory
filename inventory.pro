@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = inventory
 DESTDIR = bin
-VERSION = 0.9.5
+VERSION = 0.9.6
 QT += sql
 CONFIG += qt release
 

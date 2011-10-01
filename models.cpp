@@ -86,6 +86,21 @@ bool PlaceModel::insertRows(int row, int count, const QModelIndex&) {
 	return true;
 }
 
+bool PlaceModel::removeRows(int row, int count, const QModelIndex&) {
+	beginRemoveRows(QModelIndex(), row, row + count - 1);
+
+	for(int i = 0; i < count; i++)
+		if(row >= 0 && row < list.size()) {
+			if(!Place::remove(list[row].getId())) {
+				return false;
+			}
+			list.removeAt(row);
+		}
+
+	endRemoveRows();
+	return true;
+}
+
 QModelIndex PlaceModel::index(int row, int column, const QModelIndex &) const {
 	return createIndex(row, column, row);
 }
@@ -174,6 +189,21 @@ bool ItemTypeModel::insertRows(int row, int count, const QModelIndex&) {
 	}
 
 	endInsertRows();
+	return true;
+}
+
+bool ItemTypeModel::removeRows(int row, int count, const QModelIndex&) {
+	beginRemoveRows(QModelIndex(), row, row + count - 1);
+
+	for(int i = 0; i < count; i++)
+		if(row >= 0 && row < list.size()) {
+			if(!ItemType::remove(list[row].getId())) {
+				return false;
+			}
+			list.removeAt(row);
+		}
+
+	endRemoveRows();
 	return true;
 }
 
@@ -468,7 +498,7 @@ bool InventoryModel::insertRows(int row, int count, const QModelIndex&) {
 bool InventoryModel::removeRows(int row, int count, const QModelIndex&) {
 	beginRemoveRows(QModelIndex(), row, row + count - 1);
 
-	for(int i = row; i < count; i++)
+	for(int i = 0; i < count; i++)
 		if(row >= 0 && row < list.size()) {
 			Item::remove(list[row].getId());
 			list.removeAt(row);
