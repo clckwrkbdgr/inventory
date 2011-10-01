@@ -15,27 +15,26 @@ FilterDialog::FilterDialog(QWidget *parent) : QDialog(parent) {
 FilterDialog::~FilterDialog() {
 }
 
-bool FilterDialog::usesPlace() const {
-	return ui.groupPlace->isChecked();
+InventoryViewFilter FilterDialog::filter() const {
+	InventoryViewFilter result;
+	result.usePlace = ui.groupPlace->isChecked();
+	result.useItemType = ui.groupItemType->isChecked();
+	result.useActivity = ui.groupActive->isChecked();
+	result.placeId = placeModel->idAt(ui.listPlace->currentIndex());
+	result.itemTypeId = itemTypeModel->idAt(ui.listItemType->currentIndex());
+	result.active = ui.buttonActive->isChecked();
+	return result;
 }
 
-bool FilterDialog::usesItemType() const {
-	return ui.groupItemType->isChecked();
-}
-
-bool FilterDialog::usesActivity() const {
-	return ui.groupActive->isChecked();
-}
-
-int FilterDialog::placeId() const {
-	return placeModel->idAt(ui.listPlace->currentIndex());
-}
-
-int FilterDialog::itemTypeId() const {
-	return itemTypeModel->idAt(ui.listItemType->currentIndex());
-}
-
-bool FilterDialog::activity() const {
-	return ui.buttonActive->isChecked();
+void FilterDialog::setFilter(const InventoryViewFilter &newFilter) {
+	ui.groupPlace->setChecked(newFilter.usePlace);
+	ui.groupItemType->setChecked(newFilter.useItemType);
+	ui.groupActive->setChecked(newFilter.useActivity);
+	if(newFilter.usePlace)
+		ui.listPlace->setCurrentIndex(placeModel->indexOf(Place(newFilter.placeId)));
+	if(newFilter.useItemType)
+		ui.listItemType->setCurrentIndex(itemTypeModel->indexOf(ItemType(newFilter.itemTypeId)));
+	if(newFilter.useActivity)
+		ui.buttonActive->setChecked(newFilter.active);
 }
 

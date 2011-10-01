@@ -8,6 +8,8 @@
 #include "inventory.h"
 
 namespace Database {
+	InventoryViewFilter lastFilter;
+
 	Inventory *inventory = NULL;
 	const QStringList createQuery = QStringList()
 		<< "DROP TABLE IF EXISTS Places;"
@@ -298,6 +300,82 @@ Item Item::add(const ItemType &newItemType, const QString &newName, const Place 
 			arg(newItemType.name()).
 			arg(newPlace.name()));
 	return Item(id);
+}
+
+Item Item::add(const QString &newName) {
+	if(newName.isEmpty())
+		throw EmptyNameException();
+
+	// Get top (as random) values of itemType and place.
+	int itemTypeId = 0;
+	if(Database::lastFilter.useItemType)
+		itemTypeId = Database::lastFilter.itemTypeId;
+	else {
+		QSqlQuery query(QSqlDatabase::database(Database::fileName));
+		if(!query.exec("SELECT COUNT(*) FROM ItemTypes"))
+			throw DBErrorException(query);
+		query.next();
+		if(query.value(0).toInt() == 0)
+			ItemType::add(QObject::tr("New item type"));
+
+		if(!query.exec("SELECT id FROM ItemTypes"))
+			throw DBErrorException(query);
+		query.next();
+		itemTypeId = query.value(0).toInt();
+	}
+
+	int placeId = 0;
+	if(Database::lastFilter.usePlace)
+		placeId = Database::lastFilter.placeId;
+	else {
+		QSqlQuery query(QSqlDatabase::database(Database::fileName));
+		if(!query.exec("SELECT COUNT(*) FROM Places"))
+			throw DBErrorException(query);
+		query.next();
+		if(query.value(0).toInt() == 0)
+			ItemType::add(QObject::tr("New place"));
+
+		if(!query.exec("SELECT id FROM Places"))
+			throw DBErrorException(query);
+		query.next();
+		placeId = query.value(0).toInt();
+	}
+
+	// Query.
+	QSqlQuery query(QSqlDatabase::database(Database::fileName));
+	query.prepare("INSERT INTO Items VALUES(NULL, :idItemType, :name, '', NULL, :idPlace, 1)");
+	query.bindValue(":name", newName);
+	query.bindValue(":idItemType", itemTypeId);
+	query.bindValue(":idPlace", placeId);
+	if(!query.exec())
+		throw DBErrorException(query);
+
+	if(!query.exec(QString("SELECT MAX(id) FROM Items")))
+		throw DBErrorException(query);
+	query.next();
+	int id = query.value(0).toInt();
+
+	Log::add(QObject::tr("Item #%1 of itemType '%3' in place '%4' is added with name '%2'").
+			arg(id).arg(newName).
+			arg(ItemType(itemTypeId).name()).
+			arg(Place(placeId).name()));
+	return Item(id);
+}
+
+void Item::remove(int id) {
+	QSqlQuery query(QSqlDatabase::database(Database::fileName));
+	query.prepare("DELETE FROM History WHERE idItem = :idItem");
+	query.bindValue(":idItem", id);
+	if(!query.exec())
+		throw DBErrorException(query);
+
+	query.prepare("DELETE FROM Items WHERE id = :idItem");
+	query.bindValue(":idItem", id);
+	if(!query.exec())
+		throw DBErrorException(query);
+
+	Log::add(QObject::tr("Item #%1 was removed from database.").
+			arg(id));
 }
 
 void Item::addHistory(int changedField, const QString &oldValue, const QString &newValue) {
@@ -655,6 +733,35 @@ QList<Item> Inventory::items() const {
 	return result;
 }
 
+QList<Item> Inventory::filteredItems(const InventoryViewFilter &filter) const {
+	Database::lastFilter = filter;
+
+	QStringList whereList;
+	if(filter.usePlace) whereList << "idPlace = :idPlace";
+	if(filter.useItemType) whereList << "idItemType = :idItemType";
+	if(filter.useActivity) whereList << "active = :active";
+	QString where;
+	if(!whereList.isEmpty()) {
+		where = QString(" WHERE ") + whereList.join(" AND ");
+	}
+
+	QList<Item> result;
+	QSqlQuery query(QSqlDatabase::database(Database::fileName));
+	query.prepare(QString("SELECT id FROM Items") + where);
+
+	if(filter.usePlace) query.bindValue(":idPlace", filter.placeId);
+	if(filter.useItemType) query.bindValue(":idItemType", filter.itemTypeId);
+	if(filter.useActivity) query.bindValue(":active", (filter.active) ? 1 : 0);
+
+	if(!query.exec())
+		throw DBErrorException(query);
+
+	while(query.next())
+		result << Item(query.value(0).toInt());
+
+	return result;
+}
+
 QList<Item> Inventory::filteredItems(const Place *place, const ItemType *itemType, const bool* activity) const {
 	QStringList whereList;
 	if(place) whereList << "idPlace = :idPlace";
@@ -783,6 +890,39 @@ QList<History> Inventory::historyOf(const Item &item) const {
 	return result;
 }
 
+QSqlQuery Inventory::getQuery(int sortingColumn, Qt::SortOrder order) {
+	QStringList whereList;
+	if(Database::lastFilter.usePlace) whereList << "idPlace = :idPlace";
+	if(Database::lastFilter.useItemType) whereList << "idItemType = :idItemType";
+	if(Database::lastFilter.useActivity) whereList << "active = :active";
+	QString whereClause;
+	if(!whereList.isEmpty()) {
+		whereClause = QString(" WHERE ") + whereList.join(" AND ");
+	}
+
+	QString orderByClause = (sortingColumn < 0) ? ("") : QString("ORDER BY %1 %2").
+		arg(sortingColumn + 1).
+		arg( (order == Qt::AscendingOrder) ? "ASC" : "DESC" );
+
+	QList<Item> result;
+	QSqlQuery query(QSqlDatabase::database(Database::fileName));
+	query.prepare(QString("SELECT T.name, I.name, COUNT(*), I.inn, P.name, "
+				"REPLACE(REPLACE(I.active, '0', '%1'), '1', '') "
+				"FROM Items AS I "
+				"INNER JOIN ItemTypes AS T ON T.id = I.idItemType "
+				"INNER JOIN Places AS P ON P.id = I.idPlace ").arg(QObject::tr("Inactive")) +
+			whereClause +
+			"GROUP BY T.name, I.name, I.inn, P.name, I.active " +
+			orderByClause);
+
+	if(Database::lastFilter.usePlace) query.bindValue(":idPlace", Database::lastFilter.placeId);
+	if(Database::lastFilter.useItemType) query.bindValue(":idItemType", Database::lastFilter.itemTypeId);
+	if(Database::lastFilter.useActivity) query.bindValue(":active", (Database::lastFilter.active) ? 1 : 0);
+	query.exec();
+
+	return query;
+}
+
 bool Inventory::isOpen() {
 	return QSqlDatabase::database(Database::fileName).isOpen();
 }
@@ -807,6 +947,8 @@ void Inventory::open(const QString &databaseFileName) {
 	}
 
 	Log::add(QObject::tr("Database is open @ %1.").arg(databaseFileName));
+
+	Database::lastFilter.usePlace = Database::lastFilter.useItemType = Database::lastFilter.useActivity = false;
 }
 
 void Inventory::close() {
@@ -822,3 +964,6 @@ Inventory* Inventory::instance() {
 	return Database::inventory;
 }
 
+InventoryViewFilter Inventory::getLastFilter() {
+	return Database::lastFilter;
+}

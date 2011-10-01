@@ -2,6 +2,7 @@
 
 #include <QtGui/QDialog>
 
+#include "inventory.h"
 #include "ui_filterdialog.h"
 
 class PlaceModel;
@@ -14,14 +15,8 @@ public:
 	FilterDialog(QWidget *parent = 0);
 	virtual ~FilterDialog();
 
-	// @todo: struct for filter
-	// @todo: get old filter, make filter strcut app-wide and static.
-	bool usesPlace() const;
-	bool usesItemType() const;
-	bool usesActivity() const;
-	int placeId() const;
-	int itemTypeId() const;
-	bool activity() const;
+	InventoryViewFilter filter() const;
+	void setFilter(const InventoryViewFilter &newFilter);
 private:
 	Ui::FilterDialog ui;
 	PlaceModel *placeModel;

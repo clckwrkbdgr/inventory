@@ -10,12 +10,14 @@
 #include "listdialog.h"
 #include "historydialog.h"
 #include "filterdialog.h"
+#include "printpreviewdialog.h"
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.setupUi(this);
 	connect(ui.actionAdd, SIGNAL(triggered()), this, SLOT(addItem()));
 	connect(ui.actionDeactivate, SIGNAL(triggered()), this, SLOT(deactivate()));
+	connect(ui.actionRemoveItem, SIGNAL(triggered()), this, SLOT(removeItem()));
 	connect(ui.actionPlaces, SIGNAL(triggered()), this, SLOT(editPlaces()));
 	connect(ui.actionItemTypes, SIGNAL(triggered()), this, SLOT(editItemTypes()));
 	connect(ui.actionFilter, SIGNAL(triggered()), this, SLOT(setFilter()));
@@ -25,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
 	itemMenu = new QMenu(tr("Item menu"), this);
 	itemMenu->addAction(ui.actionDeactivate);
+	itemMenu->addAction(ui.actionRemoveItem);
 	itemMenu->addSeparator();
 	itemMenu->addAction(ui.actionHistory);
 
@@ -67,6 +70,14 @@ void MainWindow::resizeView(const QModelIndex&, const QModelIndex&) {
 	ui.view->resizeColumnsToContents();
 }
 
+void MainWindow::removeItem() {
+	if(QMessageBox::question(this, tr("Remove item"), tr("Do you really want to remove selected item?\n"
+							"All associated history also will be deleted."),
+							QMessageBox::Yes | QMessageBox::Cancel) == QMessageBox::Yes) {
+		model->removeRow(ui.view->currentIndex().row());
+	}
+}
+
 void MainWindow::addItem() {
 	model->insertRow(model->rowCount());
 }
@@ -90,28 +101,9 @@ void MainWindow::editItemTypes() {
 
 void MainWindow::setFilter() {
 	FilterDialog *dialog = new FilterDialog(this);
+	dialog->setFilter(Inventory::getLastFilter());
 	if(dialog->exec()) {
-		Place *place = NULL;
-		ItemType *itemType = NULL;
-		bool *activity = NULL;
-
-		if(dialog->usesPlace() && dialog->placeId() > -1) {
-			place = new Place(dialog->placeId());
-		}
-		if(dialog->usesItemType() && dialog->itemTypeId() > -1) {
-			itemType = new ItemType(dialog->itemTypeId());
-		}
-		if(dialog->usesActivity()) {
-			activity = new bool(dialog->activity());
-		}
-		model->updateList(Inventory::instance()->filteredItems(place, itemType, activity));
-
-		if(place)
-			delete place;
-		if(itemType)
-			delete itemType;
-		if(activity)
-			delete activity;
+		model->updateList(Inventory::instance()->filteredItems(dialog->filter()));
 	}
 	delete dialog;
 }
@@ -129,53 +121,8 @@ void MainWindow::showHistory() {
 }
 
 void MainWindow::print() {
-	QPrinter printer;
-	QPrintDialog *dialog = new QPrintDialog(&printer, this);
-	dialog->setWindowTitle(tr("Print main view"));
-	if(dialog->exec()) {
-		// Prepare main table view for printing: resize it to the page size.
-		ui.view->resize(printer.pageRect().size());
-		Qt::ScrollBarPolicy horPolicy = ui.view->horizontalScrollBarPolicy(),
-			verPolicy = ui.view->verticalScrollBarPolicy();
-		ui.view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-		ui.view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-		ui.view->clearSelection();
-
-		// Print.
-		QPainter painter;
-		painter.begin(&printer);
-
-		int rowsPrinted = 0;
-		ui.view->scrollTo(model->index(0, 0), QAbstractItemView::PositionAtTop);
-		while(true) {
-			// Render rows.
-			ui.view->render(&painter);
-
-			// Hide already printed rows and get it's count.
-			int currentBottomRow = ui.view->rowAt(ui.view->rect().bottom()) - 1;
-			for(int row = rowsPrinted; row < currentBottomRow; row++)
-				ui.view->hideRow(row);
-			rowsPrinted = currentBottomRow;
-			if(rowsPrinted < 0)
-				rowsPrinted = model->rowCount();
-
-			// Set next page or quit.
-			if(rowsPrinted < model->rowCount())
-				printer.newPage();
-			else
-				break;
-		}
-
-		painter.end();
-
-		// Resize table view back.
-		ui.verticalLayout->invalidate();
-		ui.view->setVerticalScrollBarPolicy(verPolicy);
-		ui.view->setHorizontalScrollBarPolicy(horPolicy);
-		for(int row = 0; row < model->rowCount(); row++) {
-			ui.view->showRow(row);
-		}
-	}
+	PrintPreviewDialog *dialog = new PrintPreviewDialog(this);
+	dialog->exec();
 	delete dialog;
 }
 

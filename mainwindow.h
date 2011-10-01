@@ -18,6 +18,7 @@ public:
 
 public slots:
 	void addItem();
+	void removeItem();
 	void deactivate();
 	void editPlaces();
 	void editItemTypes();

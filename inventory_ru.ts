@@ -78,57 +78,57 @@
 <context>
     <name>HistoryModel</name>
     <message>
-        <location filename="models.cpp" line="641"/>
+        <location filename="models.cpp" line="604"/>
         <source>Item type</source>
         <translation>Тип предмета</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="642"/>
+        <location filename="models.cpp" line="605"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="643"/>
+        <location filename="models.cpp" line="606"/>
         <source>Note</source>
         <translation>Примечание</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="644"/>
+        <location filename="models.cpp" line="607"/>
         <source>Inn</source>
         <translation>ИНН</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="645"/>
+        <location filename="models.cpp" line="608"/>
         <source>Place</source>
         <translation>Место</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="646"/>
+        <location filename="models.cpp" line="609"/>
         <source>Activity</source>
         <translation>Состояние</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="647"/>
+        <location filename="models.cpp" line="610"/>
         <source>Unknown field</source>
         <translation>Неизвестно</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="667"/>
+        <location filename="models.cpp" line="630"/>
         <source>Change time</source>
         <translation>Время изменения</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="668"/>
+        <location filename="models.cpp" line="631"/>
         <source>Field</source>
         <translation>Поле</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="669"/>
+        <location filename="models.cpp" line="632"/>
         <source>Old value</source>
         <translation>Старое значение</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="670"/>
+        <location filename="models.cpp" line="633"/>
         <source>New value</source>
         <translation>Новое значение</translation>
     </message>
@@ -136,47 +136,45 @@
 <context>
     <name>InventoryModel</name>
     <message>
-        <location filename="models.cpp" line="308"/>
+        <location filename="models.cpp" line="290"/>
         <source>Item type</source>
         <translation>Тип предмета</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="309"/>
+        <location filename="models.cpp" line="291"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="310"/>
+        <location filename="models.cpp" line="292"/>
         <source>Note</source>
         <translation>Примечание</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="311"/>
+        <location filename="models.cpp" line="293"/>
         <source>INN</source>
         <translation>ИНН</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="312"/>
+        <location filename="models.cpp" line="294"/>
         <source>Place</source>
         <translation>Место</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="313"/>
+        <location filename="models.cpp" line="295"/>
         <source>Active</source>
         <translation>Состояние</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="496"/>
         <source>New item type</source>
-        <translation>Новый тип</translation>
+        <translation type="obsolete">Новый тип</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="501"/>
         <source>New place</source>
-        <translation>Новое место</translation>
+        <translation type="obsolete">Новое место</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="505"/>
+        <location filename="models.cpp" line="461"/>
         <source>New item</source>
         <translation>Новый предмет</translation>
     </message>
@@ -184,12 +182,12 @@
 <context>
     <name>ItemTypeModel</name>
     <message>
-        <location filename="models.cpp" line="157"/>
+        <location filename="models.cpp" line="145"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="185"/>
+        <location filename="models.cpp" line="173"/>
         <source>New item type</source>
         <translation>Новый тип</translation>
     </message>
@@ -245,203 +243,284 @@
         <translation>Инвентаризация</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="48"/>
+        <location filename="mainwindow.ui" line="45"/>
         <source>toolBar</source>
         <translation>Панель инструментов</translation>
     </message>
     <message>
+        <location filename="mainwindow.ui" line="71"/>
         <location filename="mainwindow.ui" line="74"/>
-        <location filename="mainwindow.ui" line="77"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
+        <location filename="mainwindow.ui" line="77"/>
         <location filename="mainwindow.ui" line="80"/>
-        <location filename="mainwindow.ui" line="83"/>
         <source>Add new item</source>
         <translation>Добавить новый предмет</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="86"/>
+        <location filename="mainwindow.ui" line="83"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="95"/>
+        <location filename="mainwindow.ui" line="92"/>
         <source>Deactivate</source>
         <translation>Списать</translation>
     </message>
     <message>
+        <location filename="mainwindow.ui" line="95"/>
         <location filename="mainwindow.ui" line="98"/>
-        <location filename="mainwindow.ui" line="101"/>
         <source>Deactivate selected item</source>
         <translation>Списать выделенный предмет</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="104"/>
+        <location filename="mainwindow.ui" line="101"/>
         <source>Ctrl+D</source>
         <translation>Ctrl+D</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="113"/>
+        <location filename="mainwindow.ui" line="110"/>
         <source>Places</source>
         <translation>Места хранения</translation>
     </message>
     <message>
+        <location filename="mainwindow.ui" line="113"/>
         <location filename="mainwindow.ui" line="116"/>
-        <location filename="mainwindow.ui" line="119"/>
         <source>Edit places </source>
         <translation>Редактировать места хранения</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="128"/>
+        <location filename="mainwindow.ui" line="125"/>
         <source>Types</source>
         <translation>Типы предметов</translation>
     </message>
     <message>
+        <location filename="mainwindow.ui" line="128"/>
         <location filename="mainwindow.ui" line="131"/>
-        <location filename="mainwindow.ui" line="134"/>
         <source>Edit item types</source>
         <translation>Редактировать типы предметов</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="143"/>
+        <location filename="mainwindow.ui" line="140"/>
         <source>Filter</source>
         <translation>Фильтр</translation>
     </message>
     <message>
+        <location filename="mainwindow.ui" line="143"/>
         <location filename="mainwindow.ui" line="146"/>
-        <location filename="mainwindow.ui" line="149"/>
         <source>Set filter on item view</source>
         <translation>Установить фильтрацию на отображение предметов</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="152"/>
+        <location filename="mainwindow.ui" line="149"/>
         <source>Ctrl+F</source>
         <translation>Ctrl+F</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="161"/>
+        <location filename="mainwindow.ui" line="158"/>
         <source>History</source>
         <translation>История</translation>
     </message>
     <message>
+        <location filename="mainwindow.ui" line="161"/>
         <location filename="mainwindow.ui" line="164"/>
-        <location filename="mainwindow.ui" line="167"/>
         <source>Show history of selected item</source>
         <translation>Показать историю выделенных предметов</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="170"/>
+        <location filename="mainwindow.ui" line="167"/>
         <source>Ctrl+H</source>
         <translation>Ctrl+H</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="179"/>
+        <location filename="mainwindow.ui" line="176"/>
         <source>Print</source>
         <translation>Печать</translation>
     </message>
     <message>
+        <location filename="mainwindow.ui" line="179"/>
         <location filename="mainwindow.ui" line="182"/>
-        <location filename="mainwindow.ui" line="185"/>
         <source>Print current view</source>
         <translation>Печатать текущее отображение</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="188"/>
+        <location filename="mainwindow.ui" line="185"/>
         <source>Ctrl+P</source>
         <translation>Ctrl+P</translation>
     </message>
     <message>
+        <location filename="mainwindow.ui" line="194"/>
         <location filename="mainwindow.ui" line="197"/>
         <location filename="mainwindow.ui" line="200"/>
-        <location filename="mainwindow.ui" line="203"/>
         <source>Quit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="206"/>
+        <location filename="mainwindow.ui" line="203"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="26"/>
+        <location filename="mainwindow.ui" line="212"/>
+        <location filename="mainwindow.cpp" line="74"/>
+        <source>Remove item</source>
+        <translation>Удалить предмет</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="215"/>
+        <source>Del</source>
+        <translation>Del</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="28"/>
         <source>Item menu</source>
         <translation>Меню предмета</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="134"/>
+        <location filename="mainwindow.cpp" line="74"/>
+        <source>Do you really want to remove selected item?
+All associated history also will be deleted.</source>
+        <translation>Вы действительно хотите удалить выбранный предмет?
+Вся связанная с ним история также будет удалена.</translation>
+    </message>
+    <message>
         <source>Print main view</source>
-        <translation>Печатать главный вид</translation>
+        <translation type="obsolete">Печатать главный вид</translation>
     </message>
 </context>
 <context>
     <name>PlaceModel</name>
     <message>
-        <location filename="models.cpp" line="60"/>
+        <location filename="models.cpp" line="54"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="88"/>
+        <location filename="models.cpp" line="82"/>
         <source>New place</source>
         <translation>Новое место</translation>
     </message>
 </context>
 <context>
+    <name>PrintPreviewDialog</name>
+    <message>
+        <location filename="printpreviewdialog.ui" line="17"/>
+        <source>Preview</source>
+        <translation>Предпросмотр</translation>
+    </message>
+    <message>
+        <location filename="printpreviewdialog.cpp" line="15"/>
+        <source>Item type</source>
+        <translation>Тип предмета</translation>
+    </message>
+    <message>
+        <location filename="printpreviewdialog.cpp" line="16"/>
+        <source>Name</source>
+        <translation>Наименование</translation>
+    </message>
+    <message>
+        <location filename="printpreviewdialog.cpp" line="17"/>
+        <source>Count</source>
+        <translation>Количество</translation>
+    </message>
+    <message>
+        <location filename="printpreviewdialog.cpp" line="18"/>
+        <source>INN</source>
+        <translation>ИНН</translation>
+    </message>
+    <message>
+        <location filename="printpreviewdialog.cpp" line="19"/>
+        <source>Place</source>
+        <translation>Место</translation>
+    </message>
+    <message>
+        <location filename="printpreviewdialog.cpp" line="20"/>
+        <source>Active</source>
+        <translation>Состояние</translation>
+    </message>
+    <message>
+        <location filename="printpreviewdialog.cpp" line="33"/>
+        <source>Print report</source>
+        <translation>Печать отчета</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
-        <location filename="inventory.cpp" line="233"/>
+        <location filename="inventory.cpp" line="235"/>
         <source>Empty</source>
         <translation>Отсутствует</translation>
     </message>
     <message>
-        <location filename="inventory.cpp" line="272"/>
+        <location filename="inventory.cpp" line="274"/>
         <source>Active</source>
         <translation>В наличии</translation>
     </message>
     <message>
-        <location filename="inventory.cpp" line="272"/>
+        <location filename="inventory.cpp" line="274"/>
+        <location filename="inventory.cpp" line="913"/>
         <source>Inactive</source>
         <translation>Списан</translation>
     </message>
     <message>
-        <location filename="inventory.cpp" line="296"/>
+        <location filename="inventory.cpp" line="298"/>
         <source>Items #%1 of itemType &apos;%3&apos; in place &apos;%4&apos; is added with name &apos;%2&apos;</source>
         <translation>Предмет #%1 типа &apos;%3&apos; в месте &apos;%4&apos; добавлен с именем &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="inventory.cpp" line="371"/>
+        <location filename="inventory.cpp" line="319"/>
+        <source>New item type</source>
+        <translation>Новый тип</translation>
+    </message>
+    <message>
+        <location filename="inventory.cpp" line="336"/>
+        <source>New place</source>
+        <translation>Новое место</translation>
+    </message>
+    <message>
+        <location filename="inventory.cpp" line="358"/>
+        <source>Item #%1 of itemType &apos;%3&apos; in place &apos;%4&apos; is added with name &apos;%2&apos;</source>
+        <translation>Предмет #%1 типа &apos;%3&apos; в месте &apos;%4&apos; добавлен с именем &apos;%2&apos;</translation>
+    </message>
+    <message>
+        <location filename="inventory.cpp" line="377"/>
+        <source>Item #%1 was removed from database.</source>
+        <translation>Предмет #%1 был удален из базы.</translation>
+    </message>
+    <message>
+        <location filename="inventory.cpp" line="449"/>
         <source>Place #%1 changes name to &apos;%2&apos;</source>
         <translation>Место #%1 изменило имя на &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="inventory.cpp" line="393"/>
+        <location filename="inventory.cpp" line="471"/>
         <source>Place #%1 is added with name &apos;%2&apos;</source>
         <translation>Место #%1 добавлено с именем &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="inventory.cpp" line="454"/>
+        <location filename="inventory.cpp" line="532"/>
         <source>ItemType #%1 changes name to &apos;%2&apos;</source>
         <translation>Тип #%1 изменил имя на &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="inventory.cpp" line="476"/>
+        <location filename="inventory.cpp" line="554"/>
         <source>ItemType #%1 is added with name &apos;%2&apos;</source>
         <translation>Тип #%1 добавлен с именем &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="inventory.cpp" line="806"/>
+        <location filename="inventory.cpp" line="946"/>
         <source>Database has been created @ %1.</source>
         <translation>База данных создана в &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="inventory.cpp" line="809"/>
+        <location filename="inventory.cpp" line="949"/>
         <source>Database is open @ %1.</source>
         <translation>База данных открыта из &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="inventory.cpp" line="813"/>
+        <location filename="inventory.cpp" line="955"/>
         <source>Database is closed.</source>
         <translation>База данных закрыта.</translation>
     </message>

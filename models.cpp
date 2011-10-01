@@ -14,15 +14,9 @@ PlaceModel::~PlaceModel() {
 }
 
 void PlaceModel::updateList() {
-#if QT_VERSION >= 0x040600
 	beginResetModel();
-#endif
 	list = Inventory::instance()->places();
-#if QT_VERSION >= 0x040600
 	endResetModel();
-#else
-	reset();
-#endif
 }
 
 int PlaceModel::indexOf(const Place &place) const {
@@ -111,15 +105,9 @@ ItemTypeModel::~ItemTypeModel() {
 }
 
 void ItemTypeModel::updateList() {
-	#if QT_VERSION >= 0x040600
-		beginResetModel();
-	#endif
+	beginResetModel();
 	list = Inventory::instance()->itemTypes();
-#if QT_VERSION >= 0x040600
 	endResetModel();
-#else
-	reset();
-#endif
 }
 
 int ItemTypeModel::indexOf(const ItemType &itemType) const {
@@ -208,15 +196,9 @@ InventoryModel::~InventoryModel() {
 }
 
 void InventoryModel::updateList(const QList<Item> &itemList) {
-#if QT_VERSION >= 0x040600
 	beginResetModel();
-#endif
 	list = itemList;
-#if QT_VERSION >= 0x040600
 	endResetModel();
-#else
-	reset();
-#endif
 }
 
 int InventoryModel::indexOf(const Item &item) const {
@@ -233,7 +215,7 @@ Qt::ItemFlags InventoryModel::flags(const QModelIndex &index) const {
 	if(!index.isValid())
 		return Qt::ItemIsEnabled;
 	
-	if(index.column() == 5)
+	if(index.column() == 4)
 		return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 	if(!list[index.row()].isActive())
 		return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
@@ -265,14 +247,7 @@ QVariant InventoryModel::data(const QModelIndex &index, int role) const {
 
 			break;
 		}
-		case 2: { // Note.
-			if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::ToolTipRole)
-				return item.note();
-			// @todo: Icon (for not empty) and input dialog.
-
-			break;
-		}
-		case 3: { // INN.
+		case 2: { // INN.
 			if(item.innExists()) {
 				if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::ToolTipRole)
 					return item.inn();
@@ -283,7 +258,7 @@ QVariant InventoryModel::data(const QModelIndex &index, int role) const {
 
 			break;
 		}
-		case 4: { // Place.
+		case 3: { // Place.
 			if(role == Qt::DisplayRole)
 				return item.place().name();
 			if(role == Qt::EditRole)
@@ -291,9 +266,16 @@ QVariant InventoryModel::data(const QModelIndex &index, int role) const {
 
 			break;
 		}
-		case 5: { // Active.
+		case 4: { // Active.
 			if(role == Qt::CheckStateRole && item.isActive())
 				return Qt::Checked;
+
+			break;
+		}
+		case 5: { // Note.
+			if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::ToolTipRole)
+				return item.note();
+			// @todo: Icon (for not empty) and input dialog.
 
 			break;
 		}
@@ -307,10 +289,10 @@ QVariant InventoryModel::headerData(int section, Qt::Orientation orientation, in
 		switch(section) {
 			case 0: return tr("Item type");
 			case 1: return tr("Name");
-			case 2: return tr("Note");
-			case 3: return tr("INN");
-			case 4: return tr("Place");
-			case 5: return tr("Active");
+			case 2: return tr("INN");
+			case 3: return tr("Place");
+			case 4: return tr("Active");
+			case 5: return tr("Note");
 			default: return QVariant();
 		}
 
@@ -328,9 +310,7 @@ int InventoryModel::columnCount(const QModelIndex&) const {
 void InventoryModel::sort(int column, Qt::SortOrder order) {
 	switch(column) {
 		case 0: {
-#if QT_VERSION >= 0x040600
-				beginResetModel();
-#endif
+			beginResetModel();
 
 			QMultiMap<QString, Item> map;
 			foreach(Item item, list)
@@ -340,9 +320,7 @@ void InventoryModel::sort(int column, Qt::SortOrder order) {
 			break;
 		}
 		case 1: {
-#if QT_VERSION >= 0x040600
-				beginResetModel();
-#endif
+			beginResetModel();
 
 			QMultiMap<QString, Item> map;
 			foreach(Item item, list)
@@ -352,21 +330,7 @@ void InventoryModel::sort(int column, Qt::SortOrder order) {
 			break;
 		}
 		case 2: {
-#if QT_VERSION >= 0x040600
-				beginResetModel();
-#endif
-
-			QMultiMap<QString, Item> map;
-			foreach(Item item, list)
-				map.insert(item.note(), item);
-			list = map.values();
-
-			break;
-		}
-		case 3: {
-#if QT_VERSION >= 0x040600
-				beginResetModel();
-#endif
+			beginResetModel();
 
 			QMultiMap<int, Item> map;
 			foreach(Item item, list) {
@@ -379,10 +343,8 @@ void InventoryModel::sort(int column, Qt::SortOrder order) {
 
 			break;
 		}
-		case 4: {
-#if QT_VERSION >= 0x040600
-				beginResetModel();
-#endif
+		case 3: {
+			beginResetModel();
 
 			QMultiMap<QString, Item> map;
 			foreach(Item item, list)
@@ -391,14 +353,22 @@ void InventoryModel::sort(int column, Qt::SortOrder order) {
 
 			break;
 		}
-		case 5: {
-#if QT_VERSION >= 0x040600
-				beginResetModel();
-#endif
+		case 4: {
+			beginResetModel();
 
 			QMultiMap<bool, Item> map;
 			foreach(Item item, list)
 				map.insert(item.isActive(), item);
+			list = map.values();
+
+			break;
+		}
+		case 5: {
+			beginResetModel();
+
+			QMultiMap<QString, Item> map;
+			foreach(Item item, list)
+				map.insert(item.note(), item);
 			list = map.values();
 
 			break;
@@ -411,11 +381,7 @@ void InventoryModel::sort(int column, Qt::SortOrder order) {
 			list.insert(i, list.takeLast());
 	}
 
-#if QT_VERSION >= 0x040600
 	endResetModel();
-#else
-	reset();
-#endif
 }
 
 bool InventoryModel::setData(const QModelIndex &index, const QVariant &value, int role) {
@@ -445,17 +411,7 @@ bool InventoryModel::setData(const QModelIndex &index, const QVariant &value, in
 
 			break;
 		}
-		case 2: { // Note.
-			if(role == Qt::EditRole) {
-				item.setNote(value.toString());
-				emit dataChanged(index, index);
-				return true;
-			}
-			// @todo: Icon (for not empty) and input dialog.
-
-			break;
-		}
-		case 3: { // INN.
+		case 2: { // INN.
 			if(role == Qt::EditRole) {
 				item.setInn(value.toInt());
 				emit dataChanged(index, index);
@@ -464,7 +420,7 @@ bool InventoryModel::setData(const QModelIndex &index, const QVariant &value, in
 
 			break;
 		}
-		case 4: { // Place.
+		case 3: { // Place.
 			if(role == Qt::EditRole) {
 				item.setPlace(Place(value.toInt()));
 				emit dataChanged(index, index);
@@ -473,12 +429,22 @@ bool InventoryModel::setData(const QModelIndex &index, const QVariant &value, in
 
 			break;
 		}
-		case 5: { // Active.
+		case 4: { // Active.
 			if(role == Qt::EditRole) {
 				item.deactivate();
 				emit dataChanged(index, index);
 				return true;
 			}
+
+			break;
+		}
+		case 5: { // Note.
+			if(role == Qt::EditRole) {
+				item.setNote(value.toString());
+				emit dataChanged(index, index);
+				return true;
+			}
+			// @todo: Icon (for not empty) and input dialog.
 
 			break;
 		}
@@ -491,21 +457,24 @@ bool InventoryModel::setData(const QModelIndex &index, const QVariant &value, in
 bool InventoryModel::insertRows(int row, int count, const QModelIndex&) {
 	beginInsertRows(QModelIndex(), row, row + count - 1);
 
-	QList<ItemType> types = Inventory::instance()->itemTypes();
-	if(types.isEmpty())
-		ItemType::add(tr("New item type"));
-	ItemType itemType = Inventory::instance()->itemTypes()[0];
-
-	QList<Place> places = Inventory::instance()->places();
-	if(places.isEmpty())
-		Place::add(tr("New place"));
-	Place place = Inventory::instance()->places()[0];
-
 	for(int i = 0; i < count; i++) {
-		list.insert(row, Item::add(itemType, tr("New item"), place));
+		list.insert(row, Item::add(tr("New item")));
 	}
 
 	endInsertRows();
+	return true;
+}
+
+bool InventoryModel::removeRows(int row, int count, const QModelIndex&) {
+	beginRemoveRows(QModelIndex(), row, row + count - 1);
+
+	for(int i = row; i < count; i++)
+		if(row >= 0 && row < list.size()) {
+			Item::remove(list[row].getId());
+			list.removeAt(row);
+		}
+
+	endRemoveRows();
 	return true;
 }
 
@@ -604,15 +573,9 @@ HistoryModel::~HistoryModel() {
 }
 
 void HistoryModel::updateList() {
-#if QT_VERSION >= 0x040600
 	beginResetModel();
-#endif
 	list = Inventory::instance()->historyOf(item);
-#if QT_VERSION >= 0x040600
 	endResetModel();
-#else
-	reset();
-#endif
 }
 
 Qt::ItemFlags HistoryModel::flags(const QModelIndex &index) const {

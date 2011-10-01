@@ -6,6 +6,8 @@
 #include <QtCore/QString>
 #include <QtSql/QSqlQuery>
 
+class QAbstractItemModel;
+
 // @todo: - throws
 // @todo: active, IIdObject - rename.
 class IIdObject {
@@ -99,6 +101,8 @@ public:
 	virtual bool operator==(const Item &other) const;
 
 	static Item add(const ItemType &newItemType, const QString &newName, const Place &newPlace);
+	static Item add(const QString &newName);
+	static void remove(int id);
 private:
 	void addHistory(int changedField, const QString &oldValue, const QString &newValue);
 	int id;
@@ -140,6 +144,16 @@ private:
 	int id;
 };
 
+// @todo: ItemType and Place instead of id's are returned. Probably, data hiding.
+struct InventoryViewFilter {
+	bool usePlace;
+	int placeId;
+	bool useItemType;
+	int itemTypeId;
+	bool useActivity;
+	bool active;
+};
+
 class Inventory : virtual public IDatabaseObject {
 	Q_DISABLE_COPY(Inventory);
 
@@ -149,9 +163,10 @@ public:
 	class DBOpenErrorException {};
 	class DBIsClosedException {};
 
-	// @todo: database object lists as thin clients.
+	// @todo: database object lists as thin clients and models.
 	QList<Item> items() const;
 	QList<Item> filteredItems(const Place *place, const ItemType *itemType, const bool* activity) const;
+	QList<Item> filteredItems(const InventoryViewFilter &filter) const;
 	QList<Item> itemsByPlace(const Place &place) const;
 	QList<Item> itemsByItemType(const ItemType &itemType) const;
 	QList<Item> itemsByActivity(bool active) const;
@@ -161,10 +176,13 @@ public:
 	QList<Log> logByTime(QDateTime startTime, QDateTime stopTime) const;
 	QList<History> historyOf(const Item &item) const;
 
+	QSqlQuery getQuery(int sortingColumn = -1, Qt::SortOrder order = Qt::AscendingOrder);
+
 	static bool isOpen();
 	static void open(const QString &databaseFileName);
 	static void close();
 	
 	static Inventory* instance();
+	static InventoryViewFilter getLastFilter();
 };
 

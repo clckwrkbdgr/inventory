@@ -21,7 +21,7 @@
        <enum>Qt::CustomContextMenu</enum>
       </property>
       <property name="editTriggers">
-       <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+       <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
       </property>
       <property name="selectionMode">
        <enum>QAbstractItemView::SingleSelection</enum>
@@ -32,8 +32,8 @@
       <property name="sortingEnabled">
        <bool>true</bool>
       </property>
-      <attribute name="verticalHeaderVisible">
-       <bool>false</bool>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>true</bool>
       </attribute>
       <attribute name="verticalHeaderVisible">
        <bool>false</bool>
@@ -59,9 +59,9 @@
    <addaction name="actionQuit"/>
    <addaction name="separator"/>
    <addaction name="actionAdd"/>
-   <addaction name="actionPlaces"/>
    <addaction name="actionItemTypes"/>
    <addaction name="separator"/>
+   <addaction name="actionPlaces"/>
    <addaction name="actionFilter"/>
    <addaction name="actionPrint"/>
   </widget>
@@ -204,6 +204,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionRemoveItem">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
+   </property>
+   <property name="text">
+    <string>Remove item</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
    </property>
   </action>
  </widget>

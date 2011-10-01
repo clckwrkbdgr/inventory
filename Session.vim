@@ -29,7 +29,7 @@ set scrolloff=7
 let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
 let v:this_session=expand("<sfile>:p")
 silent only
-cd ~/incoming/inventory-0.9.0
+cd ~/incoming/inventory-0.9.2
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
@@ -38,28 +38,37 @@ badd +1 design
 badd +1 flow
 badd +1 classes
 badd +5 database.sql
-badd +150 inventory.h
+badd +9 inventory.h
 badd +742 ~/unsorted/inventory/inventory.cpp
 badd +1 inventory.pro
 badd +120 main.cpp
 badd +1 ~/unsorted/inventory/main.h
 badd +1 inventorymodels
-badd +11 mainwindow.h
+badd +16 mainwindow.h
 badd +11 ~/incoming/inventory/mainwindow.cpp
-badd +14 listdialog.h
+badd +1 listdialog.h
 badd +10 ~/incoming/inventory/listdialog.cpp
 badd +25 ui.design
-badd +19 historydialog.h
-badd +26 filterdialog.h
-badd +5 ~/incoming/inventory/historydialog.cpp
+badd +1 historydialog.h
+badd +20 filterdialog.h
+badd +1 ~/incoming/inventory/historydialog.cpp
 badd +39 ~/incoming/inventory/filterdialog.cpp
 badd +1 models
-badd +64 models.h
+badd +18 models.h
 badd +1 ~/incoming/inventory/models.cpp
 badd +674 ~/incoming/inventory/inventory.cpp
 badd +1 ~/incoming/inventory/models.h
 badd +296 ~/incoming/inventory-0.9.0/models.cpp
 badd +174 ~/incoming/inventory-0.9.0/mainwindow.cpp
+badd +236 ~/incoming/inventory-0.9.2/models.cpp
+badd +116 ~/incoming/inventory-0.9.2/mainwindow.cpp
+badd +35 ~/incoming/inventory-0.9.2/filterdialog.cpp
+badd +1 ~/incoming/inventory/historydialog.h
+badd +898 ~/incoming/inventory-0.9.2/inventory.cpp
+badd +6 printpreviewdialog.h
+badd +14 ~/incoming/inventory-0.9.2/printpreviewdialog.cpp
+badd +1 ~/incoming/inventory-0.9.2/listdialog.cpp
+badd +1 ~/incoming/inventory-0.9.2/historydialog.cpp
 args design
 edit design
 set splitbelow splitright
@@ -239,11 +248,11 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 20 - ((19 * winheight(0) + 28) / 56)
+let s:l = 9 - ((8 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-20
+9
 normal! 0
 tabedit models.h
 set splitbelow splitright
@@ -423,13 +432,15 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
+11
+normal zo
 64
 normal zo
-let s:l = 64 - ((63 * winheight(0) + 28) / 56)
+let s:l = 18 - ((17 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-64
+18
 normal! 0
 tabedit inventory.h
 set splitbelow splitright
@@ -609,14 +620,20 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-143
+76
 normal zo
-let s:l = 152 - ((151 * winheight(0) + 28) / 56)
+147
+normal zo
+147
+normal zo
+156
+normal zo
+let s:l = 9 - ((8 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-152
-normal! 010l
+9
+normal! 024l
 tabedit mainwindow.h
 set splitbelow splitright
 set nosplitbelow
@@ -795,12 +812,198 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 11 - ((10 * winheight(0) + 28) / 56)
+let s:l = 16 - ((15 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-11
-normal! 08l
+16
+normal! 01l
+tabedit printpreviewdialog.h
+set splitbelow splitright
+set nosplitbelow
+set nosplitright
+wincmd t
+set winheight=1 winwidth=1
+argglobal
+lnoremap <buffer> " Э
+lnoremap <buffer> # №
+lnoremap <buffer> $ ;
+lnoremap <buffer> & ?
+lnoremap <buffer> ' э
+lnoremap <buffer> , б
+lnoremap <buffer> . ю
+lnoremap <buffer> / .
+lnoremap <buffer> : Ж
+lnoremap <buffer> ; ж
+lnoremap <buffer> < Б
+lnoremap <buffer> > Ю
+lnoremap <buffer> ? ,
+lnoremap <buffer> @ "
+lnoremap <buffer> A Ф
+lnoremap <buffer> B И
+lnoremap <buffer> C С
+lnoremap <buffer> D В
+lnoremap <buffer> E У
+lnoremap <buffer> F А
+lnoremap <buffer> G П
+lnoremap <buffer> H Р
+lnoremap <buffer> I Ш
+lnoremap <buffer> J О
+lnoremap <buffer> K Л
+lnoremap <buffer> L Д
+lnoremap <buffer> M Ь
+lnoremap <buffer> N Т
+lnoremap <buffer> O Щ
+lnoremap <buffer> P З
+lnoremap <buffer> Q Й
+lnoremap <buffer> R К
+lnoremap <buffer> S Ы
+lnoremap <buffer> T Е
+lnoremap <buffer> U Г
+lnoremap <buffer> V М
+lnoremap <buffer> W Ц
+lnoremap <buffer> X Ч
+lnoremap <buffer> Y Н
+lnoremap <buffer> Z Я
+lnoremap <buffer> [ х
+lnoremap <buffer> ] ъ
+lnoremap <buffer> ^ :
+lnoremap <buffer> ` ё
+lnoremap <buffer> a ф
+lnoremap <buffer> b и
+lnoremap <buffer> c с
+lnoremap <buffer> d в
+lnoremap <buffer> e у
+lnoremap <buffer> f а
+lnoremap <buffer> g п
+let s:cpo_save=&cpo
+set cpo&vim
+lnoremap <buffer> h р
+lnoremap <buffer> i ш
+lnoremap <buffer> j о
+lnoremap <buffer> k л
+lnoremap <buffer> l д
+lnoremap <buffer> m ь
+lnoremap <buffer> n т
+lnoremap <buffer> o щ
+lnoremap <buffer> p з
+lnoremap <buffer> q й
+lnoremap <buffer> r к
+lnoremap <buffer> s ы
+lnoremap <buffer> t е
+lnoremap <buffer> u г
+lnoremap <buffer> v м
+lnoremap <buffer> w ц
+lnoremap <buffer> x ч
+lnoremap <buffer> y н
+lnoremap <buffer> z я
+lnoremap <buffer> { Х
+lnoremap <buffer> } Ъ
+lnoremap <buffer> ~ Ё
+let &cpo=s:cpo_save
+unlet s:cpo_save
+setlocal keymap=russian-jcukenwin
+setlocal noarabic
+setlocal noautoindent
+setlocal nobinary
+setlocal bufhidden=
+setlocal buflisted
+setlocal buftype=
+setlocal cindent
+setlocal cinkeys=0{,0},0),:,0#,!^F,o,O,e
+setlocal cinoptions=
+setlocal cinwords=if,else,while,do,for,switch
+setlocal comments=sO:*\ -,mO:*\ \ ,exO:*/,s1:/*,mb:*,ex:*/,f://
+setlocal commentstring=/*%s*/
+setlocal complete=.,w,b,u,t,i
+setlocal completefunc=
+setlocal nocopyindent
+setlocal nocursorcolumn
+setlocal nocursorline
+setlocal define=
+setlocal dictionary=
+setlocal nodiff
+setlocal equalprg=
+setlocal errorformat=
+setlocal noexpandtab
+if &filetype != 'cpp'
+setlocal filetype=cpp
+endif
+setlocal foldcolumn=0
+setlocal foldenable
+setlocal foldexpr=0
+setlocal foldignore=#
+setlocal foldlevel=0
+setlocal foldmarker={{{,}}}
+set foldmethod=syntax
+setlocal foldmethod=syntax
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldtext=foldtext()
+setlocal formatexpr=
+setlocal formatoptions=croql
+setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
+setlocal grepprg=
+setlocal iminsert=0
+setlocal imsearch=0
+setlocal include=
+setlocal includeexpr=
+setlocal indentexpr=
+setlocal indentkeys=0{,0},:,0#,!^F,o,O,e
+setlocal noinfercase
+setlocal iskeyword=@,48-57,_,192-255
+setlocal keywordprg=
+setlocal nolinebreak
+setlocal nolisp
+setlocal nolist
+setlocal makeprg=
+setlocal matchpairs=(:),{:},[:]
+setlocal modeline
+setlocal modifiable
+setlocal nrformats=octal,hex
+set number
+setlocal number
+setlocal numberwidth=4
+setlocal omnifunc=ccomplete#Complete
+setlocal path=
+setlocal nopreserveindent
+setlocal nopreviewwindow
+setlocal quoteescape=\\
+setlocal noreadonly
+setlocal norightleft
+setlocal rightleftcmd=search
+setlocal noscrollbind
+setlocal shiftwidth=8
+setlocal noshortname
+setlocal nosmartindent
+setlocal softtabstop=0
+setlocal nospell
+setlocal spellcapcheck=[.?!]\\_[\\])'\"\	\ ]\\+
+setlocal spellfile=
+setlocal spelllang=en
+setlocal statusline=
+setlocal suffixesadd=
+setlocal swapfile
+setlocal synmaxcol=3000
+if &syntax != 'cpp'
+setlocal syntax=cpp
+endif
+setlocal tabstop=8
+setlocal tags=
+setlocal textwidth=0
+setlocal thesaurus=
+setlocal nowinfixheight
+setlocal nowinfixwidth
+setlocal wrap
+setlocal wrapmargin=0
+10
+normal zo
+let s:l = 6 - ((5 * winheight(0) + 28) / 56)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+6
+normal! 033l
 tabedit listdialog.h
 set splitbelow splitright
 set nosplitbelow
@@ -981,13 +1184,13 @@ setlocal wrap
 setlocal wrapmargin=0
 9
 normal zo
-let s:l = 22 - ((21 * winheight(0) + 28) / 56)
+let s:l = 1 - ((0 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-22
-normal! 01l
-tabedit ~/incoming/inventory/historydialog.cpp
+1
+normal! 0
+tabedit historydialog.h
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -1102,7 +1305,7 @@ setlocal foldcolumn=0
 setlocal foldenable
 setlocal foldexpr=0
 setlocal foldignore=#
-setlocal foldlevel=1
+setlocal foldlevel=0
 setlocal foldmarker={{{,}}}
 set foldmethod=syntax
 setlocal foldmethod=syntax
@@ -1349,14 +1552,14 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-10
+11
 normal zo
 let s:l = 18 - ((17 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 18
-normal! 065l
+normal! 01l
 tabedit inventory.pro
 set splitbelow splitright
 wincmd _ | wincmd |
@@ -1541,11 +1744,11 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 3 - ((2 * winheight(0) + 27) / 55)
+let s:l = 33 - ((32 * winheight(0) + 27) / 55)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-3
+33
 normal! 012l
 wincmd w
 argglobal
@@ -1939,13 +2142,13 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 47 - ((46 * winheight(0) + 28) / 56)
+let s:l = 1 - ((0 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-47
-normal! 029l
-tabnext 2
+1
+normal! 0
+tabnext 1
 if exists('s:wipebuf')
   silent exe 'bwipe ' . s:wipebuf
 endif

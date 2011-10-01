@@ -2,6 +2,7 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtGui/QItemDelegate>
+#include <QtSql/QSqlQueryModel>
 
 #include "inventory.h"
 
@@ -60,7 +61,7 @@ private:
 
 };
 
-
+// @todo: move note into furthest right column.
 class InventoryModel : public QAbstractItemModel {
 	Q_OBJECT
 public:
@@ -81,6 +82,7 @@ public:
 	virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 	virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
+	virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
 
 	virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
 	virtual QModelIndex parent(const QModelIndex &index) const;
@@ -122,5 +124,19 @@ public:
 private:
 	Item item;
 	QList<History> list;
+};
+
+class SortingSqlQueryModel : public QSqlQueryModel {
+	Q_OBJECT
+	Q_DISABLE_COPY(SortingSqlQueryModel)
+public:
+	SortingSqlQueryModel(QObject *parent = 0) : QSqlQueryModel(parent) {
+		setQuery(Inventory::instance()->getQuery());
+	}
+	virtual ~SortingSqlQueryModel() {}
+
+	virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) {
+		setQuery(Inventory::instance()->getQuery(column, order));
+	}
 };
 
