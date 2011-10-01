@@ -11,10 +11,10 @@
 class PlaceModel : public QAbstractItemModel {
 	Q_OBJECT
 public:
-	PlaceModel(QObject *parent = 0); // Update list.
+	PlaceModel(QObject *parent = 0); // Throws DBErrorException, InvalidIdException.
 	virtual ~PlaceModel();
 
-	void updateList();
+	void updateList(); // Throws DBErrorException, InvalidIdException.
 	int indexOf(const Place &place) const;
 	int idAt(int row) const;
 
@@ -38,10 +38,10 @@ private:
 class ItemTypeModel : public QAbstractItemModel {
 	Q_OBJECT
 public:
-	ItemTypeModel(QObject *parent = 0); // Update list.
+	ItemTypeModel(QObject *parent = 0); // Throws DBErrorException, InvalidIdException.
 	virtual ~ItemTypeModel();
 
-	void updateList();
+	void updateList(); // Throws DBErrorException, InvalidIdException.
 	int indexOf(const ItemType &itemType) const;
 	int idAt(int row) const;
 
@@ -111,11 +111,10 @@ class HistoryModel : public QAbstractItemModel {
 public:
 	enum FieldType {UnknownField = -1, TimeField = 0, NameField = 1, OldValueField = 2, NewValueField = 3, FieldCount = 4};
 
-
-	HistoryModel(const Item &item, QObject *parent = 0); // Update list.
+	HistoryModel(const Item &item, QObject *parent = 0); // Throws DBErrorException, InvalidIdException.
 	virtual ~HistoryModel();
 
-	void updateList();
+	void updateList(); // Throws DBErrorException, InvalidIdException.
 
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const; // Read-only.
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const; // Tool tip.

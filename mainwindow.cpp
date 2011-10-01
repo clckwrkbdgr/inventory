@@ -6,6 +6,7 @@
 #include <QtGui/QPrintDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QPainter>
+#include <QtSql/QSqlError>
 
 #include "inventory.h"
 #include "listdialog.h"
@@ -41,9 +42,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 		setWindowState(Qt::WindowMaximized);
 
 	// Database.
-	Inventory::open("inventory.db3");
-	model = new InventoryModel(this);
-	model->updateList(Inventory::instance()->items());
+	try {
+		Inventory::open("inventory.db3");
+		model = new InventoryModel(this);
+		model->updateList(Inventory::instance()->items());
+	} catch(IDatabaseObject::DBErrorException e) {
+		QMessageBox::critical(this, tr("Error"), e.query.lastError().databaseText() + "\n" + e.query.lastError().driverText());
+		exit(1);
+	}
 
 	ui.view->setModel(model);
 	ui.view->setItemDelegate(new InventoryDelegate(this));
@@ -113,21 +119,24 @@ void MainWindow::setFilter() {
 	FilterDialog *dialog = new FilterDialog(this);
 	dialog->setFilter(Inventory::getLastFilter());
 	if(dialog->exec()) {
-		model->updateList(Inventory::instance()->filteredItems(dialog->filter()));
+		try {
+			model->updateList(Inventory::instance()->filteredItems(dialog->filter()));
+		} catch(IIdObject::InvalidIdException e) {
+			QMessageBox::critical(this, tr("Error"), tr("Database invalid id exception!"));
+		} catch(IDatabaseObject::DBErrorException e) {
+			QMessageBox::critical(this, tr("Error"), e.query.lastError().databaseText() + "\n" + e.query.lastError().driverText());
+		}
 	}
 	delete dialog;
 }
 
 void MainWindow::showHistory() {
 	HistoryDialog *dialog = NULL;
-	try {
-		Item item(model->idAt(ui.view->currentIndex().row()));
-		dialog = new HistoryDialog(item, this);
-		dialog->exec(); 
-	} catch(...) {}
-	
-	if(dialog)
-		delete dialog;
+
+	Item item(model->idAt(ui.view->currentIndex().row()));
+	dialog = new HistoryDialog(item, this);
+	dialog->exec(); 
+	delete dialog;
 }
 
 void MainWindow::print() {
@@ -140,7 +149,9 @@ void MainWindow::popupMenu(const QPoint &pos) {
 	try {
 		Item item(model->idAt(ui.view->currentIndex().row()));
 		ui.actionDeactivate->setEnabled(item.isActive());
-	} catch(...) {}
+	} catch(IDatabaseObject::DBErrorException e) {
+		QMessageBox::critical(this, tr("Error"), e.query.lastError().databaseText() + "\n" + e.query.lastError().driverText());
+	}
 
 	itemMenu->popup(ui.view->mapToGlobal(pos));
 }

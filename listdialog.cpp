@@ -1,6 +1,7 @@
 #include <QtGui/QToolBar>
 #include <QtGui/QMessageBox>
 #include <QtGui/QInputDialog>
+#include <QtSql/QSqlError>
 
 #include "models.h"
 #include "ui_addlistdialog.h"
@@ -23,10 +24,17 @@ ListDialog::ListDialog(bool placeMode, QWidget *parent) : QDialog(parent) {
 	if(box)
 		box->insertWidget(0, toolBar);
 
-	if(placeMode)
-		model = new PlaceModel(this);
-	else
-		model = new ItemTypeModel(this);
+	try {
+		if(placeMode)
+			model = new PlaceModel(this);
+		else
+			model = new ItemTypeModel(this);
+	} catch(IIdObject::InvalidIdException e) {
+		QMessageBox::critical(this, tr("Error"), tr("Database invalid id exception!"));
+	} catch(IDatabaseObject::DBErrorException e) {
+		QMessageBox::critical(this, tr("Error"), e.query.lastError().databaseText() + "\n" + e.query.lastError().driverText());
+	}
+
 
 	ui.view->setModel(model);
 }

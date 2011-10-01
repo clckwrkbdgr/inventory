@@ -2,6 +2,8 @@
 #include <QtGui/QPrinter>
 #include <QtGui/QPrintDialog>
 #include <QtGui/QPainter>
+#include <QtGui/QMessageBox>
+#include <QtSql/QSqlError>
 
 #include "models.h"
 #include "printpreviewdialog.h"
@@ -11,7 +13,14 @@ PrintPreviewDialog::PrintPreviewDialog(QWidget *parent) : QDialog(parent) {
 	ui.setupUi(this);
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(print()));
 
-	model = new SortingSqlQueryModel(this);
+	try {
+		model = new SortingSqlQueryModel(this);
+	} catch(IIdObject::InvalidIdException e) {
+		QMessageBox::critical(this, tr("Print error"), tr("Database invalid id exception!"));
+	} catch(IDatabaseObject::DBErrorException e) {
+		QMessageBox::critical(this, tr("Print error"), e.query.lastError().databaseText() + "\n" + e.query.lastError().driverText());
+	}
+
 	model->setHeaderData(0, Qt::Horizontal, tr("Item type"));
 	model->setHeaderData(1, Qt::Horizontal, tr("Name"));
 	model->setHeaderData(2, Qt::Horizontal, tr("Count"));

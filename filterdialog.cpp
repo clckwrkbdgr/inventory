@@ -1,3 +1,6 @@
+#include <QtGui/QMessageBox>
+#include <QtSql/QSqlError>
+
 #include "models.h"
 
 #include "filterdialog.h"
@@ -5,8 +8,14 @@
 FilterDialog::FilterDialog(QWidget *parent) : QDialog(parent) {
 	ui.setupUi(this);
 
-	itemTypeModel = new ItemTypeModel(this);
-	placeModel = new PlaceModel(this);
+	try {
+		itemTypeModel = new ItemTypeModel(this);
+		placeModel = new PlaceModel(this);
+	} catch(IIdObject::InvalidIdException e) {
+		QMessageBox::critical(this, tr("Filter dialog error"), tr("Database invalid id exception!"));
+	} catch(IDatabaseObject::DBErrorException e) {
+		QMessageBox::critical(this, tr("Filter dialog error"), e.query.lastError().databaseText() + "\n" + e.query.lastError().driverText());
+	}
 
 	ui.listItemType->setModel(itemTypeModel);
 	ui.listPlace->setModel(placeModel);

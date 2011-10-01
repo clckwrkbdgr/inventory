@@ -19,6 +19,7 @@ public:
 
 class IDatabaseObject {
 public:
+	// All IDdatabaseObjects can throw DBErrorException.
 	class DBErrorException {
 	public:
 		QSqlQuery query;
@@ -39,18 +40,18 @@ public:
 // @todo: item type and place are children of the common base class, so their models are, and so the add list function are working with model, not DB
 class Place : virtual public IIdObject, virtual public IDatabaseObject, virtual public INamed {
 public:
-	Place(int id);
+	Place(int id); // Throws InvalidIdException.
 	Place(const Place &other);
 	const Place& operator=(const Place &other);
 	virtual ~Place();
 
 	virtual int getId() const;
 	virtual QString name() const;
-	virtual void setName(const QString &value);
+	virtual void setName(const QString &value); // Throws EmptyNameException.
 
 	virtual bool operator==(const Place &other) const;
 
-	static Place add(const QString &newName);
+	static Place add(const QString &newName); // Throws EmptyNameException.
 	static bool remove(int id);
 private:
 	int id;
@@ -58,18 +59,18 @@ private:
 
 class ItemType : virtual public IIdObject, virtual public IDatabaseObject, virtual public INamed {
 public:
-	ItemType(int id);
+	ItemType(int id); // Throws InvalidIdException.
 	ItemType(const ItemType &other);
 	const ItemType& operator=(const ItemType &other);
 	virtual ~ItemType();
 
 	virtual int getId() const;
 	virtual QString name() const;
-	virtual void setName(const QString &value);
+	virtual void setName(const QString &value); // Throws EmptyNameException.
 
 	virtual bool operator==(const ItemType &other) const;
 
-	static ItemType add(const QString &newName);
+	static ItemType add(const QString &newName); // Throws EmptyNameException.
 	static bool remove(int id);
 private:
 	int id;
@@ -79,6 +80,7 @@ class Item : virtual public IIdObject, virtual public IDatabaseObject, virtual p
 public:
 	class InactiveException {};
 
+	// Throws InvalidIdException, DBErrorException.
 	Item(int id);
 	Item(const Item &other);
 	const Item& operator=(const Item &other);
@@ -93,8 +95,9 @@ public:
 	virtual Place place() const;
 	virtual bool isActive() const;
 
+	// All throw InactiveException.
 	virtual void setItemType(const ItemType &value);
-	virtual void setName(const QString &value);
+	virtual void setName(const QString &value); // Throws EmtpyNameException.
 	virtual void setNote(const QString &value);
 	virtual void setInn(int value);
 	virtual void setPlace(const Place &value);
@@ -102,8 +105,8 @@ public:
 
 	virtual bool operator==(const Item &other) const;
 
-	static Item add(const ItemType &newItemType, const QString &newName, const Place &newPlace);
-	static Item add(const QString &newName);
+	static Item add(const ItemType &newItemType, const QString &newName, const Place &newPlace); // Throws EmptyNameException.
+	static Item add(const QString &newName); // Throws EmptyNameException.
 	static void remove(int id);
 private:
 	void addHistory(int changedField, const QString &oldValue, const QString &newValue);
@@ -115,7 +118,7 @@ class History : virtual public IIdObject, virtual public IDatabaseObject {
 public:
 	enum ItemField {InvalidField = 0, ItemTypeField = 1, NameField = 2, NoteField = 3, InnField = 4, PlaceField = 5, ActiveField = 6};
 
-	History(int id);
+	History(int id); // Throws InvalidIdException.
 	History(const History &other);
 	const History& operator=(const History &other);
 	virtual ~History();
@@ -132,7 +135,7 @@ private:
 
 class Log : virtual public IIdObject, virtual public IDatabaseObject {
 public:
-	Log(int id);
+	Log(int id); // Throws InvalidIdException.
 	Log(const Log &other);
 	const Log& operator=(const Log &other);
 	virtual ~Log();
@@ -163,9 +166,9 @@ class Inventory : virtual public IDatabaseObject {
 	~Inventory() {}
 public:
 	class DBOpenErrorException {};
-	class DBIsClosedException {};
 
 	// @todo: database object lists as thin clients and models.
+	// All throws InvalidIdException.
 	QList<Item> items() const;
 	QList<Item> filteredItems(const Place *place, const ItemType *itemType, const bool* activity) const;
 	QList<Item> filteredItems(const InventoryViewFilter &filter) const;
@@ -181,7 +184,7 @@ public:
 	QSqlQuery getQuery(int sortingColumn = -1, Qt::SortOrder order = Qt::AscendingOrder);
 
 	static bool isOpen();
-	static void open(const QString &databaseFileName);
+	static void open(const QString &databaseFileName); // Throws DBOpenErrorException.
 	static void close();
 	
 	static Inventory* instance();
