@@ -78,57 +78,57 @@
 <context>
     <name>HistoryModel</name>
     <message>
-        <location filename="models.cpp" line="601"/>
+        <location filename="models.cpp" line="641"/>
         <source>Item type</source>
         <translation>Тип предмета</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="602"/>
+        <location filename="models.cpp" line="642"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="603"/>
+        <location filename="models.cpp" line="643"/>
         <source>Note</source>
         <translation>Примечание</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="604"/>
+        <location filename="models.cpp" line="644"/>
         <source>Inn</source>
         <translation>ИНН</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="605"/>
+        <location filename="models.cpp" line="645"/>
         <source>Place</source>
         <translation>Место</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="606"/>
+        <location filename="models.cpp" line="646"/>
         <source>Activity</source>
         <translation>Состояние</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="607"/>
+        <location filename="models.cpp" line="647"/>
         <source>Unknown field</source>
         <translation>Неизвестно</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="627"/>
+        <location filename="models.cpp" line="667"/>
         <source>Change time</source>
         <translation>Время изменения</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="628"/>
+        <location filename="models.cpp" line="668"/>
         <source>Field</source>
         <translation>Поле</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="629"/>
+        <location filename="models.cpp" line="669"/>
         <source>Old value</source>
         <translation>Старое значение</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="630"/>
+        <location filename="models.cpp" line="670"/>
         <source>New value</source>
         <translation>Новое значение</translation>
     </message>
@@ -136,47 +136,47 @@
 <context>
     <name>InventoryModel</name>
     <message>
-        <location filename="models.cpp" line="290"/>
+        <location filename="models.cpp" line="308"/>
         <source>Item type</source>
         <translation>Тип предмета</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="291"/>
+        <location filename="models.cpp" line="309"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="292"/>
+        <location filename="models.cpp" line="310"/>
         <source>Note</source>
         <translation>Примечание</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="293"/>
+        <location filename="models.cpp" line="311"/>
         <source>INN</source>
         <translation>ИНН</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="294"/>
+        <location filename="models.cpp" line="312"/>
         <source>Place</source>
         <translation>Место</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="295"/>
+        <location filename="models.cpp" line="313"/>
         <source>Active</source>
         <translation>Состояние</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="462"/>
+        <location filename="models.cpp" line="496"/>
         <source>New item type</source>
         <translation>Новый тип</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="467"/>
+        <location filename="models.cpp" line="501"/>
         <source>New place</source>
         <translation>Новое место</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="471"/>
+        <location filename="models.cpp" line="505"/>
         <source>New item</source>
         <translation>Новый предмет</translation>
     </message>
@@ -184,12 +184,12 @@
 <context>
     <name>ItemTypeModel</name>
     <message>
-        <location filename="models.cpp" line="145"/>
+        <location filename="models.cpp" line="157"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="173"/>
+        <location filename="models.cpp" line="185"/>
         <source>New item type</source>
         <translation>Новый тип</translation>
     </message>
@@ -232,7 +232,7 @@
         <translation>Ctrl+Shift+N</translation>
     </message>
     <message>
-        <location filename="listdialog.cpp" line="16"/>
+        <location filename="listdialog.cpp" line="17"/>
         <source>Tool bar</source>
         <translation>Панель инструментов</translation>
     </message>
@@ -338,7 +338,6 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="179"/>
-        <location filename="mainwindow.cpp" line="128"/>
         <source>Print</source>
         <translation>Печать</translation>
     </message>
@@ -366,20 +365,25 @@
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="22"/>
+        <location filename="mainwindow.cpp" line="26"/>
         <source>Item menu</source>
         <translation>Меню предмета</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="134"/>
+        <source>Print main view</source>
+        <translation>Печатать главный вид</translation>
     </message>
 </context>
 <context>
     <name>PlaceModel</name>
     <message>
-        <location filename="models.cpp" line="54"/>
+        <location filename="models.cpp" line="60"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="82"/>
+        <location filename="models.cpp" line="88"/>
         <source>New place</source>
         <translation>Новое место</translation>
     </message>

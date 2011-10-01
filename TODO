@@ -7,18 +7,17 @@ inventory.h:37:// @todo: item type and place are children of the common base cla
 inventory.h:152:	// @todo: database object lists as thin clients.
 listdialog.cpp:9:// @todo - windows instead of dialogs, but modal
 listdialog.h:22:	bool placeMode; // @todo: normal enum for place mode in list dialog.
-mainwindow.cpp:128:	statusBar()->showMessage(tr("Print")); // @todo: print to pdf, i guess
 mainwindow.h:10:// @todo: - some help within main window, stored in resources.
 mainwindow.h:11:// @todo: Добавить в inventory сохранение лога в файл по двойному нажатию C-d
-models.cpp:234:	// @todo: Grey backgr for disabled items.
-models.cpp:240:				return item.itemType().getId(); // @todo: Combobox.
-models.cpp:253:			// @todo: Icon (for not empty) and input dialog.
-models.cpp:263:					return 0; // @todo: Spinbox.
-models.cpp:272:				return item.place().getId(); // @todo: Combobox.
-models.cpp:400:				return true; // @todo: Combobox.
-models.cpp:420:			// @todo: Icon (for not empty) and input dialog.
-models.cpp:428:				return true; // @todo: Spinbox.
-models.cpp:437:				return true; // @todo: Combobox.
+models.cpp:252:	// @todo: Grey backgr for disabled items.
+models.cpp:258:				return item.itemType().getId(); // @todo: Combobox.
+models.cpp:271:			// @todo: Icon (for not empty) and input dialog.
+models.cpp:281:					return 0; // @todo: Spinbox.
+models.cpp:290:				return item.place().getId(); // @todo: Combobox.
+models.cpp:434:				return true; // @todo: Combobox.
+models.cpp:454:			// @todo: Icon (for not empty) and input dialog.
+models.cpp:462:				return true; // @todo: Spinbox.
+models.cpp:471:				return true; // @todo: Combobox.
 models.h:8:// @todo: - error handling ,exception catching
 models.h:9:// @todo: - all number and text constants are contansts
 models.h:10:// @todo: show note icon in name field, and tooltip, and edit note in inputdialog via context menu.

@@ -1,6 +1,10 @@
 #include <QtGui/QStatusBar>
 #include <QtGui/QMenu>
 #include <QtCore/QSettings>
+#include <QtGui/QPrinter>
+#include <QtGui/QPrintDialog>
+#include <QtGui/QMessageBox>
+#include <QtGui/QPainter>
 
 #include "inventory.h"
 #include "listdialog.h"
@@ -125,7 +129,54 @@ void MainWindow::showHistory() {
 }
 
 void MainWindow::print() {
-	statusBar()->showMessage(tr("Print")); // @todo: print to pdf, i guess
+	QPrinter printer;
+	QPrintDialog *dialog = new QPrintDialog(&printer, this);
+	dialog->setWindowTitle(tr("Print main view"));
+	if(dialog->exec()) {
+		// Prepare main table view for printing: resize it to the page size.
+		ui.view->resize(printer.pageRect().size());
+		Qt::ScrollBarPolicy horPolicy = ui.view->horizontalScrollBarPolicy(),
+			verPolicy = ui.view->verticalScrollBarPolicy();
+		ui.view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		ui.view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		ui.view->clearSelection();
+
+		// Print.
+		QPainter painter;
+		painter.begin(&printer);
+
+		int rowsPrinted = 0;
+		ui.view->scrollTo(model->index(0, 0), QAbstractItemView::PositionAtTop);
+		while(true) {
+			// Render rows.
+			ui.view->render(&painter);
+
+			// Hide already printed rows and get it's count.
+			int currentBottomRow = ui.view->rowAt(ui.view->rect().bottom()) - 1;
+			for(int row = rowsPrinted; row < currentBottomRow; row++)
+				ui.view->hideRow(row);
+			rowsPrinted = currentBottomRow;
+			if(rowsPrinted < 0)
+				rowsPrinted = model->rowCount();
+
+			// Set next page or quit.
+			if(rowsPrinted < model->rowCount())
+				printer.newPage();
+			else
+				break;
+		}
+
+		painter.end();
+
+		// Resize table view back.
+		ui.verticalLayout->invalidate();
+		ui.view->setVerticalScrollBarPolicy(verPolicy);
+		ui.view->setHorizontalScrollBarPolicy(horPolicy);
+		for(int row = 0; row < model->rowCount(); row++) {
+			ui.view->showRow(row);
+		}
+	}
+	delete dialog;
 }
 
 void MainWindow::popupMenu(const QPoint &pos) {

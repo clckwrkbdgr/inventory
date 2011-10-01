@@ -1,6 +1,7 @@
 TEMPLATE = app
 TARGET = inventory
-VERSION = 0.9.0
+DESTDIR = bin
+VERSION = 0.9.1
 QT += sql
 CONFIG += qt release
 
