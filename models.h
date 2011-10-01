@@ -7,7 +7,6 @@
 #include "inventory.h"
 
 // @todo: - error handling ,exception catching
-// @todo: - all number and text constants are contansts
 // @todo: show note icon in name field, and tooltip, and edit note in inputdialog via context menu.
 class PlaceModel : public QAbstractItemModel {
 	Q_OBJECT
@@ -61,10 +60,11 @@ private:
 
 };
 
-// @todo: move note into furthest right column.
 class InventoryModel : public QAbstractItemModel {
 	Q_OBJECT
 public:
+	enum FieldType {UnknownField = -1, ItemTypeField = 0, NameField = 1, InnField = 2, PlaceField = 3, ActiveField = 4, NoteField = 5, FieldCount = 6};
+
 	InventoryModel(QObject *parent = 0);
 	virtual ~InventoryModel();
 
@@ -73,7 +73,6 @@ public:
 	int idAt(int row) const;
 
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const;
-	// @todo - reformat item view, for name at last, active at first etc.
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const; // Tool tip.
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -108,6 +107,9 @@ public:
 class HistoryModel : public QAbstractItemModel {
 	Q_OBJECT
 public:
+	enum FieldType {UnknownField = -1, TimeField = 0, NameField = 1, OldValueField = 2, NewValueField = 3, FieldCount = 4};
+
+
 	HistoryModel(const Item &item, QObject *parent = 0); // Update list.
 	virtual ~HistoryModel();
 

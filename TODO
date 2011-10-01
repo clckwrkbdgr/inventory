@@ -1,24 +1,17 @@
 database.sql:47:/* @todo: triggers and views*/
-filterdialog.h:17:	// @todo: struct for filter
-filterdialog.h:18:	// @todo: get old filter, make filter strcut app-wide and static.
-inventory.h:9:// @todo: - throws
-inventory.h:10:// @todo: active, IIdObject - rename.
-inventory.h:37:// @todo: item type and place are children of the common base class, so their models are, and so the add list function are working with model, not DB
-inventory.h:152:	// @todo: database object lists as thin clients.
+inventory.h:11:// @todo: - throws
+inventory.h:12:// @todo: active, IIdObject - rename.
+inventory.h:39:// @todo: item type and place are children of the common base class, so their models are, and so the add list function are working with model, not DB
+inventory.h:147:// @todo: ItemType and Place instead of id's are returned. Probably, data hiding.
+inventory.h:166:	// @todo: database object lists as thin clients and models.
 listdialog.cpp:9:// @todo - windows instead of dialogs, but modal
 listdialog.h:22:	bool placeMode; // @todo: normal enum for place mode in list dialog.
 mainwindow.h:10:// @todo: - some help within main window, stored in resources.
 mainwindow.h:11:// @todo: Добавить в inventory сохранение лога в файл по двойному нажатию C-d
-models.cpp:252:	// @todo: Grey backgr for disabled items.
-models.cpp:258:				return item.itemType().getId(); // @todo: Combobox.
-models.cpp:271:			// @todo: Icon (for not empty) and input dialog.
-models.cpp:281:					return 0; // @todo: Spinbox.
-models.cpp:290:				return item.place().getId(); // @todo: Combobox.
-models.cpp:434:				return true; // @todo: Combobox.
-models.cpp:454:			// @todo: Icon (for not empty) and input dialog.
-models.cpp:462:				return true; // @todo: Spinbox.
-models.cpp:471:				return true; // @todo: Combobox.
-models.h:8:// @todo: - error handling ,exception catching
-models.h:9:// @todo: - all number and text constants are contansts
-models.h:10:// @todo: show note icon in name field, and tooltip, and edit note in inputdialog via context menu.
-models.h:75:	// @todo - reformat item view, for name at last, active at first etc.
+models.cpp:234:	// @todo: Grey backgr for disabled items.
+models.cpp:278:			// @todo: Icon (for not empty) and input dialog.
+models.cpp:447:			// @todo: Icon (for not empty) and input dialog.
+models.h:9:// @todo: - error handling ,exception catching
+models.h:10:// @todo: - all number and text constants are contansts
+models.h:11:// @todo: show note icon in name field, and tooltip, and edit note in inputdialog via context menu.
+printpreviewdialog.cpp:9:// @todo - windows instead of dialogs, but modal

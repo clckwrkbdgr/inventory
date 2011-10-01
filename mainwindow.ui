@@ -77,7 +77,7 @@
     <string>Add</string>
    </property>
    <property name="toolTip">
-    <string>Add new item</string>
+    <string>Add new item (Ctrl+N)</string>
    </property>
    <property name="statusTip">
     <string>Add new item</string>
@@ -140,7 +140,7 @@
      <normaloff>:/icons/filter</normaloff>:/icons/filter</iconset>
    </property>
    <property name="text">
-    <string>Filter</string>
+    <string>Filter (Ctrl+F)</string>
    </property>
    <property name="toolTip">
     <string>Set filter on item view</string>
@@ -176,7 +176,7 @@
      <normaloff>:/icons/print</normaloff>:/icons/print</iconset>
    </property>
    <property name="text">
-    <string>Print</string>
+    <string>Print (Ctrl+P)</string>
    </property>
    <property name="toolTip">
     <string>Print current view</string>
@@ -194,7 +194,7 @@
      <normaloff>:/icons/quit</normaloff>:/icons/quit</iconset>
    </property>
    <property name="text">
-    <string>Quit</string>
+    <string>Quit (Ctrl+Q)</string>
    </property>
    <property name="iconText">
     <string>Quit</string>

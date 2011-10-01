@@ -29,7 +29,7 @@ set scrolloff=7
 let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
 let v:this_session=expand("<sfile>:p")
 silent only
-cd ~/incoming/inventory-0.9.2
+cd ~/incoming/inventory-0.9.3
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
@@ -38,7 +38,7 @@ badd +1 design
 badd +1 flow
 badd +1 classes
 badd +5 database.sql
-badd +9 inventory.h
+badd +87 inventory.h
 badd +742 ~/unsorted/inventory/inventory.cpp
 badd +1 inventory.pro
 badd +120 main.cpp
@@ -54,7 +54,7 @@ badd +20 filterdialog.h
 badd +1 ~/incoming/inventory/historydialog.cpp
 badd +39 ~/incoming/inventory/filterdialog.cpp
 badd +1 models
-badd +18 models.h
+badd +111 models.h
 badd +1 ~/incoming/inventory/models.cpp
 badd +674 ~/incoming/inventory/inventory.cpp
 badd +1 ~/incoming/inventory/models.h
@@ -69,6 +69,9 @@ badd +6 printpreviewdialog.h
 badd +14 ~/incoming/inventory-0.9.2/printpreviewdialog.cpp
 badd +1 ~/incoming/inventory-0.9.2/listdialog.cpp
 badd +1 ~/incoming/inventory-0.9.2/historydialog.cpp
+badd +71 ~/incoming/inventory-0.9.3/mainwindow.cpp
+badd +243 ~/incoming/inventory-0.9.3/inventory.cpp
+badd +396 ~/incoming/inventory-0.9.3/models.cpp
 args design
 edit design
 set splitbelow splitright
@@ -196,7 +199,7 @@ setlocal formatexpr=
 setlocal formatoptions=tqcr
 setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
 setlocal grepprg=
-setlocal iminsert=0
+setlocal iminsert=1
 setlocal imsearch=0
 setlocal include=
 setlocal includeexpr=
@@ -248,11 +251,11 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 9 - ((8 * winheight(0) + 28) / 56)
+let s:l = 34 - ((30 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-9
+34
 normal! 0
 tabedit models.h
 set splitbelow splitright
@@ -369,7 +372,7 @@ setlocal foldcolumn=0
 setlocal foldenable
 setlocal foldexpr=0
 setlocal foldignore=#
-setlocal foldlevel=0
+setlocal foldlevel=3
 setlocal foldmarker={{{,}}}
 set foldmethod=syntax
 setlocal foldmethod=syntax
@@ -432,16 +435,36 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-11
+64
 normal zo
 64
 normal zo
-let s:l = 18 - ((17 * winheight(0) + 28) / 56)
+108
+normal zo
+132
+normal zo
+136
+normal zo
+141
+normal zo
+132
+normal zo
+108
+normal zo
+132
+normal zo
+136
+normal zo
+141
+normal zo
+132
+normal zo
+let s:l = 111 - ((27 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-18
-normal! 0
+111
+normal! 0116l
 tabedit inventory.h
 set splitbelow splitright
 set nosplitbelow
@@ -557,7 +580,7 @@ setlocal foldcolumn=0
 setlocal foldenable
 setlocal foldexpr=0
 setlocal foldignore=#
-setlocal foldlevel=0
+setlocal foldlevel=3
 setlocal foldmarker={{{,}}}
 set foldmethod=syntax
 setlocal foldmethod=syntax
@@ -620,20 +643,12 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-76
-normal zo
-147
-normal zo
-147
-normal zo
-156
-normal zo
-let s:l = 9 - ((8 * winheight(0) + 28) / 56)
+let s:l = 20 - ((19 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-9
-normal! 024l
+20
+normal! 0
 tabedit mainwindow.h
 set splitbelow splitright
 set nosplitbelow
@@ -996,14 +1011,14 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-10
+9
 normal zo
 let s:l = 6 - ((5 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 6
-normal! 033l
+normal! 0
 tabedit listdialog.h
 set splitbelow splitright
 set nosplitbelow
@@ -1744,12 +1759,12 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 33 - ((32 * winheight(0) + 27) / 55)
+let s:l = 4 - ((3 * winheight(0) + 27) / 55)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-33
-normal! 012l
+4
+normal! 014l
 wincmd w
 argglobal
 edit main.cpp
@@ -2148,7 +2163,7 @@ exe s:l
 normal! zt
 1
 normal! 0
-tabnext 1
+tabnext 2
 if exists('s:wipebuf')
   silent exe 'bwipe ' . s:wipebuf
 endif

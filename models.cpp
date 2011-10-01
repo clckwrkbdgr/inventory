@@ -215,7 +215,7 @@ Qt::ItemFlags InventoryModel::flags(const QModelIndex &index) const {
 	if(!index.isValid())
 		return Qt::ItemIsEnabled;
 	
-	if(index.column() == 4)
+	if(index.column() == ActiveField)
 		return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 	if(!list[index.row()].isActive())
 		return QAbstractItemModel::flags(index) | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
@@ -224,7 +224,7 @@ Qt::ItemFlags InventoryModel::flags(const QModelIndex &index) const {
 }
 
 QVariant InventoryModel::data(const QModelIndex &index, int role) const {
-	if(!index.isValid() || index.row() >= list.size() || index.column() >= 6)
+	if(!index.isValid() || index.row() >= list.size() || index.column() >= FieldCount)
 		return QVariant();
 
 	Item item = list[index.row()];
@@ -233,46 +233,46 @@ QVariant InventoryModel::data(const QModelIndex &index, int role) const {
 
 	// @todo: Grey backgr for disabled items.
 	switch(index.column()) {
-		case 0: { // Item type.
+		case ItemTypeField: {
 			if(role == Qt::DisplayRole)
 				return item.itemType().name();
 			if(role == Qt::EditRole)
-				return item.itemType().getId(); // @todo: Combobox.
+				return item.itemType().getId();
 
 			break;
 		}
-		case 1: { // Name.
+		case NameField: {
 			if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::ToolTipRole)
 				return item.name();
 
 			break;
 		}
-		case 2: { // INN.
+		case InnField: {
 			if(item.innExists()) {
 				if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::ToolTipRole)
 					return item.inn();
 			} else {
 				if(role == Qt::EditRole)
-					return 0; // @todo: Spinbox.
+					return 0;
 			}
 
 			break;
 		}
-		case 3: { // Place.
+		case PlaceField: {
 			if(role == Qt::DisplayRole)
 				return item.place().name();
 			if(role == Qt::EditRole)
-				return item.place().getId(); // @todo: Combobox.
+				return item.place().getId();
 
 			break;
 		}
-		case 4: { // Active.
+		case ActiveField: {
 			if(role == Qt::CheckStateRole && item.isActive())
 				return Qt::Checked;
 
 			break;
 		}
-		case 5: { // Note.
+		case NoteField: {
 			if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::ToolTipRole)
 				return item.note();
 			// @todo: Icon (for not empty) and input dialog.
@@ -287,12 +287,12 @@ QVariant InventoryModel::data(const QModelIndex &index, int role) const {
 QVariant InventoryModel::headerData(int section, Qt::Orientation orientation, int role) const {
 	if(role == Qt::DisplayRole && orientation == Qt::Horizontal)
 		switch(section) {
-			case 0: return tr("Item type");
-			case 1: return tr("Name");
-			case 2: return tr("INN");
-			case 3: return tr("Place");
-			case 4: return tr("Active");
-			case 5: return tr("Note");
+			case ItemTypeField: return tr("Item type");
+			case NameField: return tr("Name");
+			case InnField: return tr("INN");
+			case PlaceField: return tr("Place");
+			case ActiveField: return tr("Active");
+			case NoteField: return tr("Note");
 			default: return QVariant();
 		}
 
@@ -304,12 +304,12 @@ int InventoryModel::rowCount(const QModelIndex&) const {
 }
 
 int InventoryModel::columnCount(const QModelIndex&) const {
-	return 6;
+	return FieldCount;
 }
 
 void InventoryModel::sort(int column, Qt::SortOrder order) {
 	switch(column) {
-		case 0: {
+		case ItemTypeField: {
 			beginResetModel();
 
 			QMultiMap<QString, Item> map;
@@ -319,7 +319,7 @@ void InventoryModel::sort(int column, Qt::SortOrder order) {
 
 			break;
 		}
-		case 1: {
+		case NameField: {
 			beginResetModel();
 
 			QMultiMap<QString, Item> map;
@@ -329,7 +329,7 @@ void InventoryModel::sort(int column, Qt::SortOrder order) {
 
 			break;
 		}
-		case 2: {
+		case InnField: {
 			beginResetModel();
 
 			QMultiMap<int, Item> map;
@@ -343,7 +343,7 @@ void InventoryModel::sort(int column, Qt::SortOrder order) {
 
 			break;
 		}
-		case 3: {
+		case PlaceField: {
 			beginResetModel();
 
 			QMultiMap<QString, Item> map;
@@ -353,7 +353,7 @@ void InventoryModel::sort(int column, Qt::SortOrder order) {
 
 			break;
 		}
-		case 4: {
+		case ActiveField: {
 			beginResetModel();
 
 			QMultiMap<bool, Item> map;
@@ -363,7 +363,7 @@ void InventoryModel::sort(int column, Qt::SortOrder order) {
 
 			break;
 		}
-		case 5: {
+		case NoteField: {
 			beginResetModel();
 
 			QMultiMap<QString, Item> map;
@@ -385,7 +385,7 @@ void InventoryModel::sort(int column, Qt::SortOrder order) {
 }
 
 bool InventoryModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-	if(!index.isValid() || index.row() >= list.size() || index.column() >= 6)
+	if(!index.isValid() || index.row() >= list.size() || index.column() >= FieldCount)
 		return false;
 
 	Item item = list[index.row()];
@@ -393,16 +393,16 @@ bool InventoryModel::setData(const QModelIndex &index, const QVariant &value, in
 		return false;
 
 	switch(index.column()) {
-		case 0: { // Item type.
+		case ItemTypeField: {
 			if(role == Qt::EditRole) {
 				item.setItemType(ItemType(value.toInt()));
 				emit dataChanged(index, index);
-				return true; // @todo: Combobox.
+				return true;
 			}
 
 			break;
 		}
-		case 1: { // Name.
+		case NameField: {
 			if(role == Qt::EditRole) {
 				item.setName(value.toString());
 				emit dataChanged(index, index);
@@ -411,25 +411,25 @@ bool InventoryModel::setData(const QModelIndex &index, const QVariant &value, in
 
 			break;
 		}
-		case 2: { // INN.
+		case InnField: {
 			if(role == Qt::EditRole) {
 				item.setInn(value.toInt());
 				emit dataChanged(index, index);
-				return true; // @todo: Spinbox.
+				return true;
 			}
 
 			break;
 		}
-		case 3: { // Place.
+		case PlaceField: {
 			if(role == Qt::EditRole) {
 				item.setPlace(Place(value.toInt()));
 				emit dataChanged(index, index);
-				return true; // @todo: Combobox.
+				return true;
 			}
 
 			break;
 		}
-		case 4: { // Active.
+		case ActiveField: {
 			if(role == Qt::EditRole) {
 				item.deactivate();
 				emit dataChanged(index, index);
@@ -438,7 +438,7 @@ bool InventoryModel::setData(const QModelIndex &index, const QVariant &value, in
 
 			break;
 		}
-		case 5: { // Note.
+		case NoteField: {
 			if(role == Qt::EditRole) {
 				item.setNote(value.toString());
 				emit dataChanged(index, index);
@@ -497,14 +497,14 @@ InventoryDelegate::~InventoryDelegate() {
 }
 
 QWidget* InventoryDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-	if(index.isValid() && index.column() == 0) {
+	if(index.isValid() && index.column() == InventoryModel::ItemTypeField) {
 		QComboBox *comboBox = new QComboBox(parent);
 		ItemTypeModel *model = new ItemTypeModel(comboBox);
 		comboBox->setModel(model);
 		return comboBox;
 	}
 	
-	if(index.isValid() && index.column() == 4) {
+	if(index.isValid() && index.column() == InventoryModel::PlaceField) {
 		QComboBox *comboBox = new QComboBox(parent);
 		PlaceModel *model = new PlaceModel(comboBox);
 		comboBox->setModel(model);
@@ -515,7 +515,7 @@ QWidget* InventoryDelegate::createEditor(QWidget *parent, const QStyleOptionView
 }
 
 void InventoryDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
-	if(index.isValid() && index.column() == 0) {
+	if(index.isValid() && index.column() == InventoryModel::ItemTypeField) {
 		QComboBox *comboBox = static_cast<QComboBox*>(editor);
 		ItemTypeModel *model = static_cast<ItemTypeModel*>(comboBox->model());
 		int id = index.model()->data(index, Qt::EditRole).toInt();
@@ -524,7 +524,7 @@ void InventoryDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 		return;
 	}
 	
-	if(index.isValid() && index.column() == 4) {
+	if(index.isValid() && index.column() == InventoryModel::PlaceField) {
 		QComboBox *comboBox = static_cast<QComboBox*>(editor);
 		PlaceModel *model = static_cast<PlaceModel*>(comboBox->model());
 		int id = index.model()->data(index, Qt::EditRole).toInt();
@@ -537,7 +537,7 @@ void InventoryDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 }
 
 void InventoryDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
-	if(index.isValid() && index.column() == 0) {
+	if(index.isValid() && index.column() == InventoryModel::ItemTypeField) {
 		QComboBox *comboBox = static_cast<QComboBox*>(editor);
 		ItemTypeModel *itemTypeModel = static_cast<ItemTypeModel*>(comboBox->model());
 		int id = itemTypeModel->idAt(comboBox->currentIndex());
@@ -546,7 +546,7 @@ void InventoryDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 		return;
 	}
 	
-	if(index.isValid() && index.column() == 4) {
+	if(index.isValid() && index.column() == InventoryModel::PlaceField) {
 		QComboBox *comboBox = static_cast<QComboBox*>(editor);
 		PlaceModel *placeModel = static_cast<PlaceModel*>(comboBox->model());
 		int id = placeModel->idAt(comboBox->currentIndex());
@@ -589,16 +589,16 @@ QVariant HistoryModel::data(const QModelIndex &index, int role) const {
 	if(!index.isValid())
 		return QVariant();
 
-	if(index.row() >= list.size() || index.column() >= 4)
+	if(index.row() >= list.size() || index.column() >= FieldCount)
 		return QVariant();
 
 	switch(index.column()) {
-		case 0: {
+		case TimeField: {
 			if(role == Qt::DisplayRole || role == Qt::ToolTipRole)
 				return list[index.row()].dateTime().toString();
 			break;
 		}
-		case 1: {
+		case NameField: {
 			if(role == Qt::DisplayRole || role == Qt::ToolTipRole)
 				switch(list[index.row()].changedField()) {
 					case History::ItemTypeField: return tr("Item type");
@@ -610,11 +610,11 @@ QVariant HistoryModel::data(const QModelIndex &index, int role) const {
 					default: return tr("Unknown field");
 				}
 		}
-		case 2: {
+		case OldValueField: {
 			if(role == Qt::DisplayRole || role == Qt::ToolTipRole)
 				return list[index.row()].oldValue();
 		}
-		case 3: {
+		case NewValueField: {
 			if(role == Qt::DisplayRole || role == Qt::ToolTipRole)
 				return list[index.row()].newValue();
 		}
@@ -627,10 +627,10 @@ QVariant HistoryModel::data(const QModelIndex &index, int role) const {
 QVariant HistoryModel::headerData(int section, Qt::Orientation orientation, int role) const {
 	if(role == Qt::DisplayRole && orientation == Qt::Horizontal)
 		switch(section) {
-			case 0: return tr("Change time");
-			case 1: return tr("Field");
-			case 2: return tr("Old value");
-			case 3: return tr("New value");
+			case TimeField: return tr("Change time");
+			case NameField: return tr("Field");
+			case OldValueField: return tr("Old value");
+			case NewValueField: return tr("New value");
 			default: return QString();
 		}
 
@@ -642,7 +642,7 @@ int HistoryModel::rowCount(const QModelIndex &) const {
 }
 
 int HistoryModel::columnCount(const QModelIndex &) const {
-	return 4;
+	return FieldCount;
 }
 
 QModelIndex HistoryModel::index(int row, int column, const QModelIndex &) const {

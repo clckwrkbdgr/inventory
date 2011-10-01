@@ -183,8 +183,6 @@ void Item::setItemType(const ItemType &value) {
 	query.bindValue(":idItemType", value.getId());
 	if(!query.exec())
 		throw DBErrorException(query);
-
-	addHistory(History::ItemTypeField, oldValue.name(), value.name());
 }
 
 void Item::setName(const QString &value) {
@@ -202,8 +200,6 @@ void Item::setName(const QString &value) {
 	query.bindValue(":name", value);
 	if(!query.exec())
 		throw DBErrorException(query);
-
-	addHistory(History::NameField, oldValue, value);
 }
 
 void Item::setNote(const QString &value) {

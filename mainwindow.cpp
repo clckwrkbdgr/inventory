@@ -68,6 +68,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::resizeView(const QModelIndex&, const QModelIndex&) {
 	ui.view->resizeColumnsToContents();
+	ui.view->horizontalHeader()->setStretchLastSection(true);
 }
 
 void MainWindow::removeItem() {
@@ -83,8 +84,11 @@ void MainWindow::addItem() {
 }
 
 void MainWindow::deactivate() {
-	QModelIndex index = model->index(ui.view->currentIndex().row(), 5); // 'Active' field.
-	model->setData(index, false, Qt::EditRole);
+	if(QMessageBox::question(this, tr("Deactivate item"), tr("Do you really want to deactivate selected item?"),
+							QMessageBox::Yes | QMessageBox::Cancel) == QMessageBox::Yes) {
+		QModelIndex index = model->index(ui.view->currentIndex().row(), 4); // 'Active' field.
+		model->setData(index, false, Qt::EditRole);
+	}
 }
 
 void MainWindow::editPlaces() {
