@@ -928,33 +928,34 @@ QList<History> Inventory::historyOf(const Item &item) const {
 
 QSqlQuery Inventory::getQuery(int sortingColumn, Qt::SortOrder order) {
 	QStringList whereList;
-	if(Database::lastFilter.usePlace) whereList << "idPlace = :idPlace";
-	if(Database::lastFilter.useItemType) whereList << "idItemType = :idItemType";
-	if(Database::lastFilter.useActivity) whereList << "active = :active";
+	if(Database::lastFilter.usePlace) whereList << " idPlace = :idPlace ";
+	if(Database::lastFilter.useItemType) whereList << " idItemType = :idItemType ";
+	if(Database::lastFilter.useActivity) whereList << " active = :active ";
 	QString whereClause;
 	if(!whereList.isEmpty()) {
 		whereClause = QString(" WHERE ") + whereList.join(" AND ");
 	}
 
-	QString orderByClause = (sortingColumn < 0) ? ("") : QString("ORDER BY %1 %2").
+	QString orderByClause = (sortingColumn < 0) ? ("") : QString(" ORDER BY %1 %2 ").
 		arg(sortingColumn + 1).
-		arg( (order == Qt::AscendingOrder) ? "ASC" : "DESC" );
+		arg( (order == Qt::AscendingOrder) ? " ASC " : " DESC " );
 
 	QList<Item> result;
 	QSqlQuery query(QSqlDatabase::database(Database::fileName));
 	query.prepare(QString("SELECT T.name, I.name, COUNT(*), I.inn, P.name, "
-				"REPLACE(REPLACE(I.active, '0', '%1'), '1', '') "
-				"FROM Items AS I "
-				"INNER JOIN ItemTypes AS T ON T.id = I.idItemType "
-				"INNER JOIN Places AS P ON P.id = I.idPlace ").arg(QObject::tr("Inactive")) +
+				" REPLACE(REPLACE(I.active, '0', '%1'), '1', '') "
+				" FROM Items AS I "
+				" INNER JOIN ItemTypes AS T ON T.id = I.idItemType "
+				" INNER JOIN Places AS P ON P.id = I.idPlace ").arg(QObject::tr("Inactive")) +
 			whereClause +
-			"GROUP BY T.name, I.name, I.inn, P.name, I.active " +
+			" GROUP BY T.name, I.name, I.inn, P.name, I.active " +
 			orderByClause);
 
 	if(Database::lastFilter.usePlace) query.bindValue(":idPlace", Database::lastFilter.placeId);
 	if(Database::lastFilter.useItemType) query.bindValue(":idItemType", Database::lastFilter.itemTypeId);
 	if(Database::lastFilter.useActivity) query.bindValue(":active", (Database::lastFilter.active) ? 1 : 0);
 	query.exec();
+	qDebug() << query.executedQuery();
 
 	return query;
 }

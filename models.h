@@ -3,6 +3,7 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtGui/QItemDelegate>
 #include <QtSql/QSqlQueryModel>
+#include <QtDebug>
 
 #include "inventory.h"
 
