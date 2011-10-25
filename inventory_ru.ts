@@ -163,7 +163,7 @@
     <message>
         <location filename="models.cpp" line="324"/>
         <source>Active</source>
-        <translation>Состояние</translation>
+        <translation>Сост</translation>
     </message>
     <message>
         <source>New item type</source>
@@ -500,7 +500,7 @@ All associated history also will be deleted.</source>
     <message>
         <location filename="printpreviewdialog.cpp" line="17"/>
         <source>Count</source>
-        <translation>Количество</translation>
+        <translation>К-во</translation>
     </message>
     <message>
         <location filename="printpreviewdialog.cpp" line="18"/>
