@@ -9,6 +9,11 @@ CREATE TABLE Places (
 	name TEXT NOT NULL
 );
 
+CREATE TABLE Persons (
+	id INTEGER PRIMARY KEY,
+	name TEXT NOT NULL
+);
+
 CREATE TABLE ItemTypes (
 	id INTEGER PRIMARY KEY,
 	name TEXT NOT NULL
@@ -17,11 +22,14 @@ CREATE TABLE ItemTypes (
 CREATE TABLE Items (
 	id INTEGER PRIMARY KEY,
 	idItemType INTEGER NOT NULL,
-	name TEXT NOT NULL,
-	note TEXT NOT NULL,
-	inn INTEGER NULL,
 	idPlace INTEGER NOT NULL,
-	active BOOLEAN NOT NULL,
+	name TEXT NOT NULL,
+	inn INTEGER NULL,
+	writtenOff BOOLEAN NOT NULL,
+	underRepair BOOLEAN NOT NULL,
+	verified BOOLEAN NOT NULL,
+	responsiblePerson INTEGER NOT NULL,
+	note TEXT NOT NULL,
 
 	FOREIGN KEY(idItemType) REFERENCES ItemTypes(id),
 	FOREIGN KEY(idPlace) REFERENCES Places(id)
