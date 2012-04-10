@@ -4,6 +4,8 @@
 
 namespace Inventory {
 
+typedef int Id;
+
 class InventoryModel : public QAbstractTableModel {
 	Q_OBJECT
 	Q_DISABLE_COPY(InventoryModel);
@@ -15,16 +17,16 @@ public:
 	virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
 	virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	virtual bool setHeaderData(int section, Qt::Orientation orientation, const QVariant & value, int role = Qt::EditRole);
 
 	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
 	virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
 	virtual bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex());
 	virtual bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex());
 
-	virtual void setItemTypeFilter(int itemType);
+	virtual Id idAt(int row) const;
+	virtual void setItemTypeFilter(Id itemType);
 	virtual void switchItemTypeFilter(bool on = true);
-	virtual void setPlaceFilter(int place);
+	virtual void setPlaceFilter(Id place);
 	virtual void switchPlaceFilter(bool on = true);
 	virtual void setWrittenOffFilter(bool writtenOff);
 	virtual void switchWrittenOffFilter(bool on = true);
@@ -59,9 +61,9 @@ public:
 	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
 	virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
 
-	virtual void setItemTypeFilter(int itemType);
+	virtual void setItemTypeFilter(Id itemType);
 	virtual void switchItemTypeFilter(bool on = true);
-	virtual void setPlaceFilter(int place);
+	virtual void setPlaceFilter(Id place);
 	virtual void switchPlaceFilter(bool on = true);
 	virtual void setWrittenOffFilter(bool writtenOff);
 	virtual void switchWrittenOffFilter(bool on = true);
@@ -71,24 +73,24 @@ class ReferenceModel : public QAbstractTableModel {
 	Q_OBJECT
 	Q_DISABLE_COPY(ReferenceModel);
 public:
-	// Exception for a cause when value which is removing is used by item(s).
-	class ValueHasBondingItems {};
+	enum { INVALID = 0, ITEM_TYPES, PLACES, PERSONS, COUNT };
 
-	ReferenceModel(QObject * parent = 0);
+	ReferenceModel(int type, QObject * parent = 0);
 	virtual ~ReferenceModel() {}
 
 	virtual Qt::ItemFlags flags(const QModelIndex & index) const;
 	virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
 	virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	virtual bool setHeaderData(int section, Qt::Orientation orientation, const QVariant & value, int role = Qt::EditRole);
 
 	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
 	virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
 	virtual bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex());
-	virtual bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex()); // Throws ValueHasBondingItems.
+	virtual bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex());
 
-	virtual void addMultiline(const QStringList & lines);
+	virtual Id idAt(int row) const;
+	int type() const;
+	virtual bool addMultiline(const QStringList & lines);
 };
 
 }

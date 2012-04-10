@@ -27,11 +27,6 @@ QVariant InventoryModel::headerData(int /*section*/, Qt::Orientation /*orientati
 	return QVariant();
 }
 
-bool InventoryModel::setHeaderData(int /*section*/, Qt::Orientation /*orientation*/, const QVariant & /*value*/, int /*role*/)
-{
-	return false;
-}
-
 int InventoryModel::rowCount(const QModelIndex & /*parent*/) const
 {
 	return 0;
@@ -50,6 +45,11 @@ bool InventoryModel::insertRows(int /*row*/, int /*count*/, const QModelIndex & 
 bool InventoryModel::removeRows(int /*row*/, int /*count*/, const QModelIndex & /*parent*/)
 {
 	return false;
+}
+
+Id InventoryModel::idAt(int /*row*/) const
+{
+	return Id();
 }
 
 void InventoryModel::setItemTypeFilter(int /*itemType*/)
@@ -256,7 +256,7 @@ void PrintableInventoryModel::switchWrittenOffFilter(bool /*on*/)
 
 namespace Inventory { // ReferenceModel
 
-ReferenceModel::ReferenceModel(QObject * /*parent*/)
+ReferenceModel::ReferenceModel(int /*type*/, QObject * /*parent*/)
 {
 	return;
 }
@@ -281,11 +281,6 @@ QVariant ReferenceModel::headerData(int /*section*/, Qt::Orientation /*orientati
 	return QVariant();
 }
 
-bool ReferenceModel::setHeaderData(int /*section*/, Qt::Orientation /*orientation*/, const QVariant & /*value*/, int /*role*/)
-{
-	return false;
-}
-
 int ReferenceModel::rowCount(const QModelIndex & /*parent*/) const
 {
 	return 0;
@@ -306,9 +301,19 @@ bool ReferenceModel::removeRows(int /*row*/, int /*count*/, const QModelIndex & 
 	return false;
 }
 
-void ReferenceModel::addMultiline(const QStringList & /*lines*/)
+Id ReferenceModel::idAt(int /*row*/) const
 {
-	return;
+	return Id();
+}
+
+int ReferenceModel::type() const
+{
+	return 0;
+}
+
+bool ReferenceModel::addMultiline(const QStringList & /*lines*/)
+{
+	return false;
 }
 
 

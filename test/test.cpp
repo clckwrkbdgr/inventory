@@ -5,6 +5,7 @@ using namespace Inventory;
 
 class InventoryTest: public QObject {
 	Q_OBJECT
+	enum { ITEM_TYPE = 0, PLACE, PERSON, NAME, INN, WRITTEN_OFF, REPAIR, CHECKED, NOTES };
 private slots:
 	void referenceTypes_data() {
 		QTest::addColumn<int>("original");
@@ -147,6 +148,373 @@ private slots:
 		QCOMPARE(QVariant("First line"),  model->data(model->index(1, 0)));
 		QCOMPARE(QVariant("Second line"), model->data(model->index(2, 0)));
 	}
+
+	void inventoryHeaderData_data() {
+		QTest::addColumn<QVariant>("value");
+		QTest::addColumn<int>("section");
+		QTest::addColumn<int>("orientation");
+
+		QTest::newRow("item type")     << QVariant("Item type")    << 0 << int(Qt::Horizontal);
+		QTest::newRow("place")         << QVariant("Place")        << 1 << int(Qt::Horizontal);
+		QTest::newRow("person")        << QVariant("Person")       << 2 << int(Qt::Horizontal);
+		QTest::newRow("name")          << QVariant("Name")         << 3 << int(Qt::Horizontal);
+		QTest::newRow("inn")           << QVariant("INN")          << 4 << int(Qt::Horizontal);
+		QTest::newRow("writtenoff")    << QVariant("Written off")  << 5 << int(Qt::Horizontal);
+		QTest::newRow("repair")        << QVariant("Under repair") << 6 << int(Qt::Horizontal);
+		QTest::newRow("checked")       << QVariant("Checked")      << 7 << int(Qt::Horizontal);
+		QTest::newRow("note")          << QVariant("Note")         << 8 << int(Qt::Horizontal);
+		QTest::newRow("too far right") << QVariant()               << 9 << int(Qt::Horizontal);
+		QTest::newRow("vertical")      << QVariant()               << 0 << int(Qt::Vertical);
+	}
+	void inventoryHeaderData() {
+		QFETCH(QVariant, value);
+		QFETCH(int, section);
+		QFETCH(int, orientation);
+
+		QScopedPointer<InventoryModel> model(new InventoryModel());
+		QVERIFY(model);
+		QCOMPARE(9, model->columnCount());
+		QCOMPARE(value, model->headerData(section, Qt::Orientation(orientation), Qt::DisplayRole));
+	}
+	void inventoryRowManipulation_data() {
+		QTest::addColumn<bool>("insert");
+		QTest::addColumn<int>("pos");
+		QTest::addColumn<int>("count");
+		QTest::addColumn<bool>("success");
+		QTest::addColumn<int>("rowcount");
+
+		QTest::newRow("insert at top")    << true  <<  0 << 1 << true  << 1;
+		QTest::newRow("insert at bottom") << true  <<  1 << 2 << true  << 3;
+		QTest::newRow("insert invalid")   << true  << 10 << 1 << false << 3;
+		QTest::newRow("remove at top")    << false <<  0 << 1 << true  << 2;
+		QTest::newRow("remove invalid")   << false << 10 << 1 << false << 2;
+		QTest::newRow("insert no rows")   << true  <<  1 << 0 << false << 2;
+		QTest::newRow("remove at bottom") << false <<  1 << 1 << true  << 1;
+	}
+	void inventoryRowManipulation() {
+		QFETCH(bool, insert);
+		QFETCH(int, pos);
+		QFETCH(int, count);
+		QFETCH(bool, success);
+		QFETCH(int, rowcount);
+
+		QScopedPointer<InventoryModel> model(new InventoryModel());
+		QVERIFY(model);
+
+		bool ok = false;
+		ok = insert ? model->insertRows(pos, count) : model->removeRows(pos, count);
+		QCOMPARE(ok, success);
+		QCOMPARE(rowcount, model->rowCount());
+	}
+	void inventoryTextCells_data() {
+		QTest::addColumn<int>("row");
+		QTest::addColumn<int>("column");
+		QTest::addColumn<QVariant>("editvalue");
+		QTest::addColumn<QVariant>("displayvalue");
+		QTest::addColumn<bool>("success");
+		QTest::addColumn<int>("flags");
+
+		const int R = 3;
+		const int INVALID    = Qt::NoItemFlags;
+		QTest::newRow("invalid row") << R << 0 << QVariant()       << QVariant() << false << INVALID;
+
+		QScopedPointer<InventoryModel> model(new InventoryModel());
+		QVERIFY(model);
+
+		bool ok = false;
+		const int C = model->columnCount();
+		const int PLAIN_EDIT = Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+
+		ok = model->removeRows(0, model->rowCount() - 1); QVERIFY(ok); QCOMPARE(0, model->rowCount());
+		ok = model->insertRows(0, R);                     QVERIFY(ok); QCOMPARE(R, model->rowCount());
+
+		QTest::newRow("invalid col") << 0 << C << QVariant("Test") << QVariant() << false << INVALID;
+
+		QTest::newRow("NAME 0")     << 0 << int(NAME) << QVariant("Test")   << QVariant("Test")   << true << PLAIN_EDIT;
+		QTest::newRow("NAME 1")     << 1 << int(NAME) << QVariant("Test 1") << QVariant("Test 1") << true << PLAIN_EDIT;
+		QTest::newRow("NAME empty") << 1 << int(NAME) << QVariant("      ") << QVariant("      ") << true << PLAIN_EDIT;
+
+		QTest::newRow("NOTE 0")     << 0 << int(NOTES) << QVariant("Test")   << QVariant("Test")   << true << PLAIN_EDIT;
+		QTest::newRow("NOTE 0")     << 1 << int(NOTES) << QVariant("Test 1") << QVariant("Test 1") << true << PLAIN_EDIT;
+		QTest::newRow("NOTE empty") << 1 << int(NOTES) << QVariant("      ") << QVariant("      ") << true << PLAIN_EDIT;
+
+		QTest::newRow("INN")        << 0 << int(INN) << QVariant("1") << QVariant("1") << true  << PLAIN_EDIT;
+		QTest::newRow("INN empty")  << 0 << int(INN) << QVariant("")  << QVariant("")  << true  << PLAIN_EDIT;
+		QTest::newRow("INN null")   << 0 << int(INN) << QVariant()    << QVariant("")  << true  << PLAIN_EDIT;
+		QTest::newRow("INN alpha")  << 2 << int(INN) << QVariant("a") << QVariant("")  << false << PLAIN_EDIT;
+		QTest::newRow("INN space")  << 2 << int(INN) << QVariant(" ") << QVariant("")  << true  << PLAIN_EDIT;
+		QTest::newRow("INN uniq 1") << 2 << int(INN) << QVariant("1") << QVariant("1") << true  << PLAIN_EDIT;
+		QTest::newRow("INN 2")      << 1 << int(INN) << QVariant("2") << QVariant("2") << true  << PLAIN_EDIT;
+		QTest::newRow("INN uniq 2") << 1 << int(INN) << QVariant("1") << QVariant("1") << true  << PLAIN_EDIT;
+	}
+	void inventoryTextCells() {
+		QFETCH(int, row);
+		QFETCH(int, column);
+		QFETCH(QVariant, editvalue);
+		QFETCH(QVariant, displayvalue);
+		QFETCH(bool, success);
+		QFETCH(int, flags);
+
+		QScopedPointer<InventoryModel> model(new InventoryModel());
+		QVERIFY(model);
+
+		QModelIndex index = model->index(row, column);
+		QCOMPARE(Qt::ItemFlags(flags), model->flags(index));
+		bool ok = model->setData(index, editvalue, Qt::EditRole);
+		QCOMPARE(ok, success);
+		if(ok) {
+			QCOMPARE(displayvalue, model->data(index, Qt::DisplayRole));
+			QCOMPARE(editvalue, model->data(index, Qt::EditRole));
+		}
+	}
+	void inventorySwitchCells_data() {
+		QTest::addColumn<int>("row");
+		QTest::addColumn<int>("column");
+		QTest::addColumn<QVariant>("checkvalue");
+		QTest::addColumn<QVariant>("displayvalue");
+		QTest::addColumn<bool>("success");
+		QTest::addColumn<int>("flags");
+
+		QScopedPointer<InventoryModel> model(new InventoryModel());
+		QVERIFY(model);
+
+		bool ok = false;
+		const int R = 3, C = model->columnCount();
+		const int INVALID    = Qt::NoItemFlags;
+		const int SWITCH_EDIT = Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
+		const QVariant checked = QVariant(Qt::Checked);
+		const QVariant unchecked = QVariant(Qt::Unchecked);
+		const QVariant STR_WRITTEN_OFF = "Written off", STR_REPAIR = "Under repair", STR_CHECKED = "Checked", UNCHECKED = "";
+
+		QTest::newRow("invalid row") << R << 0 << QVariant()        << QVariant() << false << INVALID;
+		QTest::newRow("invalid col") << 0 << C << QVariant("Test")  << QVariant() << false << INVALID;
+
+		ok = model->removeRows(0, model->rowCount() - 1); QVERIFY(ok); QCOMPARE(0, model->rowCount());
+		ok = model->insertRows(0, R);                     QVERIFY(ok); QCOMPARE(R, model->rowCount());
+
+		QTest::newRow("written off checked")   << 0 << int(WRITTEN_OFF) << checked   << STR_WRITTEN_OFF << true << SWITCH_EDIT;
+		QTest::newRow("written off unchecked") << 0 << int(WRITTEN_OFF) << unchecked << UNCHECKED       << true << SWITCH_EDIT;
+		QTest::newRow("repair checked")        << 1 << int(REPAIR)      << checked   << STR_REPAIR      << true << SWITCH_EDIT;
+		QTest::newRow("repair unchecked")      << 2 << int(REPAIR)      << unchecked << UNCHECKED       << true << SWITCH_EDIT;
+		QTest::newRow("checked checked")       << 2 << int(CHECKED)     << checked   << STR_CHECKED     << true << SWITCH_EDIT;
+		QTest::newRow("checked unchecked")     << 2 << int(CHECKED)     << unchecked << UNCHECKED       << true << SWITCH_EDIT;
+	}
+	void inventorySwitchCells() {
+		QFETCH(int, row);
+		QFETCH(int, column);
+		QFETCH(QVariant, checkvalue);
+		QFETCH(QVariant, displayvalue);
+		QFETCH(bool, success);
+		QFETCH(int, flags);
+
+		QScopedPointer<InventoryModel> model(new InventoryModel());
+		QVERIFY(model);
+
+		QModelIndex index = model->index(row, column);
+		QCOMPARE(Qt::ItemFlags(flags), model->flags(index));
+		bool ok = model->setData(index, displayvalue, Qt::EditRole);
+		QVERIFY(!ok);
+		ok = model->setData(index, checkvalue, Qt::CheckStateRole);
+		QCOMPARE(ok, success);
+		if(ok) {
+			QCOMPARE(displayvalue, model->data(index, Qt::DisplayRole));
+			QCOMPARE(checkvalue, model->data(index, Qt::CheckStateRole));
+		}
+	}
+	void inventoryRefCells_data() {
+		QTest::addColumn<int>("row");
+		QTest::addColumn<int>("column");
+		QTest::addColumn<QVariant>("editvalue");
+		QTest::addColumn<QVariant>("displayvalue");
+		QTest::addColumn<bool>("success");
+		QTest::addColumn<int>("flags");
+
+		QScopedPointer<InventoryModel> model(new InventoryModel());
+		QVERIFY(model);
+
+		bool ok = false;
+		const int R = 3;
+		const int INVALID    = Qt::NoItemFlags;
+		const int PLAIN_EDIT = Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+		const int C = model->columnCount();
+
+		QTest::newRow("invalid row") << R << 0 << QVariant()       << QVariant() << false << INVALID;
+		QTest::newRow("invalid col") << 0 << C << QVariant("Test") << QVariant() << false << INVALID;
+
+		QScopedPointer<ReferenceModel> itemTypes(new ReferenceModel(ReferenceModel::ITEM_TYPES));
+			QVERIFY(itemTypes);
+			itemTypes->removeRows(0, itemTypes->rowCount() - 1);
+			itemTypes->insertRows(0, 3);
+			itemTypes->setData(itemTypes->index(0, 0), "Type 1");
+			itemTypes->setData(itemTypes->index(1, 0), "Type 2");
+			itemTypes->setData(itemTypes->index(2, 0), "Type 3");
+		QScopedPointer<ReferenceModel> places   (new ReferenceModel(ReferenceModel::PLACES));
+			QVERIFY(places);
+			places->removeRows(0, places->rowCount() - 1);
+			places->insertRows(0, 3);
+			places->setData(places->index(0, 0), "Place 1");
+			places->setData(places->index(1, 0), "Place 2");
+			places->setData(places->index(2, 0), "Place 3");
+		QScopedPointer<ReferenceModel> persons  (new ReferenceModel(ReferenceModel::PERSONS));
+			QVERIFY(persons);
+			persons->removeRows(0, persons->rowCount() - 1);
+			persons->insertRows(0, 3);
+			persons->setData(persons->index(0, 0), "Person 1");
+			persons->setData(persons->index(1, 0), "Person 2");
+			persons->setData(persons->index(2, 0), "Person 3");
+
+		ok = model->removeRows(0, model->rowCount() - 1); QVERIFY(ok); QCOMPARE(0, model->rowCount());
+		ok = model->insertRows(0, R);                     QVERIFY(ok); QCOMPARE(R, model->rowCount());
+
+		QTest::newRow("type 1")     << 0 << int(ITEM_TYPE) << QVariant(itemTypes->idAt(1)) << QVariant("Type 2") << true  << PLAIN_EDIT;
+		QTest::newRow("type 0")     << 1 << int(ITEM_TYPE) << QVariant(itemTypes->idAt(0)) << QVariant("Type 1") << true  << PLAIN_EDIT;
+		QTest::newRow("type at 5")  << 1 << int(ITEM_TYPE) << QVariant(itemTypes->idAt(5)) << QVariant("Type 1") << false << PLAIN_EDIT;
+		QTest::newRow("type at -1") << 1 << int(ITEM_TYPE) << QVariant(-1)                 << QVariant("Type 1") << false << PLAIN_EDIT;
+
+		QTest::newRow("place 1")     << 0 << int(PLACE) << QVariant(places->idAt(1)) << QVariant("Place 2") << true  << PLAIN_EDIT;
+		QTest::newRow("place 0")     << 1 << int(PLACE) << QVariant(places->idAt(0)) << QVariant("Place 1") << true  << PLAIN_EDIT;
+		QTest::newRow("place at 5")  << 1 << int(PLACE) << QVariant(places->idAt(5)) << QVariant("Place 1") << false << PLAIN_EDIT;
+		QTest::newRow("place at -1") << 1 << int(PLACE) << QVariant(-1)              << QVariant("Place 1") << false << PLAIN_EDIT;
+
+		QTest::newRow("person 1")     << 0 << int(PERSON) << QVariant(persons->idAt(1)) << QVariant("Person 2") << true  << PLAIN_EDIT;
+		QTest::newRow("person 0")     << 1 << int(PERSON) << QVariant(persons->idAt(0)) << QVariant("Person 1") << true  << PLAIN_EDIT;
+		QTest::newRow("person at 5")  << 1 << int(PERSON) << QVariant(persons->idAt(5)) << QVariant("Person 1") << false << PLAIN_EDIT;
+		QTest::newRow("person at -1") << 1 << int(PERSON) << QVariant(-1)               << QVariant("Person 1") << false << PLAIN_EDIT;
+	}
+	void inventoryRefCells() {
+		QFETCH(int, row);
+		QFETCH(int, column);
+		QFETCH(QVariant, editvalue);
+		QFETCH(QVariant, displayvalue);
+		QFETCH(bool, success);
+		QFETCH(int, flags);
+
+		QScopedPointer<InventoryModel> model(new InventoryModel());
+		QVERIFY(model);
+
+		QModelIndex index = model->index(row, column);
+		QCOMPARE(Qt::ItemFlags(flags), model->flags(index));
+		bool ok = model->setData(index, editvalue, Qt::EditRole);
+		QCOMPARE(ok, success);
+		if(ok) {
+			QCOMPARE(displayvalue, model->data(index, Qt::DisplayRole));
+			QCOMPARE(editvalue, model->data(index, Qt::EditRole));
+		}
+	}
+	void inventoryFilter_data() {
+		QTest::addColumn<int>("count");
+		QTest::addColumn<bool>("itemtypefilter");
+		QTest::addColumn<QVariant>("itemtype");
+		QTest::addColumn<bool>("placefilter");
+		QTest::addColumn<QVariant>("place");
+		QTest::addColumn<bool>("writtenofffilter");
+		QTest::addColumn<QVariant>("writtenoff");
+
+		QTest::newRow("invalid") << 8 << false << QVariant(-1) << false << QVariant(-1) << false << QVariant(0);
+
+		bool ok = false;
+
+		QScopedPointer<InventoryModel> model(new InventoryModel());
+		QVERIFY(model);
+		ok = model->removeRows(0, model->rowCount() - 1); QVERIFY(ok); QCOMPARE(0, model->rowCount());
+		QScopedPointer<ReferenceModel> itemTypes(new ReferenceModel(ReferenceModel::ITEM_TYPES));
+			QVERIFY(itemTypes);
+			itemTypes->removeRows(0, itemTypes->rowCount() - 1);
+			itemTypes->insertRows(0, 3);
+			itemTypes->setData(itemTypes->index(0, 0), "Type 1");
+			itemTypes->setData(itemTypes->index(1, 0), "Type 2");
+			itemTypes->setData(itemTypes->index(2, 0), "Type 3");
+		QScopedPointer<ReferenceModel> places   (new ReferenceModel(ReferenceModel::PLACES));
+			QVERIFY(places);
+			places->removeRows(0, places->rowCount() - 1);
+			places->insertRows(0, 3);
+			places->setData(places->index(0, 0), "Place 1");
+			places->setData(places->index(1, 0), "Place 2");
+			places->setData(places->index(2, 0), "Place 3");
+		ok = model->insertRows(0, 8); QVERIFY(ok); QCOMPARE(8, model->rowCount());
+
+		model->setData(model->index(0, ITEM_TYPE),   itemTypes->idAt(0));
+		model->setData(model->index(0, PLACE),       places->idAt(0));
+		model->setData(model->index(0, WRITTEN_OFF), Qt::Checked);
+
+		model->setData(model->index(1, ITEM_TYPE),   itemTypes->idAt(0));
+		model->setData(model->index(1, PLACE),       places->idAt(0));
+		model->setData(model->index(1, WRITTEN_OFF), Qt::Unchecked);
+
+		model->setData(model->index(2, ITEM_TYPE),   itemTypes->idAt(1));
+		model->setData(model->index(2, PLACE),       places->idAt(0));
+		model->setData(model->index(2, WRITTEN_OFF), Qt::Checked);
+
+		model->setData(model->index(3, ITEM_TYPE),   itemTypes->idAt(1));
+		model->setData(model->index(3, PLACE),       places->idAt(0));
+		model->setData(model->index(3, WRITTEN_OFF), Qt::Unchecked);
+
+		model->setData(model->index(4, ITEM_TYPE),   itemTypes->idAt(0));
+		model->setData(model->index(4, PLACE),       places->idAt(1));
+		model->setData(model->index(4, WRITTEN_OFF), Qt::Checked);
+
+		model->setData(model->index(5, ITEM_TYPE),   itemTypes->idAt(0));
+		model->setData(model->index(5, PLACE),       places->idAt(1));
+		model->setData(model->index(5, WRITTEN_OFF), Qt::Unchecked);
+
+		model->setData(model->index(6, ITEM_TYPE),   itemTypes->idAt(1));
+		model->setData(model->index(6, PLACE),       places->idAt(1));
+		model->setData(model->index(6, WRITTEN_OFF), Qt::Checked);
+
+		model->setData(model->index(7, ITEM_TYPE),   itemTypes->idAt(1));
+		model->setData(model->index(7, PLACE),       places->idAt(1));
+		model->setData(model->index(7, WRITTEN_OFF), Qt::Unchecked);
+
+		QTest::newRow("000")   << 8 << false << itemTypes->idAt(0) << false << places->idAt(0) << false << int(Qt::Unchecked);
+		QTest::newRow("100")   << 4 << true  << itemTypes->idAt(1) << false << places->idAt(0) << false << int(Qt::Unchecked);
+		QTest::newRow("010")   << 4 << false << itemTypes->idAt(1) << true  << places->idAt(0) << false << int(Qt::Unchecked);
+		QTest::newRow("110")   << 2 << true  << itemTypes->idAt(0) << true  << places->idAt(1) << false << int(Qt::Checked);
+		QTest::newRow("001")   << 4 << false << itemTypes->idAt(0) << false << places->idAt(1) << true  << int(Qt::Checked);
+		QTest::newRow("101")   << 2 << true  << itemTypes->idAt(1) << false << places->idAt(1) << true  << int(Qt::Checked);
+		QTest::newRow("011")   << 2 << false << itemTypes->idAt(1) << true  << places->idAt(1) << true  << int(Qt::Unchecked);
+		QTest::newRow("111 1") << 1 << true  << itemTypes->idAt(1) << true  << places->idAt(1) << true  << int(Qt::Checked);
+		QTest::newRow("111 2") << 1 << true  << itemTypes->idAt(0) << true  << places->idAt(0) << true  << int(Qt::Unchecked);
+		QTest::newRow("111 3") << 1 << true  << itemTypes->idAt(1) << true  << places->idAt(0) << true  << int(Qt::Checked);
+	}
+	void inventoryFilter() {
+		QFETCH(int, count);
+		QFETCH(bool, itemtypefilter);
+		QFETCH(QVariant, itemtype);
+		QFETCH(bool, placefilter);
+		QFETCH(QVariant, place);
+		QFETCH(bool, writtenofffilter);
+		QFETCH(QVariant, writtenoff);
+
+		QScopedPointer<InventoryModel> model(new InventoryModel());
+		QVERIFY(model);
+		model->switchItemTypeFilter(itemtypefilter);
+		model->setItemTypeFilter(itemtype.toInt());
+		model->switchPlaceFilter(placefilter);
+		model->setPlaceFilter(place.toInt());
+		model->switchWrittenOffFilter(writtenofffilter);
+		model->setWrittenOffFilter(writtenoff.toBool());
+
+		QCOMPARE(count, model->rowCount());
+
+		if(itemtypefilter) {
+			for(int row = 0; row < model->rowCount(); ++row) {
+				QCOMPARE(itemtype, model->data(model->index(row, ITEM_TYPE), Qt::EditRole));
+			}
+		}
+
+		if(placefilter) {
+			for(int row = 0; row < model->rowCount(); ++row) {
+				QCOMPARE(place, model->data(model->index(row, PLACE), Qt::EditRole));
+			}
+		}
+
+		if(writtenofffilter) {
+			for(int row = 0; row < model->rowCount(); ++row) {
+				QCOMPARE(writtenoff, model->data(model->index(row, WRITTEN_OFF), Qt::EditRole));
+			}
+		}
+	}
+	
 };
 
 QTEST_MAIN(InventoryTest)
