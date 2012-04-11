@@ -514,6 +514,105 @@ private slots:
 			}
 		}
 	}
+
+	void historyHeaderData_data() {
+		QTest::addColumn<QVariant>("value");
+		QTest::addColumn<int>("section");
+		QTest::addColumn<int>("orientation");
+
+		QTest::newRow("time")  << QVariant("Change time") << 0 << int(Qt::Horizontal);
+		QTest::newRow("field") << QVariant("Field name")  << 1 << int(Qt::Horizontal);
+		QTest::newRow("old")   << QVariant("Old value")   << 2 << int(Qt::Horizontal);
+		QTest::newRow("new")   << QVariant("New value")   << 3 << int(Qt::Horizontal);
+	}
+	void historyHeaderData() {
+		QFETCH(QVariant, value);
+		QFETCH(int, section);
+		QFETCH(int, orientation);
+
+		QScopedPointer<HistoryModel> model(new HistoryModel(0));
+		QVERIFY(model);
+		QCOMPARE(9, model->columnCount());
+		QCOMPARE(0, model->rowCount());
+		QCOMPARE(value, model->headerData(section, Qt::Orientation(orientation), Qt::DisplayRole));
+	}
+	void historyRecords_data() {
+		QTest::addColumn<int>("row");
+		QTest::addColumn<int>("column");
+		QTest::addColumn<QVariant>("value");
+		QTest::addColumn<int>("role");
+		QTest::addColumn<QString>("field");
+		QTest::addColumn<QString>("oldvalue");
+		QTest::addColumn<QString>("newvalue");
+
+		const int EDIT = Qt::EditRole, CHECK = Qt::CheckStateRole;
+		const QVariant checked = QVariant(Qt::Checked);
+		const QVariant unchecked = QVariant(Qt::Unchecked);
+		bool ok = false;
+
+		QTest::newRow("Name") << 0 << int(NAME)        << QVariant("Test item")        << EDIT  << "Name"               << ""         << "Test item";
+
+		QScopedPointer<InventoryModel> model(new InventoryModel());
+		QVERIFY(model);
+		ok = model->removeRows(0, model->rowCount() - 1); QVERIFY(ok); QCOMPARE(0, model->rowCount());
+		QScopedPointer<ReferenceModel> itemTypes(new ReferenceModel(ReferenceModel::ITEM_TYPES));
+			QVERIFY(itemTypes);
+			itemTypes->removeRows(0, itemTypes->rowCount() - 1);
+			itemTypes->insertRows(0, 3);
+			itemTypes->setData(itemTypes->index(0, 0), "Type 1");
+			itemTypes->setData(itemTypes->index(1, 0), "Type 2");
+			itemTypes->setData(itemTypes->index(2, 0), "Type 3");
+		QScopedPointer<ReferenceModel> places   (new ReferenceModel(ReferenceModel::PLACES));
+			QVERIFY(places);
+			places->removeRows(0, places->rowCount() - 1);
+			places->insertRows(0, 3);
+			places->setData(places->index(0, 0), "Place 1");
+			places->setData(places->index(1, 0), "Place 2");
+			places->setData(places->index(2, 0), "Place 3");
+		QScopedPointer<ReferenceModel> persons   (new ReferenceModel(ReferenceModel::PERSONS));
+			QVERIFY(persons);
+			persons->removeRows(0, persons->rowCount() - 1);
+			persons->insertRows(0, 3);
+			persons->setData(persons->index(0, 0), "Person 1");
+			persons->setData(persons->index(1, 0), "Person 2");
+			persons->setData(persons->index(2, 0), "Person 3");
+		ok = model->insertRow(0); QVERIFY(ok); QCOMPARE(1, model->rowCount());
+		model->setData(model->index(0, ITEM_TYPE),   itemTypes->idAt(0));
+		model->setData(model->index(0, PLACE),       places->idAt(0));
+		model->setData(model->index(0, PERSON),      persons->idAt(0));
+
+		QTest::newRow("type")    << 0 << int(ITEM_TYPE)   << QVariant(itemTypes->idAt(1)) << EDIT  << "Item type"          << "Type 1"   << "Type 2";
+		QTest::newRow("place")   << 0 << int(PLACE)       << QVariant(places->idAt(1)   ) << EDIT  << "Place"              << "Place 1"  << "Place 2";
+		QTest::newRow("person")  << 0 << int(PERSON)      << QVariant(persons->idAt(1)  ) << EDIT  << "Responsible person" << "Person 1" << "Person 2";
+		QTest::newRow("inn 1")   << 0 << int(INN)         << QVariant(1                 ) << EDIT  << "INN"                << ""         << "1";
+		QTest::newRow("inn 2")   << 0 << int(INN)         << QVariant(""                ) << EDIT  << "INN"                << "1"        << "";
+		QTest::newRow("wr off")  << 0 << int(WRITTEN_OFF) << QVariant(checked           ) << CHECK << "Written off"        << "Present"  << "Written off";
+		QTest::newRow("repair")  << 0 << int(REPAIR)      << QVariant(checked           ) << CHECK << "Under repair"       << "Working"  << "Under repair";
+		QTest::newRow("checked") << 0 << int(CHECKED)     << QVariant(checked           ) << CHECK << "Checked"            << "Not checked" << "Checked";
+		QTest::newRow("notes")   << 0 << int(NOTES)       << QVariant("Simple note"     ) << EDIT  << "Note"               << ""         << "Simple note";
+	}
+	void historyRecords() {
+		QFETCH(int, row);
+		QFETCH(int, column);
+		QFETCH(QVariant, value);
+		QFETCH(int, role);
+
+		QScopedPointer<InventoryModel> inventory(new InventoryModel());
+		bool ok = inventory->setData(inventory->index(row, column), value, role);
+		QVERIFY(ok);
+		QCOMPARE(value, inventory->data(inventory->index(row, column), role));
+
+		QFETCH(QString, field);
+		QFETCH(QString, oldvalue);
+		QFETCH(QString, newvalue);
+
+		QScopedPointer<HistoryModel> model(new HistoryModel(inventory->idAt(row)));
+		QVERIFY(model);
+		QVERIFY(model->rowCount() > 0);
+		QCOMPARE(QVariant(field),    model->data(model->index(model->rowCount() - 1, 1)));
+		QCOMPARE(QVariant(oldvalue), model->data(model->index(model->rowCount() - 1, 2)));
+		QCOMPARE(QVariant(newvalue), model->data(model->index(model->rowCount() - 1, 3)));
+	}
 	
 };
 
