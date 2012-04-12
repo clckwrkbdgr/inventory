@@ -675,7 +675,7 @@ bool ReferenceModel::insertRows(int row, int count, const QModelIndex & /*parent
 
 	if(count <= 0)
 		return false;
-	if(row < 0 || row >= rowCount())
+	if(row < 0 || row >= rowCount() + 1)
 		return false;
 
 	qDebug() << type() << refType.table;
