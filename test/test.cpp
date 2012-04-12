@@ -11,6 +11,17 @@ private slots:
 	void initTestCase() {
 		Database::setDatabaseName("inventory.sqlite");
 		QVERIFY(Database::db().isOpen());
+
+		QScopedPointer<ReferenceModel> places(new ReferenceModel(ReferenceModel::PLACES));
+		QVERIFY(places);
+		QScopedPointer<ReferenceModel> persons(new ReferenceModel(ReferenceModel::PERSONS));
+		QVERIFY(persons);
+		QScopedPointer<ReferenceModel> types(new ReferenceModel(ReferenceModel::ITEM_TYPES));
+		QVERIFY(types);
+		QScopedPointer<InventoryModel> items(new InventoryModel());
+		QVERIFY(items);
+		QScopedPointer<HistoryModel> history(new HistoryModel(0));
+		QVERIFY(history);
 	}
 	void cleanupTestCase() {
 		Database::close();
@@ -40,11 +51,11 @@ private slots:
 			ok = model->insertRow(0); QVERIFY(!ok); QCOMPARE(0, model->rowCount());
 			return;
 		}
-		QCOMPARE(0, model->rowCount());
-		QCOMPARE(1, model->columnCount());
+		QCOMPARE(model->rowCount(), 0);
+		QCOMPARE(model->columnCount(), 1);
 		ok = model->insertColumn(0);
 		QVERIFY(!ok);
-		QCOMPARE(1, model->columnCount());
+		QCOMPARE(model->columnCount(), 1);
 	}
 	void referenceHeaderData_data() {
 		QTest::addColumn<QVariant>("value");
@@ -62,7 +73,7 @@ private slots:
 
 		QScopedPointer<ReferenceModel> model(new ReferenceModel(ReferenceModel::PLACES));
 		QVERIFY(model);
-		QCOMPARE(value, model->headerData(section, Qt::Orientation(orientation), Qt::DisplayRole));
+		QCOMPARE(model->headerData(section, Qt::Orientation(orientation), Qt::DisplayRole), value);
 	}
 	void referenceRowManipulation_data() {
 		QTest::addColumn<bool>("insert");
@@ -92,7 +103,7 @@ private slots:
 		bool ok = false;
 		ok = insert ? model->insertRows(pos, count) : model->removeRows(pos, count);
 		QCOMPARE(ok, success);
-		QCOMPARE(rowcount, model->rowCount());
+		QCOMPARE(model->rowCount(), rowcount);
 	}
 	void referenceCellData_data() {
 		QTest::addColumn<int>("row");
@@ -110,13 +121,13 @@ private slots:
 		QScopedPointer<ReferenceModel> model(new ReferenceModel(ReferenceModel::PLACES));
 		QVERIFY(model);
 
-		bool ok = model->removeRows(0, model->rowCount() - 1);
+		bool ok = model->removeRows(0, model->rowCount());
 		QVERIFY(ok);
-		QCOMPARE(0, model->rowCount());
+		QCOMPARE(model->rowCount(), 0);
 
 		ok = model->insertRows(0, 3);
 		QVERIFY(ok);
-		QCOMPARE(3, model->rowCount());
+		QCOMPARE(model->rowCount(), 3);
 
 	}
 	void referenceCellData() {
@@ -130,32 +141,32 @@ private slots:
 		QVERIFY(model);
 
 		QModelIndex index = model->index(row, column);
-		QCOMPARE(Qt::ItemFlags(flags), model->flags(index));
+		QCOMPARE(model->flags(index), Qt::ItemFlags(flags));
 		bool ok = model->setData(index, value);
 		QCOMPARE(ok, success);
 		if(ok) {
-			QCOMPARE(value, model->data(index));
+			QCOMPARE(model->data(index), value);
 		}
 	}
 	void referenceMultiline() {
 		QScopedPointer<ReferenceModel> model(new ReferenceModel(ReferenceModel::PLACES));
 		QVERIFY(model);
 
-		bool ok = model->removeRows(0, model->rowCount() - 1);
+		bool ok = model->removeRows(0, model->rowCount());
 		QVERIFY(ok);
-		QCOMPARE(0, model->rowCount());
+		QCOMPARE(model->rowCount(), 0);
 
 		ok = model->insertRow(0);
 		QVERIFY(ok);
-		QCOMPARE(1, model->rowCount());
+		QCOMPARE(model->rowCount(), 1);
 
 		ok = model->addMultiline(QStringList() << "First line" << "Second line");
 		QVERIFY(ok);
-		QCOMPARE(3, model->rowCount());
+		QCOMPARE(model->rowCount(), 3);
 
-		QCOMPARE(QVariant(""),            model->data(model->index(0, 0)));
-		QCOMPARE(QVariant("First line"),  model->data(model->index(1, 0)));
-		QCOMPARE(QVariant("Second line"), model->data(model->index(2, 0)));
+		QCOMPARE(           model->data(model->index(0, 0)), QVariant(""));
+		QCOMPARE( model->data(model->index(1, 0)), QVariant("First line"));
+		QCOMPARE(model->data(model->index(2, 0)), QVariant("Second line"));
 	}
 
 	void inventoryHeaderData_data() {
@@ -182,8 +193,8 @@ private slots:
 
 		QScopedPointer<InventoryModel> model(new InventoryModel());
 		QVERIFY(model);
-		QCOMPARE(9, model->columnCount());
-		QCOMPARE(value, model->headerData(section, Qt::Orientation(orientation), Qt::DisplayRole));
+		QCOMPARE(model->columnCount(), 9);
+		QCOMPARE(model->headerData(section, Qt::Orientation(orientation), Qt::DisplayRole), value);
 	}
 	void inventoryRowManipulation_data() {
 		QTest::addColumn<bool>("insert");
@@ -213,7 +224,7 @@ private slots:
 		bool ok = false;
 		ok = insert ? model->insertRows(pos, count) : model->removeRows(pos, count);
 		QCOMPARE(ok, success);
-		QCOMPARE(rowcount, model->rowCount());
+		QCOMPARE(model->rowCount(), rowcount);
 	}
 	void inventoryTextCells_data() {
 		QTest::addColumn<int>("row");
@@ -234,8 +245,8 @@ private slots:
 		const int C = model->columnCount();
 		const int PLAIN_EDIT = Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
 
-		ok = model->removeRows(0, model->rowCount() - 1); QVERIFY(ok); QCOMPARE(0, model->rowCount());
-		ok = model->insertRows(0, R);                     QVERIFY(ok); QCOMPARE(R, model->rowCount());
+		ok = model->removeRows(0, model->rowCount()); QVERIFY(ok); QCOMPARE(model->rowCount(), 0);
+		ok = model->insertRows(0, R);                     QVERIFY(ok); QCOMPARE(model->rowCount(), R);
 
 		QTest::newRow("invalid col") << 0 << C << QVariant("Test") << QVariant() << false << INVALID;
 
@@ -249,9 +260,9 @@ private slots:
 
 		QTest::newRow("INN")        << 0 << int(INN) << QVariant("1") << QVariant("1") << true  << PLAIN_EDIT;
 		QTest::newRow("INN empty")  << 0 << int(INN) << QVariant("")  << QVariant("")  << true  << PLAIN_EDIT;
-		QTest::newRow("INN null")   << 0 << int(INN) << QVariant()    << QVariant("")  << true  << PLAIN_EDIT;
+		QTest::newRow("INN null")   << 0 << int(INN) << QVariant()    << QVariant("")  << false << PLAIN_EDIT;
 		QTest::newRow("INN alpha")  << 2 << int(INN) << QVariant("a") << QVariant("")  << false << PLAIN_EDIT;
-		QTest::newRow("INN space")  << 2 << int(INN) << QVariant(" ") << QVariant("")  << true  << PLAIN_EDIT;
+		QTest::newRow("INN space")  << 2 << int(INN) << QVariant(" ") << QVariant("")  << false << PLAIN_EDIT;
 		QTest::newRow("INN uniq 1") << 2 << int(INN) << QVariant("1") << QVariant("1") << true  << PLAIN_EDIT;
 		QTest::newRow("INN 2")      << 1 << int(INN) << QVariant("2") << QVariant("2") << true  << PLAIN_EDIT;
 		QTest::newRow("INN uniq 2") << 1 << int(INN) << QVariant("1") << QVariant("1") << true  << PLAIN_EDIT;
@@ -268,12 +279,12 @@ private slots:
 		QVERIFY(model);
 
 		QModelIndex index = model->index(row, column);
-		QCOMPARE(Qt::ItemFlags(flags), model->flags(index));
+		QCOMPARE(model->flags(index), Qt::ItemFlags(flags));
 		bool ok = model->setData(index, editvalue, Qt::EditRole);
 		QCOMPARE(ok, success);
 		if(ok) {
-			QCOMPARE(displayvalue, model->data(index, Qt::DisplayRole));
-			QCOMPARE(editvalue, model->data(index, Qt::EditRole));
+			QCOMPARE(model->data(index, Qt::DisplayRole), displayvalue);
+			QCOMPARE(model->data(index, Qt::EditRole), editvalue);
 		}
 	}
 	void inventorySwitchCells_data() {
@@ -298,8 +309,8 @@ private slots:
 		QTest::newRow("invalid row") << R << 0 << QVariant()        << QVariant() << false << INVALID;
 		QTest::newRow("invalid col") << 0 << C << QVariant("Test")  << QVariant() << false << INVALID;
 
-		ok = model->removeRows(0, model->rowCount() - 1); QVERIFY(ok); QCOMPARE(0, model->rowCount());
-		ok = model->insertRows(0, R);                     QVERIFY(ok); QCOMPARE(R, model->rowCount());
+		ok = model->removeRows(0, model->rowCount()); QVERIFY(ok); QCOMPARE(model->rowCount(), 0);
+		ok = model->insertRows(0, R);                     QVERIFY(ok); QCOMPARE(model->rowCount(), R);
 
 		QTest::newRow("written off checked")   << 0 << int(WRITTEN_OFF) << checked   << STR_WRITTEN_OFF << true << SWITCH_EDIT;
 		QTest::newRow("written off unchecked") << 0 << int(WRITTEN_OFF) << unchecked << UNCHECKED       << true << SWITCH_EDIT;
@@ -320,14 +331,14 @@ private slots:
 		QVERIFY(model);
 
 		QModelIndex index = model->index(row, column);
-		QCOMPARE(Qt::ItemFlags(flags), model->flags(index));
+		QCOMPARE(model->flags(index), Qt::ItemFlags(flags));
 		bool ok = model->setData(index, displayvalue, Qt::EditRole);
 		QVERIFY(!ok);
 		ok = model->setData(index, checkvalue, Qt::CheckStateRole);
 		QCOMPARE(ok, success);
 		if(ok) {
-			QCOMPARE(displayvalue, model->data(index, Qt::DisplayRole));
-			QCOMPARE(checkvalue, model->data(index, Qt::CheckStateRole));
+			QCOMPARE(model->data(index, Qt::DisplayRole), displayvalue);
+			QCOMPARE(model->data(index, Qt::CheckStateRole), checkvalue);
 		}
 	}
 	void inventoryRefCells_data() {
@@ -352,28 +363,28 @@ private slots:
 
 		QScopedPointer<ReferenceModel> itemTypes(new ReferenceModel(ReferenceModel::ITEM_TYPES));
 			QVERIFY(itemTypes);
-			itemTypes->removeRows(0, itemTypes->rowCount() - 1);
+			itemTypes->removeRows(0, itemTypes->rowCount());
 			itemTypes->insertRows(0, 3);
 			itemTypes->setData(itemTypes->index(0, 0), "Type 1");
 			itemTypes->setData(itemTypes->index(1, 0), "Type 2");
 			itemTypes->setData(itemTypes->index(2, 0), "Type 3");
 		QScopedPointer<ReferenceModel> places   (new ReferenceModel(ReferenceModel::PLACES));
 			QVERIFY(places);
-			places->removeRows(0, places->rowCount() - 1);
+			places->removeRows(0, places->rowCount());
 			places->insertRows(0, 3);
 			places->setData(places->index(0, 0), "Place 1");
 			places->setData(places->index(1, 0), "Place 2");
 			places->setData(places->index(2, 0), "Place 3");
 		QScopedPointer<ReferenceModel> persons  (new ReferenceModel(ReferenceModel::PERSONS));
 			QVERIFY(persons);
-			persons->removeRows(0, persons->rowCount() - 1);
+			persons->removeRows(0, persons->rowCount());
 			persons->insertRows(0, 3);
 			persons->setData(persons->index(0, 0), "Person 1");
 			persons->setData(persons->index(1, 0), "Person 2");
 			persons->setData(persons->index(2, 0), "Person 3");
 
-		ok = model->removeRows(0, model->rowCount() - 1); QVERIFY(ok); QCOMPARE(0, model->rowCount());
-		ok = model->insertRows(0, R);                     QVERIFY(ok); QCOMPARE(R, model->rowCount());
+		ok = model->removeRows(0, model->rowCount()); QVERIFY(ok); QCOMPARE(model->rowCount(), 0);
+		ok = model->insertRows(0, R);                     QVERIFY(ok); QCOMPARE(model->rowCount(), R);
 
 		QTest::newRow("type 1")     << 0 << int(ITEM_TYPE) << QVariant(itemTypes->idAt(1)) << QVariant("Type 2") << true  << PLAIN_EDIT;
 		QTest::newRow("type 0")     << 1 << int(ITEM_TYPE) << QVariant(itemTypes->idAt(0)) << QVariant("Type 1") << true  << PLAIN_EDIT;
@@ -402,12 +413,12 @@ private slots:
 		QVERIFY(model);
 
 		QModelIndex index = model->index(row, column);
-		QCOMPARE(Qt::ItemFlags(flags), model->flags(index));
+		QCOMPARE(model->flags(index), Qt::ItemFlags(flags));
 		bool ok = model->setData(index, editvalue, Qt::EditRole);
 		QCOMPARE(ok, success);
 		if(ok) {
-			QCOMPARE(displayvalue, model->data(index, Qt::DisplayRole));
-			QCOMPARE(editvalue, model->data(index, Qt::EditRole));
+			QCOMPARE(model->data(index, Qt::DisplayRole), displayvalue);
+			QCOMPARE(model->data(index, Qt::EditRole), editvalue);
 		}
 	}
 	void inventoryFilter_data() {
@@ -425,22 +436,22 @@ private slots:
 
 		QScopedPointer<InventoryModel> model(new InventoryModel());
 		QVERIFY(model);
-		ok = model->removeRows(0, model->rowCount() - 1); QVERIFY(ok); QCOMPARE(0, model->rowCount());
+		ok = model->removeRows(0, model->rowCount()); QVERIFY(ok); QCOMPARE(model->rowCount(), 0);
 		QScopedPointer<ReferenceModel> itemTypes(new ReferenceModel(ReferenceModel::ITEM_TYPES));
 			QVERIFY(itemTypes);
-			itemTypes->removeRows(0, itemTypes->rowCount() - 1);
+			itemTypes->removeRows(0, itemTypes->rowCount());
 			itemTypes->insertRows(0, 3);
 			itemTypes->setData(itemTypes->index(0, 0), "Type 1");
 			itemTypes->setData(itemTypes->index(1, 0), "Type 2");
 			itemTypes->setData(itemTypes->index(2, 0), "Type 3");
 		QScopedPointer<ReferenceModel> places   (new ReferenceModel(ReferenceModel::PLACES));
 			QVERIFY(places);
-			places->removeRows(0, places->rowCount() - 1);
+			places->removeRows(0, places->rowCount());
 			places->insertRows(0, 3);
 			places->setData(places->index(0, 0), "Place 1");
 			places->setData(places->index(1, 0), "Place 2");
 			places->setData(places->index(2, 0), "Place 3");
-		ok = model->insertRows(0, 8); QVERIFY(ok); QCOMPARE(8, model->rowCount());
+		ok = model->insertRows(0, 8); QVERIFY(ok); QCOMPARE(model->rowCount(), 8);
 
 		model->setData(model->index(0, ITEM_TYPE),   itemTypes->idAt(0));
 		model->setData(model->index(0, PLACE),       places->idAt(0));
@@ -503,23 +514,23 @@ private slots:
 		model->switchWrittenOffFilter(writtenofffilter);
 		model->setWrittenOffFilter(writtenoff.toBool());
 
-		QCOMPARE(count, model->rowCount());
+		QCOMPARE(model->rowCount(), count);
 
 		if(itemtypefilter) {
 			for(int row = 0; row < model->rowCount(); ++row) {
-				QCOMPARE(itemtype, model->data(model->index(row, ITEM_TYPE), Qt::EditRole));
+				QCOMPARE(model->data(model->index(row, ITEM_TYPE), Qt::EditRole), itemtype);
 			}
 		}
 
 		if(placefilter) {
 			for(int row = 0; row < model->rowCount(); ++row) {
-				QCOMPARE(place, model->data(model->index(row, PLACE), Qt::EditRole));
+				QCOMPARE(model->data(model->index(row, PLACE), Qt::EditRole), place);
 			}
 		}
 
 		if(writtenofffilter) {
 			for(int row = 0; row < model->rowCount(); ++row) {
-				QCOMPARE(writtenoff, model->data(model->index(row, WRITTEN_OFF), Qt::EditRole));
+				QCOMPARE(model->data(model->index(row, WRITTEN_OFF), Qt::EditRole), writtenoff);
 			}
 		}
 	}
@@ -541,9 +552,9 @@ private slots:
 
 		QScopedPointer<HistoryModel> model(new HistoryModel(0));
 		QVERIFY(model);
-		QCOMPARE(9, model->columnCount());
-		QCOMPARE(0, model->rowCount());
-		QCOMPARE(value, model->headerData(section, Qt::Orientation(orientation), Qt::DisplayRole));
+		QCOMPARE(model->columnCount(), 9);
+		QCOMPARE(model->rowCount(), 0);
+		QCOMPARE(model->headerData(section, Qt::Orientation(orientation), Qt::DisplayRole), value);
 	}
 	void historyRecords_data() {
 		QTest::addColumn<int>("row");
@@ -563,29 +574,29 @@ private slots:
 
 		QScopedPointer<InventoryModel> model(new InventoryModel());
 		QVERIFY(model);
-		ok = model->removeRows(0, model->rowCount() - 1); QVERIFY(ok); QCOMPARE(0, model->rowCount());
+		ok = model->removeRows(0, model->rowCount()); QVERIFY(ok); QCOMPARE(model->rowCount(), 0);
 		QScopedPointer<ReferenceModel> itemTypes(new ReferenceModel(ReferenceModel::ITEM_TYPES));
 			QVERIFY(itemTypes);
-			itemTypes->removeRows(0, itemTypes->rowCount() - 1);
+			itemTypes->removeRows(0, itemTypes->rowCount());
 			itemTypes->insertRows(0, 3);
 			itemTypes->setData(itemTypes->index(0, 0), "Type 1");
 			itemTypes->setData(itemTypes->index(1, 0), "Type 2");
 			itemTypes->setData(itemTypes->index(2, 0), "Type 3");
 		QScopedPointer<ReferenceModel> places   (new ReferenceModel(ReferenceModel::PLACES));
 			QVERIFY(places);
-			places->removeRows(0, places->rowCount() - 1);
+			places->removeRows(0, places->rowCount());
 			places->insertRows(0, 3);
 			places->setData(places->index(0, 0), "Place 1");
 			places->setData(places->index(1, 0), "Place 2");
 			places->setData(places->index(2, 0), "Place 3");
 		QScopedPointer<ReferenceModel> persons   (new ReferenceModel(ReferenceModel::PERSONS));
 			QVERIFY(persons);
-			persons->removeRows(0, persons->rowCount() - 1);
+			persons->removeRows(0, persons->rowCount());
 			persons->insertRows(0, 3);
 			persons->setData(persons->index(0, 0), "Person 1");
 			persons->setData(persons->index(1, 0), "Person 2");
 			persons->setData(persons->index(2, 0), "Person 3");
-		ok = model->insertRow(0); QVERIFY(ok); QCOMPARE(1, model->rowCount());
+		ok = model->insertRow(0); QVERIFY(ok); QCOMPARE(model->rowCount(), 1);
 		model->setData(model->index(0, ITEM_TYPE),   itemTypes->idAt(0));
 		model->setData(model->index(0, PLACE),       places->idAt(0));
 		model->setData(model->index(0, PERSON),      persons->idAt(0));
@@ -609,7 +620,7 @@ private slots:
 		QScopedPointer<InventoryModel> inventory(new InventoryModel());
 		bool ok = inventory->setData(inventory->index(row, column), value, role);
 		QVERIFY(ok);
-		QCOMPARE(value, inventory->data(inventory->index(row, column), role));
+		QCOMPARE(inventory->data(inventory->index(row, column), role), value);
 
 		QFETCH(QString, field);
 		QFETCH(QString, oldvalue);
@@ -618,15 +629,15 @@ private slots:
 		QScopedPointer<HistoryModel> model(new HistoryModel(inventory->idAt(row)));
 		QVERIFY(model);
 		QVERIFY(model->rowCount() > 0);
-		QCOMPARE(QVariant(field),    model->data(model->index(model->rowCount() - 1, 1)));
-		QCOMPARE(QVariant(oldvalue), model->data(model->index(model->rowCount() - 1, 2)));
-		QCOMPARE(QVariant(newvalue), model->data(model->index(model->rowCount() - 1, 3)));
+		QCOMPARE(   model->data(model->index(model->rowCount() - 1, 1)), QVariant(field));
+		QCOMPARE(model->data(model->index(model->rowCount() - 1, 2)), QVariant(oldvalue));
+		QCOMPARE(model->data(model->index(model->rowCount() - 1, 3)), QVariant(newvalue));
 
-		QCOMPARE(int(Qt::ItemIsSelectable | Qt::ItemIsEnabled), int(model->flags(model->index(model->rowCount() - 1, 0))));
-		QCOMPARE(int(Qt::ItemIsSelectable | Qt::ItemIsEnabled), int(model->flags(model->index(model->rowCount() - 1, 1))));
-		QCOMPARE(int(Qt::ItemIsSelectable | Qt::ItemIsEnabled), int(model->flags(model->index(model->rowCount() - 1, 2))));
-		QCOMPARE(int(Qt::ItemIsSelectable | Qt::ItemIsEnabled), int(model->flags(model->index(model->rowCount() - 1, 3))));
-		QCOMPARE(int(Qt::NoItemFlags),                          int(model->flags(model->index(model->rowCount() - 1, 4))));
+		QCOMPARE(int(model->flags(model->index(model->rowCount() - 1, 0))), int(Qt::ItemIsSelectable | Qt::ItemIsEnabled));
+		QCOMPARE(int(model->flags(model->index(model->rowCount() - 1, 1))), int(Qt::ItemIsSelectable | Qt::ItemIsEnabled));
+		QCOMPARE(int(model->flags(model->index(model->rowCount() - 1, 2))), int(Qt::ItemIsSelectable | Qt::ItemIsEnabled));
+		QCOMPARE(int(model->flags(model->index(model->rowCount() - 1, 3))), int(Qt::ItemIsSelectable | Qt::ItemIsEnabled));
+		QCOMPARE(                         int(model->flags(model->index(model->rowCount() - 1, 4))), int(Qt::NoItemFlags));
 	}
 	void historyClear() {
 		QScopedPointer<InventoryModel> inventory(new InventoryModel());
@@ -638,7 +649,7 @@ private slots:
 
 		QScopedPointer<HistoryModel> model(new HistoryModel(id));
 		QVERIFY(model);
-		QCOMPARE(0, model->rowCount());
+		QCOMPARE(model->rowCount(), 0);
 	}
 	
 	void printableInventoryHeaderData_data() {
@@ -660,9 +671,9 @@ private slots:
 
 		QScopedPointer<PrintableInventoryModel> model(new PrintableInventoryModel());
 		QVERIFY(model);
-		QCOMPARE(9, model->columnCount());
-		QCOMPARE(0, model->rowCount());
-		QCOMPARE(value, model->headerData(section, Qt::Orientation(orientation), Qt::DisplayRole));
+		QCOMPARE(model->columnCount(), 9);
+		QCOMPARE(model->rowCount(), 0);
+		QCOMPARE(model->headerData(section, Qt::Orientation(orientation), Qt::DisplayRole), value);
 	}
 	void printableInventory_data() {
 		QTest::addColumn<QString>("name");
@@ -675,29 +686,29 @@ private slots:
 
 		QScopedPointer<InventoryModel> model(new InventoryModel());
 		QVERIFY(model);
-		ok = model->removeRows(0, model->rowCount() - 1); QVERIFY(ok); QCOMPARE(0, model->rowCount());
+		ok = model->removeRows(0, model->rowCount()); QVERIFY(ok); QCOMPARE(model->rowCount(), 0);
 		QScopedPointer<ReferenceModel> itemTypes(new ReferenceModel(ReferenceModel::ITEM_TYPES));
 			QVERIFY(itemTypes);
-			itemTypes->removeRows(0, itemTypes->rowCount() - 1);
+			itemTypes->removeRows(0, itemTypes->rowCount());
 			itemTypes->insertRows(0, 3);
 			itemTypes->setData(itemTypes->index(0, 0), "Type 1");
 			itemTypes->setData(itemTypes->index(1, 0), "Type 2");
 			itemTypes->setData(itemTypes->index(2, 0), "Type 3");
 		QScopedPointer<ReferenceModel> places   (new ReferenceModel(ReferenceModel::PLACES));
 			QVERIFY(places);
-			places->removeRows(0, places->rowCount() - 1);
+			places->removeRows(0, places->rowCount());
 			places->insertRows(0, 3);
 			places->setData(places->index(0, 0), "Place 1");
 			places->setData(places->index(1, 0), "Place 2");
 			places->setData(places->index(2, 0), "Place 3");
 		QScopedPointer<ReferenceModel> persons   (new ReferenceModel(ReferenceModel::PERSONS));
 			QVERIFY(persons);
-			persons->removeRows(0, persons->rowCount() - 1);
+			persons->removeRows(0, persons->rowCount());
 			persons->insertRows(0, 3);
 			persons->setData(persons->index(0, 0), "Person 1");
 			persons->setData(persons->index(1, 0), "Person 2");
 			persons->setData(persons->index(2, 0), "Person 3");
-		ok = model->insertRows(0, 8); QVERIFY(ok); QCOMPARE(8, model->rowCount());
+		ok = model->insertRows(0, 8); QVERIFY(ok); QCOMPARE(model->rowCount(), 8);
 
 		model->setData(model->index(0, ITEM_TYPE),   itemTypes->idAt(0));
 		model->setData(model->index(0, PLACE),       places->idAt(0));
@@ -757,8 +768,8 @@ private slots:
 				sum += model->data(model->index(row, 2)).toInt();
 			}
 		}
-		QCOMPARE(rowcount, matches);
-		QCOMPARE(totalcount, sum);
+		QCOMPARE(matches, rowcount);
+		QCOMPARE(sum, totalcount);
 	}
 	
 	void printableInventoryFilter_data() {
@@ -776,22 +787,22 @@ private slots:
 
 		QScopedPointer<InventoryModel> model(new InventoryModel());
 		QVERIFY(model);
-		ok = model->removeRows(0, model->rowCount() - 1); QVERIFY(ok); QCOMPARE(0, model->rowCount());
+		ok = model->removeRows(0, model->rowCount()); QVERIFY(ok); QCOMPARE(model->rowCount(), 0);
 		QScopedPointer<ReferenceModel> itemTypes(new ReferenceModel(ReferenceModel::ITEM_TYPES));
 			QVERIFY(itemTypes);
-			itemTypes->removeRows(0, itemTypes->rowCount() - 1);
+			itemTypes->removeRows(0, itemTypes->rowCount());
 			itemTypes->insertRows(0, 3);
 			itemTypes->setData(itemTypes->index(0, 0), "Type 1");
 			itemTypes->setData(itemTypes->index(1, 0), "Type 2");
 			itemTypes->setData(itemTypes->index(2, 0), "Type 3");
 		QScopedPointer<ReferenceModel> places   (new ReferenceModel(ReferenceModel::PLACES));
 			QVERIFY(places);
-			places->removeRows(0, places->rowCount() - 1);
+			places->removeRows(0, places->rowCount());
 			places->insertRows(0, 3);
 			places->setData(places->index(0, 0), "Place 1");
 			places->setData(places->index(1, 0), "Place 2");
 			places->setData(places->index(2, 0), "Place 3");
-		ok = model->insertRows(0, 8); QVERIFY(ok); QCOMPARE(8, model->rowCount());
+		ok = model->insertRows(0, 8); QVERIFY(ok); QCOMPARE(model->rowCount(), 8);
 
 		model->setData(model->index(0, ITEM_TYPE),   itemTypes->idAt(0));
 		model->setData(model->index(0, PLACE),       places->idAt(0));
@@ -854,23 +865,23 @@ private slots:
 		model->switchWrittenOffFilter(writtenofffilter);
 		model->setWrittenOffFilter(writtenoff.toBool());
 
-		QCOMPARE(count, model->rowCount());
+		QCOMPARE(model->rowCount(), count);
 
 		if(itemtypefilter) {
 			for(int row = 0; row < model->rowCount(); ++row) {
-				QCOMPARE(itemtype, model->data(model->index(row, 0), Qt::EditRole));
+				QCOMPARE(model->data(model->index(row, 0), Qt::EditRole), itemtype);
 			}
 		}
 
 		if(placefilter) {
 			for(int row = 0; row < model->rowCount(); ++row) {
-				QCOMPARE(place, model->data(model->index(row, 3), Qt::EditRole));
+				QCOMPARE(model->data(model->index(row, 3), Qt::EditRole), place);
 			}
 		}
 
 		if(writtenofffilter) {
 			for(int row = 0; row < model->rowCount(); ++row) {
-				QCOMPARE(writtenoff, model->data(model->index(row, 4), Qt::EditRole));
+				QCOMPARE(model->data(model->index(row, 4), Qt::EditRole), writtenoff);
 			}
 		}
 	}

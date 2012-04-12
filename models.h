@@ -15,11 +15,10 @@ public:
 	static void close();
 
 	static QSqlDatabase db();
-	static QString lastError();
+	static QString error(QSqlError e = db().lastError());
 	static void setDatabaseName(const QString & newName);
-	static bool query(const QString & text);
-	static bool query(const QString & prepared, const Placeholders & placeholders);
-	static QSqlQuery select(const QString & text);
+	static bool query(const QString & prepared, const Placeholders & placeholders = Placeholders());
+	static QSqlQuery select(const QString & prepared, const Placeholders & placeholders = Placeholders());
 private:
 	Database() {}
 	~Database() {}
@@ -120,6 +119,7 @@ struct RefRecord {
 struct RefType {
 	int type;
 	QString table;
+	QString foreignKey;
 };
 
 class ReferenceModel : public QAbstractTableModel {
@@ -142,6 +142,7 @@ public:
 	virtual bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex());
 
 	virtual Id idAt(int row) const;
+	int countOfItemsUsing(Id id);
 	int type() const;
 	virtual bool addMultiline(const QStringList & lines);
 private:

@@ -38,16 +38,14 @@ QSqlDatabase Database::db()
 	return QSqlDatabase::database("inventory");
 }
 
-QString Database::lastError()
+QString Database::error(QSqlError e)
 {
 	static ErrorMap errorTypes = getErrorTypes();
-	QSqlDatabase db = QSqlDatabase::database("inventory");
-	QSqlError error = db.lastError();
 	return QObject::tr("Type: %1\nNumber: %2\nDriver: %3\nDatabase: %4").
-		arg(errorTypes[error.type()]).
-		arg(error.number()).
-		arg(error.driverText()).
-		arg(error.databaseText());
+		arg(errorTypes[e.type()]).
+		arg(e.number()).
+		arg(e.driverText()).
+		arg(e.databaseText());
 }
 
 void Database::setDatabaseName(const QString & newName)
@@ -56,26 +54,25 @@ void Database::setDatabaseName(const QString & newName)
 	reopen();
 }
 
-bool Database::query(const QString & text)
-{
-	QSqlQuery query(Database::db());
-	return query.exec(text);
-}
-
-bool Database::query(const QString & prepared, const QMap<QString, QVariant> & placeholders)
+bool Database::query(const QString & prepared, const Placeholders & placeholders)
 {
 	QSqlQuery query(Database::db());
 	query.prepare(prepared);
 	foreach(QString key, placeholders.keys()) {
 		query.bindValue(key, placeholders[key]);
 	}
-	return query.exec();
+	bool ok = query.exec();
+	return ok;
 }
 
-QSqlQuery Database::select(const QString & text)
+QSqlQuery Database::select(const QString & prepared, const Placeholders & placeholders)
 {
 	QSqlQuery query(Database::db());
-	query.exec(text);
+	query.prepare(prepared);
+	foreach(QString key, placeholders.keys()) {
+		query.bindValue(key, placeholders[key]);
+	}
+	query.exec();
 	return query;
 }
 
@@ -88,16 +85,16 @@ InventoryModel::InventoryModel(QObject * parent)
 {
 	Database::query(" CREATE TABLE IF NOT EXISTS "
 			" Inventory ( "
-			" id                INT  PRIMARY KEY, "
-			" itemType          INT  NOT NULL, "
-			" place             INT  NOT NULL, "
-			" responsiblePerson INT  NOT NULL, "
-			" name              TEXT NOT NULL DEFAULT '', "
-			" inn               INT           DEFAULT NULL, "
-			" writtenOff        INT  NOT NULL DEFAULT 0, "
-			" underRepair       INT  NOT NULL DEFAULT 0, "
-			" checked           INT  NOT NULL DEFAULT 0, "
-			" note              TEXT NOT NULL DEFAULT '', "
+			" id                INTEGER  PRIMARY KEY, "
+			" itemType          INTEGER  NOT NULL, "
+			" place             INTEGER  NOT NULL, "
+			" responsiblePerson INTEGER  NOT NULL, "
+			" name              TEXT     NOT NULL DEFAULT '', "
+			" inn               INTEGER           DEFAULT NULL, "
+			" writtenOff        INTEGER  NOT NULL DEFAULT 0, "
+			" underRepair       INTEGER  NOT NULL DEFAULT 0, "
+			" checked           INTEGER  NOT NULL DEFAULT 0, "
+			" note              TEXT     NOT NULL DEFAULT '', "
 			" FOREIGN KEY (itemType)          REFERENCES ItemTypes(id), "
 			" FOREIGN KEY (place)             REFERENCES Place    (id), "
 			" FOREIGN KEY (responsiblePerson) REFERENCES Persons  (id) "
@@ -113,11 +110,11 @@ void InventoryModel::update()
 			"   itemType, ItemTypes.name, "
 			"   place, Places.name, "
 			"   responsiblePerson, Persons.name, "
-			"   Inventory.name, CASE inn WHEN inn IS NOT NULL THEN 1 ELSE 0 END as innIsNotNull, "
+			"   Inventory.name, "
 			"   inn, writtenOff, underRepair, checked, note "
-			" FROM Inventory, ItemTypes, Place, Persons "
-			" WHERE Inventory.itemType = ItemTypes.id, "
-			" AND Inventory.place = Places.id, "
+			" FROM Inventory, ItemTypes, Places, Persons "
+			" WHERE Inventory.itemType = ItemTypes.id "
+			" AND Inventory.place = Places.id "
 			" AND Inventory.responsiblePerson = Persons.id "
 			" ; "
 			);
@@ -132,12 +129,12 @@ void InventoryModel::update()
 		item.responsiblePersonId = query.value( 5).toInt();
 		item.responsiblePerson   = query.value( 6).toString();
 		item.name                = query.value( 7).toString();
-		item.innIsNotNull        = query.value( 8).toBool();
-		item.inn                 = query.value( 9).toInt();
-		item.writtenOff          = query.value(10).toBool();
-		item.underRepair         = query.value(11).toBool();
-		item.checked             = query.value(12).toBool();
-		item.note                = query.value(13).toString();
+		item.innIsNotNull        = query.value( 8).isValid() && !query.value(8).isNull();
+		item.inn                 = query.value( 8).toInt();
+		item.writtenOff          = query.value( 9).toBool();
+		item.underRepair         = query.value(10).toBool();
+		item.checked             = query.value(11).toBool();
+		item.note                = query.value(12).toString();
 		items << item;
 	}
 }
@@ -146,9 +143,9 @@ enum { ITEM_TYPE, ITEM_PLACE, ITEM_PERSON, ITEM_NAME, ITEM_INN, ITEM_WRITTEN_OFF
 
 Qt::ItemFlags InventoryModel::flags(const QModelIndex & index) const
 {
-	if(index.row() >= rowCount())
+	if(index.row() < 0 || rowCount() <= index.row())
 		return Qt::NoItemFlags;
-	if(index.column() >= ITEM_FIELD_COUNT)
+	if(index.column() < 0 || ITEM_FIELD_COUNT <= index.column())
 		return Qt::NoItemFlags;
 
 	return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
@@ -214,7 +211,7 @@ QVariant InventoryModel::data(const QModelIndex & index, int role) const
 
 enum { HISTORY_TYPE, HISTORY_PLACE, HISTORY_PERSON, HISTORY_NAME, HISTORY_INN,
 	HISTORY_WRITTEN_OFF, HISTORY_UNDER_REPAIR, HISTORY_CHECKED, HISTORY_NOTE, HISTORY_FIELD_COUNT };
-template<class T> void updateField(const QString & fieldName, int fieldIndex, const T & oldValue, const T & newValue)
+template<class T> void updateField(Id id, const QString & fieldName, int fieldIndex, const T & oldValue, const T & newValue)
 {
 	if(oldValue == newValue)
 		return;
@@ -232,12 +229,15 @@ template<class T> void updateField(const QString & fieldName, int fieldIndex, co
 
 	Database::Placeholders values;
 	values[":value"] = newValue;
-	Database::query("UPDATE Inventory SET " + fieldName + " = :value", values);
+	values[":id"] = id;
+	Database::query("UPDATE Inventory SET " + fieldName + " = :value WHERE id = :id", values);
 }
 
 bool InventoryModel::setData(const QModelIndex & index, const QVariant & value, int role)
 {
 	if(index.row() >= rowCount())
+		return false;
+	if(!value.isValid())
 		return false;
 
 	bool success = false;
@@ -245,25 +245,45 @@ bool InventoryModel::setData(const QModelIndex & index, const QVariant & value, 
 		success = true;
 		const Item & item = items[index.row()];
 		switch(index.column()) {
-			case ITEM_WRITTEN_OFF:  updateField("writtenOff",  HISTORY_WRITTEN_OFF,  item.writtenOff,  value == Qt::Checked); break;
-			case ITEM_UNDER_REPAIR: updateField("underRepair", HISTORY_UNDER_REPAIR, item.underRepair, value == Qt::Checked); break;
-			case ITEM_CHECKED:      updateField("checked",     HISTORY_CHECKED,      item.checked,     value == Qt::Checked); break;
+			case ITEM_WRITTEN_OFF:  updateField(item.id, "writtenOff",  HISTORY_WRITTEN_OFF,  item.writtenOff,  value == Qt::Checked); break;
+			case ITEM_UNDER_REPAIR: updateField(item.id, "underRepair", HISTORY_UNDER_REPAIR, item.underRepair, value == Qt::Checked); break;
+			case ITEM_CHECKED:      updateField(item.id, "checked",     HISTORY_CHECKED,      item.checked,     value == Qt::Checked); break;
 			default: success = false;
 		}
 	} else if(role == Qt::EditRole) {
 		success = true;
 		const Item & item = items[index.row()];
 		switch(index.column()) {
-			case ITEM_TYPE: updateField("itemType", HISTORY_TYPE, item.itemTypeId, value.toInt()); break;
-			case ITEM_PLACE: updateField("place", HISTORY_PLACE, item.placeId, value.toInt()); break;
-			case ITEM_PERSON: updateField("responsiblePerson", HISTORY_PERSON, item.responsiblePersonId, value.toInt()); break;
-			case ITEM_NAME: updateField("name", HISTORY_NAME, item.name, value.toString()); break;
-			case ITEM_INN: updateField("inn", HISTORY_INN,
-								   item.innIsNotNull ? QVariant(item.inn) : QVariant(),
-								   value.toString().toInt() ? value : QVariant()
-								   );
-						   break;
-			case ITEM_NOTE: updateField("note", HISTORY_NOTE, item.note, value.toString()); break;
+			case ITEM_TYPE: updateField(item.id, "itemType", HISTORY_TYPE, item.itemTypeId, value.toInt()); break;
+			case ITEM_PLACE: updateField(item.id, "place", HISTORY_PLACE, item.placeId, value.toInt()); break;
+			case ITEM_PERSON: updateField(item.id, "responsiblePerson", HISTORY_PERSON, item.responsiblePersonId, value.toInt()); break;
+			case ITEM_NAME: updateField(item.id, "name", HISTORY_NAME, item.name, value.toString()); break;
+			case ITEM_INN: {
+				bool valueIsNull = !value.isValid();
+				bool valueIsNum = false;
+				int inn = value.toInt(&valueIsNum);
+				bool valueIsEmpty = value.toString().isEmpty();
+
+				if(!valueIsNull && (valueIsNum || valueIsEmpty)) {
+					updateField(item.id, "inn", HISTORY_INN,
+							item.innIsNotNull ? QVariant(item.inn) : QVariant(),
+							valueIsEmpty ? QVariant() : inn
+							);
+				} else {
+					success = false;
+				}
+
+				/*
+				update();
+				QSqlQuery q = Database::select("select inn from inventory;");
+				while(q.next()) {
+					qDebug() << q.value(0);
+				}
+				qDebug() << value << success << (valueIsNull?"null":"not null") << (valueIsEmpty?"empty":"full") << (valueIsNum?"num":"alpha") << inn;
+				*/
+				break;
+			}
+			case ITEM_NOTE: updateField(item.id, "note", HISTORY_NOTE, item.note, value.toString()); break;
 			default: success = false;
 		}
 	}
@@ -324,7 +344,7 @@ bool InventoryModel::insertRows(int row, int count, const QModelIndex & /*parent
 {
 	if(count <= 0)
 		return false;
-	if(row < 0 || row >= rowCount())
+	if(row < 0 || rowCount() + 1 <= row)
 		return false;
 
 	Id itemTypeId = getDefaultId("ItemTypes");
@@ -338,8 +358,9 @@ bool InventoryModel::insertRows(int row, int count, const QModelIndex & /*parent
 		map[":place"]    = placeId;
 		map[":person"]   = personId;
 		Database::query(
-				"INSERT INTO Inventory (itemType, place, person) "
-				" VALUES (:itemtype, :place, :person) "
+				"INSERT INTO Inventory (itemType, place, responsiblePerson) "
+				" VALUES (:itemtype, :place, :person); ",
+				map
 				);
 	}
 	update();
@@ -547,16 +568,19 @@ RefType getRefType(int type)
 		case ReferenceModel::ITEM_TYPES: {
 			result.type = type;
 			result.table = "ItemTypes";
+			result.foreignKey = "itemType";
 			break;
 		}
 		case ReferenceModel::PLACES: {
 			result.type = type;
 			result.table = "Places";
+			result.foreignKey = "place";
 			break;
 		}
 		case ReferenceModel::PERSONS: {
 			result.type = type;
 			result.table = "Persons";
+			result.foreignKey = "responsiblePerson";
 			break;
 		}
 		default: break;
@@ -572,8 +596,8 @@ ReferenceModel::ReferenceModel(int newType, QObject * parent)
 		return;
 
 	Database::query(" CREATE TABLE IF NOT EXISTS "
-			" " + refType.table +" ( "
-			" id                INT  PRIMARY KEY, "
+			" " + refType.table + " ( "
+			" id                INTEGER  PRIMARY KEY AUTOINCREMENT, "
 			" name              TEXT NOT NULL DEFAULT '' "
 			" ); "
 			);
@@ -601,9 +625,9 @@ void ReferenceModel::update()
 
 Qt::ItemFlags ReferenceModel::flags(const QModelIndex & index) const
 {
-	if(index.row() >= rowCount())
+	if(index.row() < 0 || rowCount() <= index.row())
 		return Qt::NoItemFlags;
-	if(index.column() >= 1)
+	if(index.column() < 0 || columnCount() <= index.column())
 		return Qt::NoItemFlags;
 
 	return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
@@ -675,15 +699,30 @@ bool ReferenceModel::insertRows(int row, int count, const QModelIndex & /*parent
 
 	if(count <= 0)
 		return false;
-	if(row < 0 || row >= rowCount() + 1)
+	if(row < 0 || rowCount() + 1 <= row)
 		return false;
 
-	qDebug() << type() << refType.table;
 	while(count--) {
 		Database::query("INSERT INTO " + refType.table + " DEFAULT VALUES; ");
 	}
 	update();
 	return true;
+}
+
+int ReferenceModel::countOfItemsUsing(Id id)
+{
+	QString queryText = QString(
+			"SELECT COUNT(Inventory.id) FROM Inventory, %1"
+			" WHERE Inventory.%2 = %1.id AND %1.id = :id;"
+			).
+		arg(refType.table).
+		arg(refType.foreignKey);
+
+	Database::Placeholders map;
+	map[":id"] = id;
+	QSqlQuery q = Database::select(queryText, map);
+	q.next();
+	return q.value(0).toInt();
 }
 
 bool ReferenceModel::removeRows(int row, int count, const QModelIndex & /*parent*/)
@@ -693,14 +732,17 @@ bool ReferenceModel::removeRows(int row, int count, const QModelIndex & /*parent
 
 	if(count <= 0)
 		return false;
-	if(row < 0 || row >= rowCount())
+	if(row < 0 || row >= rowCount() + 1)
 		return false;
 	
 	for(int i = 0; i < count; ++i) {
+		if(countOfItemsUsing(idAt(row + i)) > 0) {
+			return false;
+		}
+
 		Database::Placeholders map;
 		map[":id"] = idAt(row + i);
 		Database::query("DELETE FROM " + refType.table + " WHERE id = :id", map);
-		// TODO Бросить исключение, если есть ещё предметы, используещие указанные значения.
 	}
 	update();
 	return true;
