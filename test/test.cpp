@@ -1,4 +1,5 @@
 #include <QtTest/QtTest>
+#include <QtDebug>
 #include "models.h"
 
 using namespace Inventory;
@@ -7,6 +8,14 @@ class InventoryTest: public QObject {
 	Q_OBJECT
 	enum { ITEM_TYPE = 0, PLACE, PERSON, NAME, INN, WRITTEN_OFF, REPAIR, CHECKED, NOTES };
 private slots:
+	void initTestCase() {
+		Database::setDatabaseName("inventory.sqlite");
+		QVERIFY(Database::db().isOpen());
+	}
+	void cleanupTestCase() {
+		Database::close();
+		QVERIFY(!Database::db().isOpen());
+	}
 	void referenceTypes_data() {
 		QTest::addColumn<int>("original");
 		QTest::addColumn<int>("result");
@@ -15,7 +24,7 @@ private slots:
 		QTest::newRow("places")     << int(ReferenceModel::PLACES)     << int(ReferenceModel::PLACES);
 		QTest::newRow("persons")    << int(ReferenceModel::PERSONS)    << int(ReferenceModel::PERSONS);
 		QTest::newRow("invalid")    << int(ReferenceModel::INVALID)    << int(ReferenceModel::INVALID);
-		QTest::newRow("too big")    << int(ReferenceModel::COUNT)      << int(ReferenceModel::INVALID);
+		QTest::newRow("too big")    << int(ReferenceModel::REF_TYPE_COUNT)      << int(ReferenceModel::INVALID);
 	}
 	void referenceTypes() {
 		QFETCH(int, original);
@@ -156,7 +165,7 @@ private slots:
 
 		QTest::newRow("item type")     << QVariant("Item type")    << 0 << int(Qt::Horizontal);
 		QTest::newRow("place")         << QVariant("Place")        << 1 << int(Qt::Horizontal);
-		QTest::newRow("person")        << QVariant("Person")       << 2 << int(Qt::Horizontal);
+		QTest::newRow("person")        << QVariant("Responsible person") << 2 << int(Qt::Horizontal);
 		QTest::newRow("name")          << QVariant("Name")         << 3 << int(Qt::Horizontal);
 		QTest::newRow("inn")           << QVariant("INN")          << 4 << int(Qt::Horizontal);
 		QTest::newRow("writtenoff")    << QVariant("Written off")  << 5 << int(Qt::Horizontal);

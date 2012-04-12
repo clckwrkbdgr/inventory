@@ -1,10 +1,50 @@
 #pragma once
 
 #include <QtCore/QAbstractTableModel>
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
+#include <QtCore/QStringList>
 
 namespace Inventory {
 
+class Database {
+public:
+	typedef QMap<QString, QVariant> Placeholders;
+	static bool reopen();
+	static void close();
+
+	static QSqlDatabase db();
+	static QString lastError();
+	static void setDatabaseName(const QString & newName);
+	static bool query(const QString & text);
+	static bool query(const QString & prepared, const Placeholders & placeholders);
+	static QSqlQuery select(const QString & text);
+private:
+	Database() {}
+	~Database() {}
+
+	static QString databaseName;
+};
+
 typedef int Id;
+
+struct Item {
+	Id id;
+	Id itemTypeId;
+	QString itemType;
+	Id placeId;
+	QString place;
+	Id responsiblePersonId;
+	QString responsiblePerson;
+	QString name;
+	bool innIsNotNull;
+	int inn;
+	bool writtenOff;
+	bool underRepair;
+	bool checked;
+	QString note;
+};
 
 class InventoryModel : public QAbstractTableModel {
 	Q_OBJECT
@@ -30,6 +70,9 @@ public:
 	virtual void switchPlaceFilter(bool on = true);
 	virtual void setWrittenOffFilter(bool writtenOff);
 	virtual void switchWrittenOffFilter(bool on = true);
+private:
+	QList<Item> items;
+	void update();
 };
 
 class HistoryModel : public QAbstractTableModel {
@@ -69,13 +112,23 @@ public:
 	virtual void switchWrittenOffFilter(bool on = true);
 };
 
+struct RefRecord {
+	Id id;
+	QString name;
+};
+
+struct RefType {
+	int type;
+	QString table;
+};
+
 class ReferenceModel : public QAbstractTableModel {
 	Q_OBJECT
 	Q_DISABLE_COPY(ReferenceModel);
 public:
-	enum { INVALID = 0, ITEM_TYPES, PLACES, PERSONS, COUNT };
+	enum { INVALID = 0, ITEM_TYPES, PLACES, PERSONS, REF_TYPE_COUNT };
 
-	ReferenceModel(int type, QObject * parent = 0);
+	ReferenceModel(int newType, QObject * parent = 0);
 	virtual ~ReferenceModel() {}
 
 	virtual Qt::ItemFlags flags(const QModelIndex & index) const;
@@ -91,6 +144,10 @@ public:
 	virtual Id idAt(int row) const;
 	int type() const;
 	virtual bool addMultiline(const QStringList & lines);
+private:
+	QList<RefRecord> records;
+	RefType refType;
+	void update();
 };
 
 }
