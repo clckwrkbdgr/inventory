@@ -459,46 +459,48 @@ private slots:
 
 		model->setData(model->index(0, ITEM_TYPE),   itemTypes->idAt(0));
 		model->setData(model->index(0, PLACE),       places->idAt(0));
-		model->setData(model->index(0, WRITTEN_OFF), Qt::Checked);
+		model->setData(model->index(0, WRITTEN_OFF), Qt::Checked, Qt::CheckStateRole);
 
 		model->setData(model->index(1, ITEM_TYPE),   itemTypes->idAt(0));
 		model->setData(model->index(1, PLACE),       places->idAt(0));
-		model->setData(model->index(1, WRITTEN_OFF), Qt::Unchecked);
+		model->setData(model->index(1, WRITTEN_OFF), Qt::Unchecked, Qt::CheckStateRole);
 
 		model->setData(model->index(2, ITEM_TYPE),   itemTypes->idAt(1));
 		model->setData(model->index(2, PLACE),       places->idAt(0));
-		model->setData(model->index(2, WRITTEN_OFF), Qt::Checked);
+		model->setData(model->index(2, WRITTEN_OFF), Qt::Checked, Qt::CheckStateRole);
 
 		model->setData(model->index(3, ITEM_TYPE),   itemTypes->idAt(1));
 		model->setData(model->index(3, PLACE),       places->idAt(0));
-		model->setData(model->index(3, WRITTEN_OFF), Qt::Unchecked);
+		model->setData(model->index(3, WRITTEN_OFF), Qt::Unchecked, Qt::CheckStateRole);
 
 		model->setData(model->index(4, ITEM_TYPE),   itemTypes->idAt(0));
 		model->setData(model->index(4, PLACE),       places->idAt(1));
-		model->setData(model->index(4, WRITTEN_OFF), Qt::Checked);
+		model->setData(model->index(4, WRITTEN_OFF), Qt::Checked, Qt::CheckStateRole);
 
 		model->setData(model->index(5, ITEM_TYPE),   itemTypes->idAt(0));
 		model->setData(model->index(5, PLACE),       places->idAt(1));
-		model->setData(model->index(5, WRITTEN_OFF), Qt::Unchecked);
+		model->setData(model->index(5, WRITTEN_OFF), Qt::Unchecked, Qt::CheckStateRole);
 
 		model->setData(model->index(6, ITEM_TYPE),   itemTypes->idAt(1));
 		model->setData(model->index(6, PLACE),       places->idAt(1));
-		model->setData(model->index(6, WRITTEN_OFF), Qt::Checked);
+		model->setData(model->index(6, WRITTEN_OFF), Qt::Checked, Qt::CheckStateRole);
 
 		model->setData(model->index(7, ITEM_TYPE),   itemTypes->idAt(1));
 		model->setData(model->index(7, PLACE),       places->idAt(1));
-		model->setData(model->index(7, WRITTEN_OFF), Qt::Unchecked);
+		model->setData(model->index(7, WRITTEN_OFF), Qt::Unchecked, Qt::CheckStateRole);
 
-		QTest::newRow("000")   << 8 << false << QVariant(itemTypes->idAt(0)) << false << QVariant(places->idAt(0)) << false << QVariant(Qt::Unchecked);
-		QTest::newRow("100")   << 4 << true  << QVariant(itemTypes->idAt(1)) << false << QVariant(places->idAt(0)) << false << QVariant(Qt::Unchecked);
-		QTest::newRow("010")   << 4 << false << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(0)) << false << QVariant(Qt::Unchecked);
-		QTest::newRow("110")   << 2 << true  << QVariant(itemTypes->idAt(0)) << true  << QVariant(places->idAt(1)) << false << QVariant(Qt::Checked);
-		QTest::newRow("001")   << 4 << false << QVariant(itemTypes->idAt(0)) << false << QVariant(places->idAt(1)) << true  << QVariant(Qt::Checked);
-		QTest::newRow("101")   << 2 << true  << QVariant(itemTypes->idAt(1)) << false << QVariant(places->idAt(1)) << true  << QVariant(Qt::Checked);
-		QTest::newRow("011")   << 2 << false << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(1)) << true  << QVariant(Qt::Unchecked);
-		QTest::newRow("111 1") << 1 << true  << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(1)) << true  << QVariant(Qt::Checked);
-		QTest::newRow("111 2") << 1 << true  << QVariant(itemTypes->idAt(0)) << true  << QVariant(places->idAt(0)) << true  << QVariant(Qt::Unchecked);
-		QTest::newRow("111 3") << 1 << true  << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(0)) << true  << QVariant(Qt::Checked);
+		int checked = 1, unchecked = 0;
+
+		QTest::newRow("000")   << 8 << false << QVariant(itemTypes->idAt(0)) << false << QVariant(places->idAt(0)) << false << QVariant(unchecked);
+		QTest::newRow("100")   << 4 << true  << QVariant(itemTypes->idAt(1)) << false << QVariant(places->idAt(0)) << false << QVariant(unchecked);
+		QTest::newRow("010")   << 4 << false << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(0)) << false << QVariant(unchecked);
+		QTest::newRow("110")   << 2 << true  << QVariant(itemTypes->idAt(0)) << true  << QVariant(places->idAt(1)) << false << QVariant(checked);
+		QTest::newRow("001")   << 4 << false << QVariant(itemTypes->idAt(0)) << false << QVariant(places->idAt(1)) << true  << QVariant(checked);
+		QTest::newRow("101")   << 2 << true  << QVariant(itemTypes->idAt(1)) << false << QVariant(places->idAt(1)) << true  << QVariant(checked);
+		QTest::newRow("011")   << 2 << false << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(1)) << true  << QVariant(unchecked);
+		QTest::newRow("111 1") << 1 << true  << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(1)) << true  << QVariant(checked);
+		QTest::newRow("111 2") << 1 << true  << QVariant(itemTypes->idAt(0)) << true  << QVariant(places->idAt(0)) << true  << QVariant(unchecked);
+		QTest::newRow("111 3") << 1 << true  << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(0)) << true  << QVariant(checked);
 	}
 	void inventoryFilter() {
 		QFETCH(int, count);
@@ -511,6 +513,9 @@ private slots:
 
 		QScopedPointer<InventoryModel> model(new InventoryModel());
 		QVERIFY(model);
+		//qDebug() << "itemtype" << itemtypefilter << itemtype;
+		//qDebug() << "place" << placefilter << place;
+		//qDebug() << "writtenoff" << writtenofffilter << writtenoff;
 		model->switchItemTypeFilter(itemtypefilter);
 		model->setItemTypeFilter(itemtype.toInt());
 		model->switchPlaceFilter(placefilter);
@@ -534,7 +539,7 @@ private slots:
 
 		if(writtenofffilter) {
 			for(int row = 0; row < model->rowCount(); ++row) {
-				QCOMPARE(model->data(model->index(row, WRITTEN_OFF), Qt::EditRole), writtenoff);
+				QCOMPARE(model->data(model->index(row, WRITTEN_OFF), Qt::DisplayRole), writtenoff.toInt() ? QVariant("Written off") : QVariant(""));
 			}
 		}
 	}

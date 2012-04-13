@@ -29,6 +29,19 @@ private:
 
 typedef int Id;
 
+struct Filter {
+	bool useItemTypeFilter;
+	Id itemTypeFilter;
+	bool usePlaceFilter;
+	Id placeFilter;
+	bool useWrittenOffFilter;
+	bool writtenOffFilter;
+	Filter()
+		: useItemTypeFilter(false), itemTypeFilter(0),
+		usePlaceFilter(false), placeFilter(0),
+		useWrittenOffFilter(false), writtenOffFilter(false) { }
+};
+
 struct Item {
 	Id id;
 	Id itemTypeId;
@@ -70,6 +83,7 @@ public:
 	virtual void setWrittenOffFilter(bool writtenOff);
 	virtual void switchWrittenOffFilter(bool on = true);
 private:
+	Filter filter;
 	QList<Item> items;
 	void update();
 };

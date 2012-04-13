@@ -160,6 +160,26 @@ InventoryModel::InventoryModel(QObject * parent)
 
 void InventoryModel::update()
 {
+	Database::Placeholders map;
+
+	QStringList filterClauses;
+	if(filter.useItemTypeFilter) {
+		filterClauses << "itemType = :itemType";
+		map[":itemType"] = filter.itemTypeFilter;
+	}
+	if(filter.usePlaceFilter) {
+		filterClauses << "place = :place";
+		map[":place"] = filter.placeFilter;
+	}
+	if(filter.useWrittenOffFilter) {
+		filterClauses << "writtenOff = :writtenOff";
+		map[":writtenOff"] = int(filter.writtenOffFilter);
+	}
+
+	QStringList constraints;
+	constraints << "Inventory.itemType = ItemTypes.id";
+	constraints << "Inventory.place = Places.id";
+	constraints << "Inventory.responsiblePerson = Persons.id";
 	QSqlQuery query = Database::select(
 			" SELECT Inventory.id, "
 			"   itemType, ItemTypes.name, "
@@ -168,10 +188,10 @@ void InventoryModel::update()
 			"   Inventory.name, "
 			"   inn, writtenOff, underRepair, checked, note "
 			" FROM Inventory, ItemTypes, Places, Persons "
-			" WHERE Inventory.itemType = ItemTypes.id "
-			" AND Inventory.place = Places.id "
-			" AND Inventory.responsiblePerson = Persons.id "
-			" ; "
+			" WHERE "
+			+ (filterClauses + constraints).join(" AND ") +
+			" ; ",
+			map
 			);
 	items.clear();
 	while(query.next()) {
@@ -191,6 +211,10 @@ void InventoryModel::update()
 		item.note                = query.value(12).toString();
 		items << item;
 	}
+	//if(filter.useItemTypeFilter || filter.usePlaceFilter || filter.useWrittenOffFilter) {
+		////qDebug() << map << query.executedQuery();
+		//qDebug() << items.count();
+	//}
 }
 
 enum { ITEM_TYPE, ITEM_PLACE, ITEM_PERSON, ITEM_NAME, ITEM_INN, ITEM_WRITTEN_OFF, ITEM_UNDER_REPAIR, ITEM_CHECKED, ITEM_NOTE, ITEM_FIELD_COUNT };
@@ -306,6 +330,8 @@ void updateField(Id id, const QString & fieldName, int fieldIndex, const QString
 
 void updateField(Id id, const QString & fieldName, int fieldIndex, int oldValue, int newValue)
 {
+	//if(fieldIndex == HISTORY_WRITTEN_OFF)
+		////qDebug() << id << fieldName << oldValue << newValue;
 	updateField(id, fieldName, fieldIndex, QString::number(oldValue), QString::number(newValue));
 }
 
@@ -467,34 +493,40 @@ Id InventoryModel::idAt(int row) const
 	return Id();
 }
 
-void InventoryModel::setItemTypeFilter(int /*itemType*/)
+void InventoryModel::setItemTypeFilter(int itemType)
 {
-	return;
+	filter.itemTypeFilter = itemType;
+	update();
 }
 
-void InventoryModel::switchItemTypeFilter(bool /*on*/)
+void InventoryModel::switchItemTypeFilter(bool on)
 {
-	return;
+	filter.useItemTypeFilter = on;
+	update();
 }
 
-void InventoryModel::setPlaceFilter(int /*place*/)
+void InventoryModel::setPlaceFilter(int place)
 {
-	return;
+	filter.placeFilter = place;
+	update();
 }
 
-void InventoryModel::switchPlaceFilter(bool /*on*/)
+void InventoryModel::switchPlaceFilter(bool on)
 {
-	return;
+	filter.usePlaceFilter = on;
+	update();
 }
 
-void InventoryModel::setWrittenOffFilter(bool /*writtenOff*/)
+void InventoryModel::setWrittenOffFilter(bool writtenOff)
 {
-	return;
+	filter.writtenOffFilter = writtenOff;
+	update();
 }
 
-void InventoryModel::switchWrittenOffFilter(bool /*on*/)
+void InventoryModel::switchWrittenOffFilter(bool on)
 {
-	return;
+	filter.useWrittenOffFilter = on;
+	update();
 }
 
 }
