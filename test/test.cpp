@@ -337,7 +337,7 @@ private slots:
 		ok = model->setData(index, checkvalue, Qt::CheckStateRole);
 		QCOMPARE(ok, success);
 		if(ok) {
-			QCOMPARE(model->data(index, Qt::DisplayRole), displayvalue);
+			QCOMPARE(model->data(index, Qt::DisplayRole),    displayvalue);
 			QCOMPARE(model->data(index, Qt::CheckStateRole), checkvalue);
 		}
 	}
@@ -556,7 +556,7 @@ private slots:
 
 		QScopedPointer<HistoryModel> model(new HistoryModel(0));
 		QVERIFY(model);
-		QCOMPARE(model->columnCount(), 9);
+		QCOMPARE(model->columnCount(), 4);
 		QCOMPARE(model->rowCount(), 0);
 		QCOMPARE(model->headerData(section, Qt::Orientation(orientation), Qt::DisplayRole), value);
 	}
@@ -634,6 +634,13 @@ private slots:
 		QVERIFY(model);
 		QVERIFY(model->rowCount() > 0);
 		QCOMPARE(   model->data(model->index(model->rowCount() - 1, 1)), QVariant(field));
+		/*
+		qDebug() << 
+			model->data(model->index(model->rowCount() - 1, 0)) <<
+			model->data(model->index(model->rowCount() - 1, 1)) <<
+			model->data(model->index(model->rowCount() - 1, 2)) <<
+			model->data(model->index(model->rowCount() - 1, 3));
+			*/
 		QCOMPARE(model->data(model->index(model->rowCount() - 1, 2)), QVariant(oldvalue));
 		QCOMPARE(model->data(model->index(model->rowCount() - 1, 3)), QVariant(newvalue));
 

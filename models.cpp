@@ -23,7 +23,58 @@ bool Database::reopen()
 {
 	QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "inventory");
 	db.setDatabaseName(databaseName);
-	return db.open();
+	bool ok = db.open();
+	if(!ok)
+		return false;
+
+	Database::query(" CREATE TABLE IF NOT EXISTS "
+			" Places ( "
+			" id                INTEGER  PRIMARY KEY AUTOINCREMENT, "
+			" name              TEXT NOT NULL DEFAULT '' "
+			" ); "
+			);
+	Database::query(" CREATE TABLE IF NOT EXISTS "
+			" Persons ( "
+			" id                INTEGER  PRIMARY KEY AUTOINCREMENT, "
+			" name              TEXT NOT NULL DEFAULT '' "
+			" ); "
+			);
+	Database::query(" CREATE TABLE IF NOT EXISTS "
+			" ItemTypes ( "
+			" id                INTEGER  PRIMARY KEY AUTOINCREMENT, "
+			" name              TEXT NOT NULL DEFAULT '' "
+			" ); "
+			);
+	Database::query(" CREATE TABLE IF NOT EXISTS "
+			" Inventory ( "
+			" id                INTEGER  PRIMARY KEY AUTOINCREMENT, "
+			" itemType          INTEGER  NOT NULL, "
+			" place             INTEGER  NOT NULL, "
+			" responsiblePerson INTEGER  NOT NULL, "
+			" name              TEXT     NOT NULL DEFAULT '', "
+			" inn               INTEGER  NOT NULL DEFAULT 0, "
+			" writtenOff        INTEGER  NOT NULL DEFAULT 0, "
+			" underRepair       INTEGER  NOT NULL DEFAULT 0, "
+			" checked           INTEGER  NOT NULL DEFAULT 0, "
+			" note              TEXT     NOT NULL DEFAULT '', "
+			" FOREIGN KEY (itemType)          REFERENCES ItemTypes(id), "
+			" FOREIGN KEY (place)             REFERENCES Place    (id), "
+			" FOREIGN KEY (responsiblePerson) REFERENCES Persons  (id) "
+			" ); "
+			);
+	Database::query(" CREATE TABLE IF NOT EXISTS "
+			" History ( "
+			"   id                INTEGER  PRIMARY KEY AUTOINCREMENT, "
+			"   item              INTEGER  NOT NULL, "
+			"   changeTime        TEXT     NOT NULL DEFAULT '', "
+			"   field             INTEGER  NOT NULL DEFAULT 10, "
+			"   oldValue          TEXT     NOT NULL DEFAULT '', "
+			"   newValue          TEXT     NOT NULL DEFAULT '', "
+			"   FOREIGN KEY (item) REFERENCES Inventory(id) "
+			" ); "
+			);
+
+	return ok;
 }
 
 void Database::close()
@@ -56,12 +107,15 @@ void Database::setDatabaseName(const QString & newName)
 
 bool Database::query(const QString & prepared, const Placeholders & placeholders)
 {
-	QSqlQuery query(Database::db());
-	query.prepare(prepared);
+	QSqlQuery q(Database::db());
+	q.prepare(prepared);
 	foreach(QString key, placeholders.keys()) {
-		query.bindValue(key, placeholders[key]);
+		q.bindValue(key, placeholders[key]);
 	}
-	bool ok = query.exec();
+	bool ok = q.exec();
+	if(!ok) {
+		qDebug() << q.executedQuery() << error(q.lastError());
+	}
 	return ok;
 }
 
@@ -83,23 +137,6 @@ namespace Inventory { // InventoryModel
 InventoryModel::InventoryModel(QObject * parent)
 	: QAbstractTableModel(parent)
 {
-	Database::query(" CREATE TABLE IF NOT EXISTS "
-			" Inventory ( "
-			" id                INTEGER  PRIMARY KEY, "
-			" itemType          INTEGER  NOT NULL, "
-			" place             INTEGER  NOT NULL, "
-			" responsiblePerson INTEGER  NOT NULL, "
-			" name              TEXT     NOT NULL DEFAULT '', "
-			" inn               INTEGER           DEFAULT NULL, "
-			" writtenOff        INTEGER  NOT NULL DEFAULT 0, "
-			" underRepair       INTEGER  NOT NULL DEFAULT 0, "
-			" checked           INTEGER  NOT NULL DEFAULT 0, "
-			" note              TEXT     NOT NULL DEFAULT '', "
-			" FOREIGN KEY (itemType)          REFERENCES ItemTypes(id), "
-			" FOREIGN KEY (place)             REFERENCES Place    (id), "
-			" FOREIGN KEY (responsiblePerson) REFERENCES Persons  (id) "
-			" ); "
-			);
 	update();
 }
 
@@ -129,11 +166,13 @@ void InventoryModel::update()
 		item.responsiblePersonId = query.value( 5).toInt();
 		item.responsiblePerson   = query.value( 6).toString();
 		item.name                = query.value( 7).toString();
-		item.innIsNotNull        = query.value( 8).isValid() && !query.value(8).isNull();
 		item.inn                 = query.value( 8).toInt();
-		item.writtenOff          = query.value( 9).toBool();
-		item.underRepair         = query.value(10).toBool();
-		item.checked             = query.value(11).toBool();
+		item.writtenOff          = query.value( 9).toInt();
+		item.underRepair         = query.value(10).toInt();
+		item.checked             = query.value(11).toInt();
+		//qDebug() << query.value(9) << item.writtenOff
+		//<< query.value(10) << item.underRepair
+		//<< query.value(11) << item.writtenOff;
 		item.note                = query.value(12).toString();
 		items << item;
 	}
@@ -198,7 +237,7 @@ QVariant InventoryModel::data(const QModelIndex & index, int role) const
 			}
 			case ITEM_NAME: return item.name;
 			case ITEM_INN: {
-			    if(item.innIsNotNull) {
+			    if(item.inn) {
 			 	   return item.inn;
 			    } else {
 			 	   return "";
@@ -214,30 +253,6 @@ QVariant InventoryModel::data(const QModelIndex & index, int role) const
 	return QVariant();
 }
 
-enum { HISTORY_TYPE, HISTORY_PLACE, HISTORY_PERSON, HISTORY_NAME, HISTORY_INN,
-	HISTORY_WRITTEN_OFF, HISTORY_UNDER_REPAIR, HISTORY_CHECKED, HISTORY_NOTE, HISTORY_FIELD_COUNT };
-template<class T> void updateField(Id id, const QString & fieldName, int fieldIndex, const T & oldValue, const T & newValue)
-{
-	if(oldValue == newValue)
-		return;
-	if(fieldIndex >= HISTORY_FIELD_COUNT)
-		return;
-
-	Database::Placeholders map;
-	map[":old"] = oldValue;
-	map[":field"] = fieldIndex;
-	map[":new"] = newValue;
-	Database::query(
-			"INSERT INTO History (fieldName, oldValue, newValue) "
-			" VALUES (:field, :old, :new); ", map
-			);
-
-	Database::Placeholders values;
-	values[":value"] = newValue;
-	values[":id"] = id;
-	Database::query("UPDATE Inventory SET " + fieldName + " = :value WHERE id = :id; ", values);
-}
-
 bool foreignIdExists(const QString & tableName, int id)
 {
 	Database::Placeholders map;
@@ -247,6 +262,36 @@ bool foreignIdExists(const QString & tableName, int id)
 		return false;
 	q.next();
 	return q.value(0).toInt() > 0;
+}
+
+enum { HISTORY_TYPE, HISTORY_PLACE, HISTORY_PERSON, HISTORY_NAME, HISTORY_INN,
+	HISTORY_WRITTEN_OFF, HISTORY_UNDER_REPAIR, HISTORY_CHECKED, HISTORY_NOTE, HISTORY_FIELD_COUNT };
+void updateField(Id id, const QString & fieldName, int fieldIndex, const QString & oldValue, const QString & newValue)
+{
+	if(oldValue == newValue)
+		return;
+	if(fieldIndex >= HISTORY_FIELD_COUNT)
+		return;
+
+	Database::Placeholders map;
+	map[":id"]    = id;
+	map[":field"] = fieldIndex;
+	map[":old"]   = oldValue;
+	map[":new"]   = newValue;
+	Database::query(
+			"INSERT INTO History (item, changeTime, field, oldValue, newValue) "
+			" VALUES (:id, DATETIME('now'), :field, :old, :new); ", map
+			);
+
+	Database::Placeholders values;
+	values[":value"] = newValue;
+	values[":id"]    = id;
+	Database::query("UPDATE Inventory SET " + fieldName + " = :value WHERE id = :id; ", values);
+}
+
+void updateField(Id id, const QString & fieldName, int fieldIndex, int oldValue, int newValue)
+{
+	updateField(id, fieldName, fieldIndex, QString::number(oldValue), QString::number(newValue));
 }
 
 bool InventoryModel::setData(const QModelIndex & index, const QVariant & value, int role)
@@ -290,10 +335,7 @@ bool InventoryModel::setData(const QModelIndex & index, const QVariant & value, 
 				bool valueIsEmpty = value.toString().isEmpty();
 
 				if(!valueIsNull && (valueIsNum || valueIsEmpty)) {
-					updateField(item.id, "inn", HISTORY_INN,
-							item.innIsNotNull ? QVariant(item.inn) : QVariant(),
-							valueIsEmpty ? QVariant() : inn
-							);
+					updateField(item.id, "inn", HISTORY_INN, item.inn, inn);
 				} else {
 					return false;
 				}
@@ -442,34 +484,129 @@ void InventoryModel::switchWrittenOffFilter(bool /*on*/)
 
 namespace Inventory { // HistoryModel
 
-HistoryModel::HistoryModel(int /*item*/, QObject * /*parent*/)
+QString unfoldHistoryValue(int field, const QString & value)
 {
-	return;
+	switch(field) {
+		case HISTORY_TYPE: {
+			Database::Placeholders map;
+			map[":id"] = value;
+			QSqlQuery q = Database::select("SELECT name FROM ItemTypes WHERE id = :id", map);
+			q.next();
+			return q.value(0).toString();
+		}
+		case HISTORY_PLACE: {
+			Database::Placeholders map;
+			map[":id"] = value;
+			QSqlQuery q = Database::select("SELECT name FROM Places WHERE id = :id", map);
+			q.next();
+			return q.value(0).toString();
+		}
+		case HISTORY_PERSON: {
+			Database::Placeholders map;
+			map[":id"] = value;
+			QSqlQuery q = Database::select("SELECT name FROM Persons WHERE id = :id", map);
+			q.next();
+			return q.value(0).toString();
+		}
+		case HISTORY_NAME:         return value;
+		case HISTORY_INN:          return (value == "0") ? "" : value;
+		case HISTORY_WRITTEN_OFF:  return (value == "1") ? HistoryModel::tr("Written off")  : HistoryModel::tr("Present");
+		case HISTORY_UNDER_REPAIR: return (value == "1") ? HistoryModel::tr("Under repair") : HistoryModel::tr("Working");
+		case HISTORY_CHECKED:      return (value == "1") ? HistoryModel::tr("Checked")      : HistoryModel::tr("Not checked");
+		case HISTORY_NOTE:         return value;
+		default: return value;
+	};
+	return value;
 }
 
-Qt::ItemFlags HistoryModel::flags(const QModelIndex & /*index*/) const
+HistoryModel::HistoryModel(int item, QObject * parent)
+	: QAbstractTableModel(parent)
 {
-	return 0;
+	Database::Placeholders map;
+	map[":item"] = item;
+	QSqlQuery query = Database::select(
+			" SELECT id, changeTime, field, oldValue, newValue "
+			" FROM History "
+			" WHERE item = :item; ", map
+			);
+	records.clear();
+	while(query.next()) {
+		HistoryRecord rec;
+		rec.id         = query.value(0).toInt();
+		rec.changeTime = QDateTime::fromString(query.value(1).toString(), Qt::ISODate);
+		rec.field      = query.value(2).toInt();
+		rec.oldValue   = unfoldHistoryValue(rec.field, query.value(3).toString());
+		rec.newValue   = unfoldHistoryValue(rec.field, query.value(4).toString());
+		records << rec;
+	}
 }
 
-QVariant HistoryModel::data(const QModelIndex & /*index*/, int /*role*/) const
+Qt::ItemFlags HistoryModel::flags(const QModelIndex & index) const
 {
+	if(index.row() < 0 || rowCount() <= index.row())
+		return Qt::NoItemFlags;
+	if(index.column() < 0 || columnCount() <= index.column())
+		return Qt::NoItemFlags;
+
+	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+}
+
+QVariant HistoryModel::data(const QModelIndex & index, int role) const
+{
+	if(index.row() >= rowCount())
+		return QVariant();
+
+	const HistoryRecord & rec = records[index.row()];
+	if(role == Qt::DisplayRole) {
+		switch(index.column()) {
+			case 0: return rec.changeTime.toString();
+			case 1:
+				switch(rec.field) {
+					case HISTORY_TYPE:         return tr("Item type");
+					case HISTORY_PLACE:        return tr("Place");
+					case HISTORY_PERSON:       return tr("Responsible person");
+					case HISTORY_NAME:         return tr("Name");
+					case HISTORY_INN:          return tr("INN");
+					case HISTORY_WRITTEN_OFF:  return tr("Written off");
+					case HISTORY_UNDER_REPAIR: return tr("Under repair");
+					case HISTORY_CHECKED:      return tr("Checked");
+					case HISTORY_NOTE:         return tr("Note");
+					default: return tr("Unknown");
+				}
+				break;
+			case 2: return rec.oldValue;
+			case 3: return rec.newValue;
+			default: return QVariant();
+		}
+	}
 	return QVariant();
 }
 
-QVariant HistoryModel::headerData(int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const
+QVariant HistoryModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
+	if(role != Qt::EditRole && role != Qt::DisplayRole)
+		return QVariant();
+	if(orientation != Qt::Horizontal)
+		return QVariant();
+
+	switch(section) {
+		case 0: return tr("Change time");
+		case 1: return tr("Field name");
+		case 2: return tr("Old value");
+		case 3: return tr("New value");
+		default: return QVariant();
+	}
 	return QVariant();
 }
 
 int HistoryModel::rowCount(const QModelIndex & /*parent*/) const
 {
-	return 0;
+	return records.count();
 }
 
 int HistoryModel::columnCount(const QModelIndex & /*parent*/) const
 {
-	return 0;
+	return 4;
 }
 
 
@@ -611,12 +748,6 @@ ReferenceModel::ReferenceModel(int newType, QObject * parent)
 	if(!type())
 		return;
 
-	Database::query(" CREATE TABLE IF NOT EXISTS "
-			" " + refType.table + " ( "
-			" id                INTEGER  PRIMARY KEY AUTOINCREMENT, "
-			" name              TEXT NOT NULL DEFAULT '' "
-			" ); "
-			);
 	update();
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QAbstractTableModel>
+#include <QtCore/QDateTime>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
@@ -37,7 +38,6 @@ struct Item {
 	Id responsiblePersonId;
 	QString responsiblePerson;
 	QString name;
-	bool innIsNotNull;
 	int inn;
 	bool writtenOff;
 	bool underRepair;
@@ -74,6 +74,14 @@ private:
 	void update();
 };
 
+struct HistoryRecord {
+	int id;
+	QDateTime changeTime;
+	int field;
+	QString oldValue;
+	QString newValue;
+};
+
 class HistoryModel : public QAbstractTableModel {
 	Q_OBJECT
 	Q_DISABLE_COPY(HistoryModel);
@@ -87,6 +95,8 @@ public:
 
 	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
 	virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
+private:
+	QList<HistoryRecord> records;
 };
 
 class PrintableInventoryModel : public QAbstractTableModel {
