@@ -99,6 +99,17 @@ private:
 	QList<HistoryRecord> records;
 };
 
+struct ItemGroup {
+	QString itemType;
+	int itemTypeId;
+	QString name;
+	int itemCount;
+	QString place;
+	int placeId;
+	int inn;
+	bool writtenOff;
+};
+
 class PrintableInventoryModel : public QAbstractTableModel {
 	Q_OBJECT
 	Q_DISABLE_COPY(PrintableInventoryModel);
@@ -119,6 +130,9 @@ public:
 	virtual void switchPlaceFilter(bool on = true);
 	virtual void setWrittenOffFilter(bool writtenOff);
 	virtual void switchWrittenOffFilter(bool on = true);
+private:
+	QList<ItemGroup> groups;
+	void update();
 };
 
 struct RefRecord {

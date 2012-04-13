@@ -73,6 +73,24 @@ bool Database::reopen()
 			"   FOREIGN KEY (item) REFERENCES Inventory(id) "
 			" ); "
 			);
+	Database::query(" CREATE VIEW IF NOT EXISTS "
+			" PrintableInventory AS "
+			" SELECT "
+			"   ItemTypes.name        AS itemType, "
+			"   ItemTypes.id          AS itemTypeId, "
+			"   Inventory.name        AS name, "
+			"   COUNT(Inventory.name) AS itemCount, "
+			"   Places.name           AS place, "
+			"   Places.id             AS placeId, "
+			"                            inn, "
+			"                            writtenOff "
+			" FROM Inventory, ItemTypes, Places "
+			" WHERE "
+			"   Inventory.itemType = ItemTypes.id AND "
+			"   Inventory.place    = Places.id "
+			" GROUP BY itemType, itemTypeId, name, place, placeId, inn, writtenOff "
+			" ; "
+			);
 
 	return ok;
 }
@@ -170,9 +188,6 @@ void InventoryModel::update()
 		item.writtenOff          = query.value( 9).toInt();
 		item.underRepair         = query.value(10).toInt();
 		item.checked             = query.value(11).toInt();
-		//qDebug() << query.value(9) << item.writtenOff
-		//<< query.value(10) << item.underRepair
-		//<< query.value(11) << item.writtenOff;
 		item.note                = query.value(12).toString();
 		items << item;
 	}
@@ -427,8 +442,10 @@ bool InventoryModel::insertRows(int row, int count, const QModelIndex & /*parent
 
 bool InventoryModel::removeRows(int row, int count, const QModelIndex & /*parent*/)
 {
-	if(count <= 0)
+	if(count < 0)
 		return false;
+	if(count == 0)
+		return true;
 	if(row < 0 || row >= rowCount())
 		return false;
 	
@@ -609,53 +626,102 @@ int HistoryModel::columnCount(const QModelIndex & /*parent*/) const
 	return 4;
 }
 
-
-/*
-История:
-	Создать: требуется указать предмет.
-	Столбцов: 5.
-	Строк: сколько загружено.
-	Нередактируемо.
-	Ячейки:
-		Время - текст (не показывать день недели).
-		Поле - текст.
-		Старое значение - текст.
-		Новое значение - текст.
-		Для полей-пометок писать словами.
-*/
-
 }
 
 namespace Inventory { // PrintableInventoryModel
 
-PrintableInventoryModel::PrintableInventoryModel(QObject * /*parent*/)
+PrintableInventoryModel::PrintableInventoryModel(QObject * parent)
+	: QAbstractTableModel(parent)
 {
-	return;
+	update();
 }
 
-Qt::ItemFlags PrintableInventoryModel::flags(const QModelIndex & /*index*/) const
+void PrintableInventoryModel::update()
 {
-	return 0;
+	QSqlQuery query = Database::select(
+			" SELECT "
+			"   itemType, "
+			"   itemTypeId, "
+			"   name, "
+			"   itemCount, "
+			"   place, "
+			"   placeId, "
+			"   inn, "
+			"   writtenOff "
+			" FROM PrintableInventory; "
+			);
+	groups.clear();
+	while(query.next()) {
+		ItemGroup group;
+		group.itemType   = query.value(0).toString();
+		group.itemTypeId = query.value(1).toInt();
+		group.name       = query.value(2).toString();
+		group.itemCount  = query.value(3).toInt();
+		group.place      = query.value(4).toString();
+		group.placeId    = query.value(5).toInt();
+		group.inn        = query.value(6).toInt();
+		group.writtenOff = query.value(7).toInt();
+		groups << group;
+	}
 }
 
-QVariant PrintableInventoryModel::data(const QModelIndex & /*index*/, int /*role*/) const
+Qt::ItemFlags PrintableInventoryModel::flags(const QModelIndex & index) const
 {
+	if(index.row() < 0 || rowCount() <= index.row())
+		return Qt::NoItemFlags;
+	if(index.column() < 0 || columnCount() <= index.column())
+		return Qt::NoItemFlags;
+
+	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+}
+
+QVariant PrintableInventoryModel::data(const QModelIndex & index, int role) const
+{
+	if(index.row() >= rowCount())
+		return QVariant();
+
+	const ItemGroup & group = groups[index.row()];
+	if(role == Qt::DisplayRole) {
+		switch(index.column()) {
+			case 0: return group.itemType;
+			case 1: return group.name;
+			case 2: return group.itemCount;
+			case 3: return group.place;
+			case 4: return group.inn ? QVariant(group.inn) : QVariant("");
+			case 5: return group.writtenOff ? tr("Written off") : "";
+			default: return QVariant();
+		}
+	}
 	return QVariant();
 }
 
-QVariant PrintableInventoryModel::headerData(int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const
+QVariant PrintableInventoryModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
+	if(role != Qt::EditRole && role != Qt::DisplayRole)
+		return QVariant();
+	if(orientation != Qt::Horizontal)
+		return QVariant();
+
+	switch(section) {
+		case 0: return tr("Item type");
+		case 1: return tr("Name");
+		case 2: return tr("Count");
+		case 3: return tr("Place");
+		case 4: return tr("INN");
+		case 5: return tr("Written off");
+		default: return QVariant();
+	}
 	return QVariant();
 }
 
 int PrintableInventoryModel::rowCount(const QModelIndex & /*parent*/) const
 {
-	return 0;
+	return groups.count();
 }
 
 int PrintableInventoryModel::columnCount(const QModelIndex & /*parent*/) const
 {
-	return 0;
+	return 6;
 }
 
 void PrintableInventoryModel::setItemTypeFilter(int /*itemType*/)
@@ -691,24 +757,7 @@ void PrintableInventoryModel::switchWrittenOffFilter(bool /*on*/)
 
 /*
 Печать:
-	Нередактируемо.
-	Столбцов: 6
-	Строк: сколько загружено.
-	Ячейки:
-		Тип: слово.
-		Наименование: слово.
-		Количество: слово.
-		Место: слово.
-		ИНН: пусто или число.
-		Пометка: пусто или "списан".
-	Установить фильтр по типу(тип).
-	Включить фильтр по типу(вкл|выкл).
-	Установить фильтр по месту(место).
-	Включить фильтр по месту(вкл|выкл).
-	Установить фильтр по списанию(списан|нет).
-	Включить фильтр по списанию.
 	*/
-
 }
 
 namespace Inventory { // ReferenceModel
