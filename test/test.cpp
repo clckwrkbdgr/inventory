@@ -513,9 +513,6 @@ private slots:
 
 		QScopedPointer<InventoryModel> model(new InventoryModel());
 		QVERIFY(model);
-		//qDebug() << "itemtype" << itemtypefilter << itemtype;
-		//qDebug() << "place" << placefilter << place;
-		//qDebug() << "writtenoff" << writtenofffilter << writtenoff;
 		model->switchItemTypeFilter(itemtypefilter);
 		model->setItemTypeFilter(itemtype.toInt());
 		model->switchPlaceFilter(placefilter);
@@ -788,6 +785,122 @@ private slots:
 	void printableInventoryFilter_data() {
 		QTest::addColumn<int>("count");
 		QTest::addColumn<bool>("itemtypefilter");
+		QTest::addColumn<QVariant>("itemtype");
+		QTest::addColumn<bool>("placefilter");
+		QTest::addColumn<QVariant>("place");
+		QTest::addColumn<bool>("writtenofffilter");
+		QTest::addColumn<QVariant>("writtenoff");
+
+		QTest::newRow("invalid") << 8 << false << QVariant(-1) << false << QVariant(-1) << false << QVariant(0);
+
+		bool ok = false;
+
+		QScopedPointer<InventoryModel> model(new InventoryModel());
+		QVERIFY(model);
+		ok = model->removeRows(0, model->rowCount()); QVERIFY(ok); QCOMPARE(model->rowCount(), 0);
+		QScopedPointer<ReferenceModel> itemTypes(new ReferenceModel(ReferenceModel::ITEM_TYPES));
+			QVERIFY(itemTypes);
+			itemTypes->removeRows(0, itemTypes->rowCount());
+			itemTypes->insertRows(0, 3);
+			itemTypes->setData(itemTypes->index(0, 0), "Type 1");
+			itemTypes->setData(itemTypes->index(1, 0), "Type 2");
+			itemTypes->setData(itemTypes->index(2, 0), "Type 3");
+		QScopedPointer<ReferenceModel> places   (new ReferenceModel(ReferenceModel::PLACES));
+			QVERIFY(places);
+			places->removeRows(0, places->rowCount());
+			places->insertRows(0, 3);
+			places->setData(places->index(0, 0), "Place 1");
+			places->setData(places->index(1, 0), "Place 2");
+			places->setData(places->index(2, 0), "Place 3");
+		ok = model->insertRows(0, 8); QVERIFY(ok); QCOMPARE(model->rowCount(), 8);
+
+		model->setData(model->index(0, ITEM_TYPE),   itemTypes->idAt(0));
+		model->setData(model->index(0, PLACE),       places->idAt(0));
+		model->setData(model->index(0, WRITTEN_OFF), Qt::Checked, Qt::CheckStateRole);
+
+		model->setData(model->index(1, ITEM_TYPE),   itemTypes->idAt(0));
+		model->setData(model->index(1, PLACE),       places->idAt(0));
+		model->setData(model->index(1, WRITTEN_OFF), Qt::Unchecked, Qt::CheckStateRole);
+
+		model->setData(model->index(2, ITEM_TYPE),   itemTypes->idAt(1));
+		model->setData(model->index(2, PLACE),       places->idAt(0));
+		model->setData(model->index(2, WRITTEN_OFF), Qt::Checked, Qt::CheckStateRole);
+
+		model->setData(model->index(3, ITEM_TYPE),   itemTypes->idAt(1));
+		model->setData(model->index(3, PLACE),       places->idAt(0));
+		model->setData(model->index(3, WRITTEN_OFF), Qt::Unchecked, Qt::CheckStateRole);
+
+		model->setData(model->index(4, ITEM_TYPE),   itemTypes->idAt(0));
+		model->setData(model->index(4, PLACE),       places->idAt(1));
+		model->setData(model->index(4, WRITTEN_OFF), Qt::Checked, Qt::CheckStateRole);
+
+		model->setData(model->index(5, ITEM_TYPE),   itemTypes->idAt(0));
+		model->setData(model->index(5, PLACE),       places->idAt(1));
+		model->setData(model->index(5, WRITTEN_OFF), Qt::Unchecked, Qt::CheckStateRole);
+
+		model->setData(model->index(6, ITEM_TYPE),   itemTypes->idAt(1));
+		model->setData(model->index(6, PLACE),       places->idAt(1));
+		model->setData(model->index(6, WRITTEN_OFF), Qt::Checked, Qt::CheckStateRole);
+
+		model->setData(model->index(7, ITEM_TYPE),   itemTypes->idAt(1));
+		model->setData(model->index(7, PLACE),       places->idAt(1));
+		model->setData(model->index(7, WRITTEN_OFF), Qt::Unchecked, Qt::CheckStateRole);
+
+		int checked = 1, unchecked = 0;
+
+		QTest::newRow("000")   << 8 << false << QVariant(itemTypes->idAt(0)) << false << QVariant(places->idAt(0)) << false << QVariant(unchecked);
+		QTest::newRow("100")   << 4 << true  << QVariant(itemTypes->idAt(1)) << false << QVariant(places->idAt(0)) << false << QVariant(unchecked);
+		QTest::newRow("010")   << 4 << false << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(0)) << false << QVariant(unchecked);
+		QTest::newRow("110")   << 2 << true  << QVariant(itemTypes->idAt(0)) << true  << QVariant(places->idAt(1)) << false << QVariant(checked);
+		QTest::newRow("001")   << 4 << false << QVariant(itemTypes->idAt(0)) << false << QVariant(places->idAt(1)) << true  << QVariant(checked);
+		QTest::newRow("101")   << 2 << true  << QVariant(itemTypes->idAt(1)) << false << QVariant(places->idAt(1)) << true  << QVariant(checked);
+		QTest::newRow("011")   << 2 << false << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(1)) << true  << QVariant(unchecked);
+		QTest::newRow("111 1") << 1 << true  << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(1)) << true  << QVariant(checked);
+		QTest::newRow("111 2") << 1 << true  << QVariant(itemTypes->idAt(0)) << true  << QVariant(places->idAt(0)) << true  << QVariant(unchecked);
+		QTest::newRow("111 3") << 1 << true  << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(0)) << true  << QVariant(checked);
+	}
+	void printableInventoryFilter() {
+		QFETCH(int, count);
+		QFETCH(bool, itemtypefilter);
+		QFETCH(QVariant, itemtype);
+		QFETCH(bool, placefilter);
+		QFETCH(QVariant, place);
+		QFETCH(bool, writtenofffilter);
+		QFETCH(QVariant, writtenoff);
+
+		QScopedPointer<PrintableInventoryModel> model(new PrintableInventoryModel());
+		QVERIFY(model);
+		model->switchItemTypeFilter(itemtypefilter);
+		model->setItemTypeFilter(itemtype.toInt());
+		model->switchPlaceFilter(placefilter);
+		model->setPlaceFilter(place.toInt());
+		model->switchWrittenOffFilter(writtenofffilter);
+		model->setWrittenOffFilter(writtenoff.toBool());
+
+		QCOMPARE(model->rowCount(), count);
+
+		if(itemtypefilter) {
+			for(int row = 0; row < model->rowCount(); ++row) {
+				QCOMPARE(model->data(model->index(row, 0), Qt::EditRole), itemtype);
+			}
+		}
+
+		if(placefilter) {
+			for(int row = 0; row < model->rowCount(); ++row) {
+				QCOMPARE(model->data(model->index(row, 3), Qt::EditRole), place);
+			}
+		}
+
+		if(writtenofffilter) {
+			for(int row = 0; row < model->rowCount(); ++row) {
+				QCOMPARE(model->data(model->index(row, 5), Qt::DisplayRole), writtenoff.toInt() ? QVariant("Written off") : QVariant(""));
+			}
+		}
+	}
+
+	/*void printableInventoryFilter_data() {
+		QTest::addColumn<int>("count");
+		QTest::addColumn<bool>("itemtypefilter");
 		QTest::addColumn<int>("itemtype");
 		QTest::addColumn<bool>("placefilter");
 		QTest::addColumn<int>("place");
@@ -898,6 +1011,7 @@ private slots:
 			}
 		}
 	}
+	*/
 };
 
 QTEST_MAIN(InventoryTest)

@@ -36,10 +36,8 @@ struct Filter {
 	Id placeFilter;
 	bool useWrittenOffFilter;
 	bool writtenOffFilter;
-	Filter()
-		: useItemTypeFilter(false), itemTypeFilter(0),
-		usePlaceFilter(false), placeFilter(0),
-		useWrittenOffFilter(false), writtenOffFilter(false) { }
+
+	Filter();
 };
 
 struct Item {
@@ -146,6 +144,7 @@ public:
 	virtual void switchWrittenOffFilter(bool on = true);
 private:
 	QList<ItemGroup> groups;
+	Filter filter;
 	void update();
 };
 

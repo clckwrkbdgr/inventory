@@ -97,8 +97,10 @@ bool Database::reopen()
 
 void Database::close()
 {
-	QSqlDatabase db = QSqlDatabase::database("inventory");
-	db.close();
+	{
+		QSqlDatabase db = QSqlDatabase::database("inventory");
+		db.close();
+	}
 	QSqlDatabase::removeDatabase("inventory");
 }
 
@@ -150,6 +152,15 @@ QSqlQuery Database::select(const QString & prepared, const Placeholders & placeh
 
 }
 
+namespace Inventory { // Filter
+
+Filter::Filter()
+	: useItemTypeFilter(false), itemTypeFilter(0),
+	usePlaceFilter(false), placeFilter(0),
+	useWrittenOffFilter(false), writtenOffFilter(false) { }
+
+}
+
 namespace Inventory { // InventoryModel
 
 InventoryModel::InventoryModel(QObject * parent)
@@ -161,25 +172,27 @@ InventoryModel::InventoryModel(QObject * parent)
 void InventoryModel::update()
 {
 	Database::Placeholders map;
-
-	QStringList filterClauses;
+	QStringList constraints;
 	if(filter.useItemTypeFilter) {
-		filterClauses << "itemType = :itemType";
+		constraints << "itemType = :itemType";
 		map[":itemType"] = filter.itemTypeFilter;
 	}
 	if(filter.usePlaceFilter) {
-		filterClauses << "place = :place";
+		constraints << "place = :place";
 		map[":place"] = filter.placeFilter;
 	}
 	if(filter.useWrittenOffFilter) {
-		filterClauses << "writtenOff = :writtenOff";
+		constraints << "writtenOff = :writtenOff";
 		map[":writtenOff"] = int(filter.writtenOffFilter);
 	}
-
-	QStringList constraints;
 	constraints << "Inventory.itemType = ItemTypes.id";
 	constraints << "Inventory.place = Places.id";
 	constraints << "Inventory.responsiblePerson = Persons.id";
+
+	QString whereClause = constraints.join(" AND ");
+	if(!whereClause.isEmpty()) {
+		whereClause = " WHERE " + whereClause;
+	}
 	QSqlQuery query = Database::select(
 			" SELECT Inventory.id, "
 			"   itemType, ItemTypes.name, "
@@ -188,8 +201,7 @@ void InventoryModel::update()
 			"   Inventory.name, "
 			"   inn, writtenOff, underRepair, checked, note "
 			" FROM Inventory, ItemTypes, Places, Persons "
-			" WHERE "
-			+ (filterClauses + constraints).join(" AND ") +
+			+ whereClause + 
 			" ; ",
 			map
 			);
@@ -211,10 +223,6 @@ void InventoryModel::update()
 		item.note                = query.value(12).toString();
 		items << item;
 	}
-	//if(filter.useItemTypeFilter || filter.usePlaceFilter || filter.useWrittenOffFilter) {
-		////qDebug() << map << query.executedQuery();
-		//qDebug() << items.count();
-	//}
 }
 
 enum { ITEM_TYPE, ITEM_PLACE, ITEM_PERSON, ITEM_NAME, ITEM_INN, ITEM_WRITTEN_OFF, ITEM_UNDER_REPAIR, ITEM_CHECKED, ITEM_NOTE, ITEM_FIELD_COUNT };
@@ -330,8 +338,6 @@ void updateField(Id id, const QString & fieldName, int fieldIndex, const QString
 
 void updateField(Id id, const QString & fieldName, int fieldIndex, int oldValue, int newValue)
 {
-	//if(fieldIndex == HISTORY_WRITTEN_OFF)
-		////qDebug() << id << fieldName << oldValue << newValue;
 	updateField(id, fieldName, fieldIndex, QString::number(oldValue), QString::number(newValue));
 }
 
@@ -670,6 +676,25 @@ PrintableInventoryModel::PrintableInventoryModel(QObject * parent)
 
 void PrintableInventoryModel::update()
 {
+	Database::Placeholders map;
+	QStringList constraints;
+	if(filter.useItemTypeFilter) {
+		constraints << "itemTypeId = :itemType";
+		map[":itemType"] = filter.itemTypeFilter;
+	}
+	if(filter.usePlaceFilter) {
+		constraints << "placeId = :place";
+		map[":place"] = filter.placeFilter;
+	}
+	if(filter.useWrittenOffFilter) {
+		constraints << "writtenOff = :writtenOff";
+		map[":writtenOff"] = int(filter.writtenOffFilter);
+	}
+	QString whereClause = constraints.join(" AND ");
+	if(!whereClause.isEmpty()) {
+		whereClause = " WHERE " + whereClause;
+	}
+
 	QSqlQuery query = Database::select(
 			" SELECT "
 			"   itemType, "
@@ -680,8 +705,14 @@ void PrintableInventoryModel::update()
 			"   placeId, "
 			"   inn, "
 			"   writtenOff "
-			" FROM PrintableInventory; "
+			" FROM PrintableInventory "
+			+ whereClause + 
+			" ; ",
+			map
 			);
+	//if(filter.useItemTypeFilter || filter.usePlaceFilter || filter.useWrittenOffFilter) {
+		//qDebug() << query.executedQuery();
+	//}
 	groups.clear();
 	while(query.next()) {
 		ItemGroup group;
@@ -713,7 +744,12 @@ QVariant PrintableInventoryModel::data(const QModelIndex & index, int role) cons
 		return QVariant();
 
 	const ItemGroup & group = groups[index.row()];
-	if(role == Qt::DisplayRole) {
+	if(role == Qt::EditRole) {
+		switch(index.column()) {
+			case 0: return group.itemTypeId;
+			case 3: return group.placeId;
+		}
+	} else if(role == Qt::DisplayRole) {
 		switch(index.column()) {
 			case 0: return group.itemType;
 			case 1: return group.name;
@@ -756,40 +792,42 @@ int PrintableInventoryModel::columnCount(const QModelIndex & /*parent*/) const
 	return 6;
 }
 
-void PrintableInventoryModel::setItemTypeFilter(int /*itemType*/)
+void PrintableInventoryModel::setItemTypeFilter(int itemType)
 {
-	return;
+	filter.itemTypeFilter = itemType;
+	update();
 }
 
-void PrintableInventoryModel::switchItemTypeFilter(bool /*on*/)
+void PrintableInventoryModel::switchItemTypeFilter(bool on)
 {
-	return;
+	filter.useItemTypeFilter = on;
+	update();
 }
 
-void PrintableInventoryModel::setPlaceFilter(int /*place*/)
+void PrintableInventoryModel::setPlaceFilter(int place)
 {
-	return;
+	filter.placeFilter = place;
+	update();
 }
 
-void PrintableInventoryModel::switchPlaceFilter(bool /*on*/)
+void PrintableInventoryModel::switchPlaceFilter(bool on)
 {
-	return;
+	filter.usePlaceFilter = on;
+	update();
 }
 
-void PrintableInventoryModel::setWrittenOffFilter(bool /*writtenOff*/)
+void PrintableInventoryModel::setWrittenOffFilter(bool writtenOff)
 {
-	return;
+	filter.writtenOffFilter = writtenOff;
+	update();
 }
 
-void PrintableInventoryModel::switchWrittenOffFilter(bool /*on*/)
+void PrintableInventoryModel::switchWrittenOffFilter(bool on)
 {
-	return;
+	filter.useWrittenOffFilter = on;
+	update();
 }
 
-
-/*
-Печать:
-	*/
 }
 
 namespace Inventory { // ReferenceModel
