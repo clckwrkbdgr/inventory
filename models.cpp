@@ -148,7 +148,12 @@ Qt::ItemFlags InventoryModel::flags(const QModelIndex & index) const
 	if(index.column() < 0 || ITEM_FIELD_COUNT <= index.column())
 		return Qt::NoItemFlags;
 
-	return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+	Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+	static QList<int> checkableFields = QList<int>() << ITEM_WRITTEN_OFF << ITEM_UNDER_REPAIR << ITEM_CHECKED;
+	if(checkableFields.contains(index.column())) {
+		result |= Qt::ItemIsUserCheckable;
+	}
+	return result;
 }
 
 QVariant InventoryModel::data(const QModelIndex & index, int role) const
@@ -230,7 +235,18 @@ template<class T> void updateField(Id id, const QString & fieldName, int fieldIn
 	Database::Placeholders values;
 	values[":value"] = newValue;
 	values[":id"] = id;
-	Database::query("UPDATE Inventory SET " + fieldName + " = :value WHERE id = :id", values);
+	Database::query("UPDATE Inventory SET " + fieldName + " = :value WHERE id = :id; ", values);
+}
+
+bool foreignIdExists(const QString & tableName, int id)
+{
+	Database::Placeholders map;
+	map[":id"] = id;
+	QSqlQuery q = Database::select("SELECT COUNT(*) FROM " + tableName + " WHERE id = :id;", map);
+	if(!q.isActive())
+		return false;
+	q.next();
+	return q.value(0).toInt() > 0;
 }
 
 bool InventoryModel::setData(const QModelIndex & index, const QVariant & value, int role)
@@ -240,23 +256,32 @@ bool InventoryModel::setData(const QModelIndex & index, const QVariant & value, 
 	if(!value.isValid())
 		return false;
 
-	bool success = false;
 	if(role == Qt::CheckStateRole) {
-		success = true;
 		const Item & item = items[index.row()];
 		switch(index.column()) {
 			case ITEM_WRITTEN_OFF:  updateField(item.id, "writtenOff",  HISTORY_WRITTEN_OFF,  item.writtenOff,  value == Qt::Checked); break;
 			case ITEM_UNDER_REPAIR: updateField(item.id, "underRepair", HISTORY_UNDER_REPAIR, item.underRepair, value == Qt::Checked); break;
 			case ITEM_CHECKED:      updateField(item.id, "checked",     HISTORY_CHECKED,      item.checked,     value == Qt::Checked); break;
-			default: success = false;
+			default: return false;
 		}
 	} else if(role == Qt::EditRole) {
-		success = true;
 		const Item & item = items[index.row()];
 		switch(index.column()) {
-			case ITEM_TYPE: updateField(item.id, "itemType", HISTORY_TYPE, item.itemTypeId, value.toInt()); break;
-			case ITEM_PLACE: updateField(item.id, "place", HISTORY_PLACE, item.placeId, value.toInt()); break;
-			case ITEM_PERSON: updateField(item.id, "responsiblePerson", HISTORY_PERSON, item.responsiblePersonId, value.toInt()); break;
+			case ITEM_TYPE:
+				if(!foreignIdExists("ItemTypes", value.toInt()))
+					return false;
+				updateField(item.id, "itemType", HISTORY_TYPE, item.itemTypeId, value.toInt());
+				break;
+			case ITEM_PLACE:
+				if(!foreignIdExists("Places", value.toInt()))
+					return false;
+				updateField(item.id, "place", HISTORY_PLACE, item.placeId, value.toInt());
+				break;
+			case ITEM_PERSON:
+				if(!foreignIdExists("Persons", value.toInt()))
+					return false;
+				updateField(item.id, "responsiblePerson", HISTORY_PERSON, item.responsiblePersonId, value.toInt());
+				break;
 			case ITEM_NAME: updateField(item.id, "name", HISTORY_NAME, item.name, value.toString()); break;
 			case ITEM_INN: {
 				bool valueIsNull = !value.isValid();
@@ -270,28 +295,19 @@ bool InventoryModel::setData(const QModelIndex & index, const QVariant & value, 
 							valueIsEmpty ? QVariant() : inn
 							);
 				} else {
-					success = false;
+					return false;
 				}
-
-				/*
-				update();
-				QSqlQuery q = Database::select("select inn from inventory;");
-				while(q.next()) {
-					qDebug() << q.value(0);
-				}
-				qDebug() << value << success << (valueIsNull?"null":"not null") << (valueIsEmpty?"empty":"full") << (valueIsNum?"num":"alpha") << inn;
-				*/
 				break;
 			}
 			case ITEM_NOTE: updateField(item.id, "note", HISTORY_NOTE, item.note, value.toString()); break;
-			default: success = false;
+			default: return false;
 		}
+	} else {
+		return false;
 	}
 
-	if(success) {
-		update();
-	}
-	return success;
+	update();
+	return true;
 }
 
 QVariant InventoryModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -659,7 +675,8 @@ bool ReferenceModel::setData(const QModelIndex & index, const QVariant & value, 
 
 			Database::Placeholders values;
 			values[":value"] = value.toString();
-			Database::query("UPDATE " + refType.table + " SET name = :value", values);
+			values[":id"]    = idAt(index.row());
+			Database::query("UPDATE " + refType.table + " SET name = :value WHERE id = :id;", values);
 
 			update();
 			return true;

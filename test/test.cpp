@@ -331,7 +331,7 @@ private slots:
 		QVERIFY(model);
 
 		QModelIndex index = model->index(row, column);
-		QCOMPARE(model->flags(index), Qt::ItemFlags(flags));
+		QCOMPARE(int(model->flags(index)), int(Qt::ItemFlags(flags)));
 		bool ok = model->setData(index, displayvalue, Qt::EditRole);
 		QVERIFY(!ok);
 		ok = model->setData(index, checkvalue, Qt::CheckStateRole);
@@ -361,6 +361,8 @@ private slots:
 		QTest::newRow("invalid row") << R << 0 << QVariant()       << QVariant() << false << INVALID;
 		QTest::newRow("invalid col") << 0 << C << QVariant("Test") << QVariant() << false << INVALID;
 
+		ok = model->removeRows(0, model->rowCount()); QVERIFY(ok); QCOMPARE(model->rowCount(), 0);
+
 		QScopedPointer<ReferenceModel> itemTypes(new ReferenceModel(ReferenceModel::ITEM_TYPES));
 			QVERIFY(itemTypes);
 			itemTypes->removeRows(0, itemTypes->rowCount());
@@ -368,6 +370,7 @@ private slots:
 			itemTypes->setData(itemTypes->index(0, 0), "Type 1");
 			itemTypes->setData(itemTypes->index(1, 0), "Type 2");
 			itemTypes->setData(itemTypes->index(2, 0), "Type 3");
+			QCOMPARE(itemTypes->rowCount(), 3);
 		QScopedPointer<ReferenceModel> places   (new ReferenceModel(ReferenceModel::PLACES));
 			QVERIFY(places);
 			places->removeRows(0, places->rowCount());
@@ -375,6 +378,7 @@ private slots:
 			places->setData(places->index(0, 0), "Place 1");
 			places->setData(places->index(1, 0), "Place 2");
 			places->setData(places->index(2, 0), "Place 3");
+			QCOMPARE(places->rowCount(), 3);
 		QScopedPointer<ReferenceModel> persons  (new ReferenceModel(ReferenceModel::PERSONS));
 			QVERIFY(persons);
 			persons->removeRows(0, persons->rowCount());
@@ -382,9 +386,9 @@ private slots:
 			persons->setData(persons->index(0, 0), "Person 1");
 			persons->setData(persons->index(1, 0), "Person 2");
 			persons->setData(persons->index(2, 0), "Person 3");
+			QCOMPARE(persons->rowCount(), 3);
 
-		ok = model->removeRows(0, model->rowCount()); QVERIFY(ok); QCOMPARE(model->rowCount(), 0);
-		ok = model->insertRows(0, R);                     QVERIFY(ok); QCOMPARE(model->rowCount(), R);
+		ok = model->insertRows(0, R); QVERIFY(ok); QCOMPARE(model->rowCount(), R);
 
 		QTest::newRow("type 1")     << 0 << int(ITEM_TYPE) << QVariant(itemTypes->idAt(1)) << QVariant("Type 2") << true  << PLAIN_EDIT;
 		QTest::newRow("type 0")     << 1 << int(ITEM_TYPE) << QVariant(itemTypes->idAt(0)) << QVariant("Type 1") << true  << PLAIN_EDIT;
@@ -413,7 +417,7 @@ private slots:
 		QVERIFY(model);
 
 		QModelIndex index = model->index(row, column);
-		QCOMPARE(model->flags(index), Qt::ItemFlags(flags));
+		QCOMPARE(int(model->flags(index)), int(Qt::ItemFlags(flags)));
 		bool ok = model->setData(index, editvalue, Qt::EditRole);
 		QCOMPARE(ok, success);
 		if(ok) {
@@ -485,16 +489,16 @@ private slots:
 		model->setData(model->index(7, PLACE),       places->idAt(1));
 		model->setData(model->index(7, WRITTEN_OFF), Qt::Unchecked);
 
-		QTest::newRow("000")   << 8 << false << itemTypes->idAt(0) << false << places->idAt(0) << false << int(Qt::Unchecked);
-		QTest::newRow("100")   << 4 << true  << itemTypes->idAt(1) << false << places->idAt(0) << false << int(Qt::Unchecked);
-		QTest::newRow("010")   << 4 << false << itemTypes->idAt(1) << true  << places->idAt(0) << false << int(Qt::Unchecked);
-		QTest::newRow("110")   << 2 << true  << itemTypes->idAt(0) << true  << places->idAt(1) << false << int(Qt::Checked);
-		QTest::newRow("001")   << 4 << false << itemTypes->idAt(0) << false << places->idAt(1) << true  << int(Qt::Checked);
-		QTest::newRow("101")   << 2 << true  << itemTypes->idAt(1) << false << places->idAt(1) << true  << int(Qt::Checked);
-		QTest::newRow("011")   << 2 << false << itemTypes->idAt(1) << true  << places->idAt(1) << true  << int(Qt::Unchecked);
-		QTest::newRow("111 1") << 1 << true  << itemTypes->idAt(1) << true  << places->idAt(1) << true  << int(Qt::Checked);
-		QTest::newRow("111 2") << 1 << true  << itemTypes->idAt(0) << true  << places->idAt(0) << true  << int(Qt::Unchecked);
-		QTest::newRow("111 3") << 1 << true  << itemTypes->idAt(1) << true  << places->idAt(0) << true  << int(Qt::Checked);
+		QTest::newRow("000")   << 8 << false << QVariant(itemTypes->idAt(0)) << false << QVariant(places->idAt(0)) << false << QVariant(Qt::Unchecked);
+		QTest::newRow("100")   << 4 << true  << QVariant(itemTypes->idAt(1)) << false << QVariant(places->idAt(0)) << false << QVariant(Qt::Unchecked);
+		QTest::newRow("010")   << 4 << false << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(0)) << false << QVariant(Qt::Unchecked);
+		QTest::newRow("110")   << 2 << true  << QVariant(itemTypes->idAt(0)) << true  << QVariant(places->idAt(1)) << false << QVariant(Qt::Checked);
+		QTest::newRow("001")   << 4 << false << QVariant(itemTypes->idAt(0)) << false << QVariant(places->idAt(1)) << true  << QVariant(Qt::Checked);
+		QTest::newRow("101")   << 2 << true  << QVariant(itemTypes->idAt(1)) << false << QVariant(places->idAt(1)) << true  << QVariant(Qt::Checked);
+		QTest::newRow("011")   << 2 << false << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(1)) << true  << QVariant(Qt::Unchecked);
+		QTest::newRow("111 1") << 1 << true  << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(1)) << true  << QVariant(Qt::Checked);
+		QTest::newRow("111 2") << 1 << true  << QVariant(itemTypes->idAt(0)) << true  << QVariant(places->idAt(0)) << true  << QVariant(Qt::Unchecked);
+		QTest::newRow("111 3") << 1 << true  << QVariant(itemTypes->idAt(1)) << true  << QVariant(places->idAt(0)) << true  << QVariant(Qt::Checked);
 	}
 	void inventoryFilter() {
 		QFETCH(int, count);
