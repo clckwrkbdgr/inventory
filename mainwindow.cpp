@@ -1,6 +1,9 @@
 #include <QtDebug>
 #include <QtCore/QSettings>
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
 #include <QtGui/QMessageBox>
+#include <QtGui/QTextEdit>
 #include <QtGui/QFileDialog>
 #include <QtGui/QDialog>
 #include <QtGui/QDialogButtonBox>
@@ -141,12 +144,59 @@ void MainWindow::on_actionShowHistory_triggered()
 
 void MainWindow::on_actionAddMultiline_triggered()
 {
+	if(tabs->currentIndex() != tabIndex.TYPES && tabs->currentIndex() != tabIndex.PLACES && tabs->currentIndex() != tabIndex.PERSONS)
+		return;
 
+	QDialog dialog(this);
+		QVBoxLayout * vbox = new QVBoxLayout();
+			QTextEdit * edit = new QTextEdit();
+			vbox->addWidget(edit);
+			QDialogButtonBox * buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+				connect(buttons, SIGNAL(accepted()), &dialog, SLOT(accept()));
+				connect(buttons, SIGNAL(rejected()), &dialog, SLOT(reject()));
+			vbox->addWidget(buttons);
+	dialog.setLayout(vbox);
+	dialog.setSizeGripEnabled(true);
+	if(dialog.exec() == QDialog::Accepted) {
+		QStringList lines = edit->toPlainText().split('\n');
+
+		Inventory::ReferenceModel * model = qobject_cast<Inventory::ReferenceModel *>(ui.view->model());
+		if(model) {
+			bool success = model->addMultiline(lines);
+			if(!success) {
+				QMessageBox::critical(this, tr("Add lines"), tr("Adding of lines failed!"));
+			}
+		}
+	}
 }
 
 void MainWindow::on_actionPrintCSV_triggered()
 {
+	if(!ui.view->model())
+		return;
 
+	QString csvFileName = QFileDialog::getSaveFileName(this, tr("Save to CSV..."), 0, tr("CSV files (*.csv);;All files (*.*)"));
+	if(csvFileName.isEmpty())
+		return;
+
+	QFile file(csvFileName);
+	if(!file.open(QFile::Text | QFile::WriteOnly)) {
+		QMessageBox::critical(this, tr("Save to CSV"), tr("Cannot open file '%1' for write!").arg(file.fileName()));
+		return;
+	}
+
+	QTextStream out(&file);
+	QAbstractItemModel * model = ui.view->model();
+	for(int row = 0; row < model->rowCount(); ++row) {
+		QStringList cells;
+		for(int col = 0; col < model->columnCount(); ++col) {
+			QString text = model->data(model->index(row, col)).toString();
+			text.replace("\"", "\\\"");
+			text.append('"').prepend('"');
+			cells << text;
+		}
+		out << cells.join(", ") << endl;
+	}
 }
 
 void MainWindow::on_actionAdd_triggered()
@@ -169,5 +219,44 @@ void MainWindow::on_actionRemove_triggered()
 			QMessageBox::information(this, tr("Remove record"), tr("Cannot remove record. Probably, there are items that are using it."));
 		}
 	}
+}
+
+void MainWindow::on_buttonUseItemTypeFilter_toggled(bool value)
+{
+	inventoryModel->switchItemTypeFilter(value);
+	printableModel->switchItemTypeFilter(value);
+}
+
+void MainWindow::on_listItemTypeFilter_currentIndexChanged(int index)
+{
+	Inventory::Id value = itemTypesModel->idAt(index);
+	inventoryModel->setItemTypeFilter(value);
+	printableModel->setItemTypeFilter(value);
+}
+
+void MainWindow::on_buttonUsePlaceFilter_toggled(bool value)
+{
+	inventoryModel->switchPlaceFilter(value);
+	printableModel->switchPlaceFilter(value);
+}
+
+void MainWindow::on_listPlaceFilter_currentIndexChanged(int index)
+{
+	Inventory::Id value = placesModel->idAt(index);
+	inventoryModel->setPlaceFilter(value);
+	printableModel->setPlaceFilter(value);
+}
+
+void MainWindow::on_buttonUseWrittenOffFilter_toggled(bool value)
+{
+	inventoryModel->switchWrittenOffFilter(value);
+	printableModel->switchWrittenOffFilter(value);
+}
+
+void MainWindow::on_listWrittenOffFilter_currentIndexChanged(int index)
+{
+	bool value = (index == 1);
+	inventoryModel->setWrittenOffFilter(value);
+	printableModel->setWrittenOffFilter(value);
 }
 

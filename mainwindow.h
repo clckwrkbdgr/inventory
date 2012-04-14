@@ -31,6 +31,13 @@ public slots:
 	void on_actionPrintCSV_triggered();
 	void on_actionAdd_triggered();
 	void on_actionRemove_triggered();
+
+	void on_buttonUseItemTypeFilter_toggled(bool);
+	void on_listItemTypeFilter_currentIndexChanged(int);
+	void on_buttonUsePlaceFilter_toggled(bool);
+	void on_listPlaceFilter_currentIndexChanged(int);
+	void on_buttonUseWrittenOffFilter_toggled(bool);
+	void on_listWrittenOffFilter_currentIndexChanged(int);
 private:
 	QString databaseLocation;
 	Ui::MainWindow ui;
@@ -43,3 +50,4 @@ private:
 	Inventory::ReferenceModel * placesModel;
 	Inventory::ReferenceModel * personsModel;
 };
+

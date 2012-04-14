@@ -1044,6 +1044,8 @@ bool ReferenceModel::addMultiline(const QStringList & lines)
 		return false;
 
 	foreach(QString name, lines) {
+		if(name.isEmpty())
+			continue;
 		Database::Placeholders map;
 		map[":name"] = name;
 		Database::query("INSERT INTO " + refType.table + " (name) VALUES (:name); ", map);
