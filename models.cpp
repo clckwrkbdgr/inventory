@@ -168,7 +168,7 @@ Filter::Filter()
 namespace Inventory { // InventoryModel
 
 InventoryModel::InventoryModel(QObject * parent)
-	: QAbstractTableModel(parent)
+	: AbstractUpdatableTableModel(parent)
 {
 	update();
 }
@@ -209,6 +209,8 @@ void InventoryModel::update()
 			" ; ",
 			map
 			);
+
+	beginResetModel();
 	items.clear();
 	while(query.next()) {
 		Item item;
@@ -227,6 +229,7 @@ void InventoryModel::update()
 		item.note                = query.value(12).toString();
 		items << item;
 	}
+	endResetModel();
 }
 
 enum { ITEM_TYPE, ITEM_PLACE, ITEM_PERSON, ITEM_NAME, ITEM_INN, ITEM_WRITTEN_OFF, ITEM_UNDER_REPAIR, ITEM_CHECKED, ITEM_NOTE, ITEM_FIELD_COUNT };
@@ -456,10 +459,10 @@ bool InventoryModel::insertRows(int row, int count, const QModelIndex & /*parent
 	if(row < 0 || rowCount() + 1 <= row)
 		return false;
 
-	Id itemTypeId = getDefaultId("ItemTypes");
-	Id placeId    = getDefaultId("Places");
+	Id itemTypeId = filter.useItemTypeFilter ? filter.itemTypeFilter : getDefaultId("ItemTypes");
+	Id placeId    = filter.usePlaceFilter    ? filter.placeFilter    : getDefaultId("Places");
 	Id personId   = getDefaultId("Persons");
-	// TODO Если установлен фильтр, использовать его значения.
+
 
 	while(count--) {
 		Database::Placeholders map;
@@ -673,7 +676,7 @@ int HistoryModel::columnCount(const QModelIndex & /*parent*/) const
 namespace Inventory { // PrintableInventoryModel
 
 PrintableInventoryModel::PrintableInventoryModel(QObject * parent)
-	: QAbstractTableModel(parent)
+	: AbstractUpdatableTableModel(parent)
 {
 	update();
 }
@@ -714,9 +717,8 @@ void PrintableInventoryModel::update()
 			" ; ",
 			map
 			);
-	//if(filter.useItemTypeFilter || filter.usePlaceFilter || filter.useWrittenOffFilter) {
-		//qDebug() << query.executedQuery();
-	//}
+
+	beginResetModel();
 	groups.clear();
 	while(query.next()) {
 		ItemGroup group;
@@ -730,6 +732,7 @@ void PrintableInventoryModel::update()
 		group.writtenOff = query.value(7).toInt();
 		groups << group;
 	}
+	endResetModel();
 }
 
 Qt::ItemFlags PrintableInventoryModel::flags(const QModelIndex & index) const
@@ -865,7 +868,7 @@ RefType getRefType(int type)
 }
 
 ReferenceModel::ReferenceModel(int newType, QObject * parent)
-	: QAbstractTableModel(parent)
+	: AbstractUpdatableTableModel(parent)
 {
 	refType = getRefType(newType);
 	if(!type())
@@ -884,6 +887,8 @@ void ReferenceModel::update()
 			" FROM " + refType.table + " "
 			" ; "
 			);
+
+	beginResetModel();
 	records.clear();
 	while(query.next()) {
 		RefRecord rec;
@@ -891,6 +896,7 @@ void ReferenceModel::update()
 		rec.name = query.value(1).toString();
 		records << rec;
 	}
+	endResetModel();
 }
 
 Qt::ItemFlags ReferenceModel::flags(const QModelIndex & index) const

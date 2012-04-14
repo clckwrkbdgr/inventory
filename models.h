@@ -30,6 +30,15 @@ private:
 
 typedef int Id;
 
+class AbstractUpdatableTableModel : public QAbstractTableModel {
+	Q_OBJECT
+public:
+	AbstractUpdatableTableModel(QObject * parent = 0)
+		: QAbstractTableModel(parent) {}
+	virtual ~AbstractUpdatableTableModel() {}
+	virtual void update() = 0;
+};
+
 struct Filter {
 	bool useItemTypeFilter;
 	Id itemTypeFilter;
@@ -57,7 +66,7 @@ struct Item {
 	QString note;
 };
 
-class InventoryModel : public QAbstractTableModel {
+class InventoryModel : public AbstractUpdatableTableModel {
 	Q_OBJECT
 	Q_DISABLE_COPY(InventoryModel);
 public:
@@ -81,10 +90,11 @@ public:
 	virtual void switchPlaceFilter(bool on = true);
 	virtual void setWrittenOffFilter(bool writtenOff);
 	virtual void switchWrittenOffFilter(bool on = true);
+
+	virtual void update();
 private:
 	Filter filter;
 	QList<Item> items;
-	void update();
 };
 
 struct HistoryRecord {
@@ -123,7 +133,7 @@ struct ItemGroup {
 	bool writtenOff;
 };
 
-class PrintableInventoryModel : public QAbstractTableModel {
+class PrintableInventoryModel : public AbstractUpdatableTableModel {
 	Q_OBJECT
 	Q_DISABLE_COPY(PrintableInventoryModel);
 public:
@@ -143,10 +153,11 @@ public:
 	virtual void switchPlaceFilter(bool on = true);
 	virtual void setWrittenOffFilter(bool writtenOff);
 	virtual void switchWrittenOffFilter(bool on = true);
+
+	virtual void update();
 private:
 	QList<ItemGroup> groups;
 	Filter filter;
-	void update();
 };
 
 struct RefRecord {
@@ -160,7 +171,7 @@ struct RefType {
 	QString foreignKey;
 };
 
-class ReferenceModel : public QAbstractTableModel {
+class ReferenceModel : public AbstractUpdatableTableModel {
 	Q_OBJECT
 	Q_DISABLE_COPY(ReferenceModel);
 public:
@@ -183,10 +194,11 @@ public:
 	int countOfItemsUsing(Id id);
 	int type() const;
 	virtual bool addMultiline(const QStringList & lines);
+
+	virtual void update();
 private:
 	QList<RefRecord> records;
 	RefType refType;
-	void update();
 };
 
 }
