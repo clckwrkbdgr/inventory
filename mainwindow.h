@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtGui/QMainWindow>
+#include <QtGui/QTabBar>
 
 #include "models.h"
 
@@ -13,5 +14,13 @@ public:
 	MainWindow(QWidget * parent = 0);
 	virtual ~MainWindow();
 private:
+	QString databaseLocation;
 	Ui::MainWindow ui;
+	QTabBar * tabs;
+	
+	Inventory::InventoryModel * inventoryModel;
+	Inventory::PrintableInventoryModel * printableModel;
+	Inventory::ReferenceModel * itemTypesModel;
+	Inventory::ReferenceModel * placesModel;
+	Inventory::ReferenceModel * personsModel;
 };

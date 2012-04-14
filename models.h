@@ -18,13 +18,14 @@ public:
 	static QSqlDatabase db();
 	static QString error(QSqlError e = db().lastError());
 	static void setDatabaseName(const QString & newName);
+	static const QString & databaseName();
 	static bool query(const QString & prepared, const Placeholders & placeholders = Placeholders());
 	static QSqlQuery select(const QString & prepared, const Placeholders & placeholders = Placeholders());
 private:
 	Database() {}
 	~Database() {}
 
-	static QString databaseName;
+	static QString dbName;
 };
 
 typedef int Id;

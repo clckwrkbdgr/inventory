@@ -4,7 +4,7 @@
 
 namespace Inventory {
 
-QString Database::databaseName = "";
+QString Database::dbName = "";
 
 typedef QMap<QSqlError::ErrorType, QString> ErrorMap;
 
@@ -22,7 +22,7 @@ ErrorMap getErrorTypes()
 bool Database::reopen()
 {
 	QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "inventory");
-	db.setDatabaseName(databaseName);
+	db.setDatabaseName(dbName);
 	bool ok = db.open();
 	if(!ok)
 		return false;
@@ -119,10 +119,14 @@ QString Database::error(QSqlError e)
 		arg(e.databaseText());
 }
 
+const QString & Database::databaseName()
+{
+	return dbName;
+}
+
 void Database::setDatabaseName(const QString & newName)
 {
-	databaseName = newName;
-	reopen();
+	dbName = newName;
 }
 
 bool Database::query(const QString & prepared, const Placeholders & placeholders)
