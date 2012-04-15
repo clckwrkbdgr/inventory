@@ -164,7 +164,6 @@
    <addaction name="actionRemove"/>
    <addaction name="separator"/>
    <addaction name="actionHideFilter"/>
-   <addaction name="actionHideResponsiblePerson"/>
   </widget>
   <action name="actionShowHistory">
    <property name="text">
