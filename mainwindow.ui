@@ -115,6 +115,33 @@
      <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuMain">
+    <property name="title">
+     <string>Main</string>
+    </property>
+    <addaction name="actionHideFilter"/>
+    <addaction name="actionHideResponsiblePerson"/>
+    <addaction name="actionPrintCSV"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionAdd"/>
+    <addaction name="actionAddMultiline"/>
+    <addaction name="actionRemove"/>
+   </widget>
+   <widget class="QMenu" name="menuItems">
+    <property name="title">
+     <string>Items</string>
+    </property>
+    <addaction name="actionShowHistory"/>
+   </widget>
+   <addaction name="menuMain"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuItems"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">

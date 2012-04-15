@@ -6,6 +6,8 @@
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 #include <QtCore/QStringList>
+#include <QtGui/QComboBox>
+#include <QtGui/QItemDelegate>
 
 namespace Inventory {
 
@@ -64,6 +66,19 @@ struct Item {
 	bool underRepair;
 	bool checked;
 	QString note;
+};
+
+class InventoryDelegate : public QItemDelegate {
+	Q_OBJECT
+	Q_DISABLE_COPY(InventoryDelegate)
+public:
+	InventoryDelegate(QObject *parent = 0);
+	virtual ~InventoryDelegate();
+
+	virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	virtual void setEditorData(QWidget *editor, const QModelIndex &index) const;
+	virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+	virtual void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
 class InventoryModel : public AbstractUpdatableTableModel {
@@ -192,6 +207,7 @@ public:
 	virtual bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex());
 
 	virtual Id idAt(int row) const;
+	virtual int rowOf(Id id) const;
 	int countOfItemsUsing(Id id);
 	int type() const;
 	virtual bool addMultiline(const QStringList & lines);

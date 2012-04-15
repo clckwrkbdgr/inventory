@@ -557,21 +557,24 @@ QString unfoldHistoryValue(int field, const QString & value)
 			Database::Placeholders map;
 			map[":id"] = value;
 			QSqlQuery q = Database::select("SELECT name FROM ItemTypes WHERE id = :id", map);
-			q.next();
+			if(!q.next())
+				return "";
 			return q.value(0).toString();
 		}
 		case HISTORY_PLACE: {
 			Database::Placeholders map;
 			map[":id"] = value;
 			QSqlQuery q = Database::select("SELECT name FROM Places WHERE id = :id", map);
-			q.next();
+			if(!q.next())
+				return "";
 			return q.value(0).toString();
 		}
 		case HISTORY_PERSON: {
 			Database::Placeholders map;
 			map[":id"] = value;
 			QSqlQuery q = Database::select("SELECT name FROM Persons WHERE id = :id", map);
-			q.next();
+			if(!q.next())
+				return "";
 			return q.value(0).toString();
 		}
 		case HISTORY_NAME:         return value;
@@ -1037,6 +1040,15 @@ Id ReferenceModel::idAt(int row) const
 	return Id();
 }
 
+int ReferenceModel::rowOf(Id id) const
+{
+	for(int row = 0; row < rowCount(); ++row) {
+		if(records[row].id == id)
+			return row;
+	}
+	return -1;
+}
+
 int ReferenceModel::type() const
 {
 	return refType.type;
@@ -1057,6 +1069,69 @@ bool ReferenceModel::addMultiline(const QStringList & lines)
 	update();
 
 	return true;
+}
+
+}
+
+namespace Inventory { // InventoryDelegate
+	
+InventoryDelegate::InventoryDelegate(QObject * parent)
+	: QItemDelegate(parent)
+{
+}
+
+InventoryDelegate::~InventoryDelegate() {
+}
+
+QWidget* InventoryDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+	if(!index.isValid())
+		return QItemDelegate::createEditor(parent, option, index);
+
+	int refType = ReferenceModel::INVALID;
+	switch(index.column()) {
+		case ITEM_TYPE  : refType = ReferenceModel::ITEM_TYPES; break;
+		case ITEM_PLACE : refType = ReferenceModel::PLACES; break;
+		case ITEM_PERSON: refType = ReferenceModel::PERSONS; break;
+		default: return QItemDelegate::createEditor(parent, option, index);
+	}
+
+	QComboBox * comboBox = new QComboBox(parent);
+	ReferenceModel * model = new ReferenceModel(refType, comboBox);
+	comboBox->setModel(model);
+	return comboBox;
+}
+
+void InventoryDelegate::setEditorData(QWidget * editor, const QModelIndex &index) const
+{
+	if(!index.isValid()) {
+		QItemDelegate::setEditorData(editor, index);
+		return;
+	}
+	
+	QComboBox * comboBox = static_cast<QComboBox *>(editor);
+	ReferenceModel * model = static_cast<ReferenceModel *>(comboBox->model());
+
+	Id id = index.model()->data(index, Qt::EditRole).toInt();
+	comboBox->setCurrentIndex(model->rowOf(id));
+}
+
+void InventoryDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+	if(!index.isValid()) {
+		QItemDelegate::setModelData(editor, model, index);
+		return;
+	}
+
+	QComboBox *comboBox = static_cast<QComboBox*>(editor);
+	ReferenceModel * refModel = static_cast<ReferenceModel*>(comboBox->model());
+	int id = refModel->idAt(comboBox->currentIndex());
+	model->setData(index, id, Qt::EditRole);
+}
+
+void InventoryDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &) const
+{
+	editor->setGeometry(option.rect);
 }
 
 }

@@ -67,6 +67,16 @@ MainWindow::MainWindow(QWidget * parent)
 	} else {
 		tabs->setCurrentIndex(tabIndex.MAIN);
 	}
+
+	// Settings again.
+	ui.actionHideResponsiblePerson->setChecked     (settings.value("ui/responsiblepersonhidden", ui.actionHideResponsiblePerson->isChecked()).toBool());
+	ui.actionHideFilter           ->setChecked     (settings.value("filter/hidden",              ui.actionHideFilter           ->isChecked()).toBool());
+	ui.buttonUseItemTypeFilter    ->setChecked     (settings.value("filter/useitemtype",         ui.buttonUseItemTypeFilter    ->isChecked()).toBool());
+	ui.listItemTypeFilter         ->setCurrentIndex(settings.value("filter/itemtype",            ui.listItemTypeFilter         ->currentIndex()).toInt());
+	ui.buttonUsePlaceFilter       ->setChecked     (settings.value("filter/useplace",            ui.buttonUsePlaceFilter       ->isChecked()).toBool());
+	ui.listPlaceFilter            ->setCurrentIndex(settings.value("filter/place",               ui.listPlaceFilter            ->currentIndex()).toInt());
+	ui.buttonUseWrittenOffFilter  ->setChecked     (settings.value("filter/usewrittenoff",       ui.buttonUseWrittenOffFilter  ->isChecked()).toBool());
+	ui.listWrittenOffFilter       ->setCurrentIndex(settings.value("filter/writtenoff",          ui.listWrittenOffFilter       ->currentIndex()).toInt());
 }
 
 MainWindow::~MainWindow()
@@ -81,6 +91,15 @@ MainWindow::~MainWindow()
 		settings.setValue("mainwindow/pos", pos());
 	}
 	settings.setValue("database/location", Inventory::Database::databaseName());
+
+	settings.setValue("ui/responsiblepersonhidden", ui.actionHideResponsiblePerson->isChecked());
+	settings.setValue("filter/hidden",              ui.actionHideFilter           ->isChecked());
+	settings.setValue("filter/useitemtype",         ui.buttonUseItemTypeFilter    ->isChecked());
+	settings.setValue("filter/itemtype",            ui.listItemTypeFilter         ->currentIndex());
+	settings.setValue("filter/useplace",            ui.buttonUsePlaceFilter       ->isChecked());
+	settings.setValue("filter/place",               ui.listPlaceFilter            ->currentIndex());
+	settings.setValue("filter/usewrittenoff",       ui.buttonUseWrittenOffFilter  ->isChecked());
+	settings.setValue("filter/writtenoff",          ui.listWrittenOffFilter       ->currentIndex());
 
 	// Database.
 	Inventory::Database::close();
@@ -102,6 +121,12 @@ void MainWindow::setupTab(int index)
 	ui.filterBox->setVisible(ui.actionHideFilter->isEnabled() && !ui.actionHideFilter->isChecked());
 
 	on_actionHideResponsiblePerson_toggled(ui.actionHideResponsiblePerson->isChecked());
+
+	if(index == tabIndex.MAIN) {
+		ui.view->setItemDelegate(new Inventory::InventoryDelegate(this));
+	} else {
+		ui.view->setItemDelegate(new QItemDelegate(this));
+	}
 
 	if     (index == tabIndex.MAIN)    ui.view->setModel(inventoryModel);
 	else if(index == tabIndex.PRINT)   ui.view->setModel(printableModel);
