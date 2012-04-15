@@ -8,4 +8,5 @@ MOC_DIR = tmp
 RCC_DIR = tmp
 UI_DIR = tmp
 
+HEADERS = main.h
 SOURCES = main.cpp
