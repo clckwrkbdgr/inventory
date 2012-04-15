@@ -1,96 +1,71 @@
 #pragma once
 
-#include <QtCore/QAbstractItemModel>
+#include <QtCore/QAbstractTableModel>
+#include <QtCore/QDateTime>
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
+#include <QtCore/QStringList>
+#include <QtGui/QComboBox>
 #include <QtGui/QItemDelegate>
-#include <QtSql/QSqlQueryModel>
-#include <QtDebug>
 
-#include "inventory.h"
+namespace Inventory {
 
-// @todo: - error handling ,exception catching
-// @todo: show note icon in name field, and tooltip, and edit note in inputdialog via context menu.
-class PlaceModel : public QAbstractItemModel {
-	Q_OBJECT
+class Database {
 public:
-	PlaceModel(QObject *parent = 0); // Throws DBErrorException, InvalidIdException.
-	virtual ~PlaceModel();
+	typedef QMap<QString, QVariant> Placeholders;
+	static bool reopen();
+	static void close();
 
-	void updateList(); // Throws DBErrorException, InvalidIdException.
-	int indexOf(const Place &place) const;
-	int idAt(int row) const;
-
-	virtual Qt::ItemFlags flags(const QModelIndex &index) const;
-	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const; // Tool tip.
-	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-
-	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-	virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
-	virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-
-	virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
-	virtual QModelIndex parent(const QModelIndex &index) const;
+	static QSqlDatabase db();
+	static QString error(QSqlError e = db().lastError());
+	static void setDatabaseName(const QString & newName);
+	static const QString & databaseName();
+	static bool query(const QString & prepared, const Placeholders & placeholders = Placeholders());
+	static QSqlQuery select(const QString & prepared, const Placeholders & placeholders = Placeholders());
 private:
-	QList<Place> list;
+	Database() {}
+	~Database() {}
 
+	static QString dbName;
 };
 
-class ItemTypeModel : public QAbstractItemModel {
+typedef int Id;
+
+class AbstractUpdatableTableModel : public QAbstractTableModel {
 	Q_OBJECT
 public:
-	ItemTypeModel(QObject *parent = 0); // Throws DBErrorException, InvalidIdException.
-	virtual ~ItemTypeModel();
-
-	void updateList(); // Throws DBErrorException, InvalidIdException.
-	int indexOf(const ItemType &itemType) const;
-	int idAt(int row) const;
-
-	virtual Qt::ItemFlags flags(const QModelIndex &index) const;
-	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const; // Tool tip.
-	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-
-	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-	virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
-	virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-
-	virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
-	virtual QModelIndex parent(const QModelIndex &index) const;
-private:
-	QList<ItemType> list;
-
+	AbstractUpdatableTableModel(QObject * parent = 0)
+		: QAbstractTableModel(parent) {}
+	virtual ~AbstractUpdatableTableModel() {}
+	virtual void update() = 0;
 };
 
-class InventoryModel : public QAbstractItemModel {
-	Q_OBJECT
-public:
-	enum FieldType {UnknownField = -1, ItemTypeField = 0, NameField = 1, InnField = 2, PlaceField = 3, ActiveField = 4, NoteField = 5, FieldCount = 6};
+struct Filter {
+	bool useItemTypeFilter;
+	Id itemTypeFilter;
+	bool usePlaceFilter;
+	Id placeFilter;
+	bool useWrittenOffFilter;
+	bool writtenOffFilter;
 
-	InventoryModel(QObject *parent = 0);
-	virtual ~InventoryModel();
+	Filter();
+};
 
-	void updateList(const QList<Item> &itemList);
-	int indexOf(const Item &item) const;
-	int idAt(int row) const;
-
-	virtual Qt::ItemFlags flags(const QModelIndex &index) const;
-	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const; // Tool tip.
-	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-
-	virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
-	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-	virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
-	virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-
-	virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
-	virtual QModelIndex parent(const QModelIndex &index) const;
-private:
-	QList<Item> list;
-
+struct Item {
+	Id id;
+	Id itemTypeId;
+	QString itemType;
+	Id placeId;
+	QString place;
+	Id responsiblePersonId;
+	QString responsiblePerson;
+	QString name;
+	int inn;
+	bool writtenOff;
+	bool underRepair;
+	bool checked;
+	QString note;
 };
 
 class InventoryDelegate : public QItemDelegate {
@@ -106,41 +81,141 @@ public:
 	virtual void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
-
-class HistoryModel : public QAbstractItemModel {
+class InventoryModel : public AbstractUpdatableTableModel {
 	Q_OBJECT
+	Q_DISABLE_COPY(InventoryModel);
 public:
-	enum FieldType {UnknownField = -1, TimeField = 0, NameField = 1, OldValueField = 2, NewValueField = 3, FieldCount = 4};
+	InventoryModel(QObject * parent = 0);
+	virtual ~InventoryModel() {}
 
-	HistoryModel(const Item &item, QObject *parent = 0); // Throws DBErrorException, InvalidIdException.
-	virtual ~HistoryModel();
-
-	void updateList(); // Throws DBErrorException, InvalidIdException.
-
-	virtual Qt::ItemFlags flags(const QModelIndex &index) const; // Read-only.
-	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const; // Tool tip.
+	virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+	virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+	virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
-	virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
-	virtual QModelIndex parent(const QModelIndex &index) const;
+	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
+	virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
+	virtual bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex());
+	virtual bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex());
+
+	int personColumnIndex() const;
+	virtual Id idAt(int row) const;
+	virtual void setItemTypeFilter(Id itemType);
+	virtual void switchItemTypeFilter(bool on = true);
+	virtual void setPlaceFilter(Id place);
+	virtual void switchPlaceFilter(bool on = true);
+	virtual void setWrittenOffFilter(bool writtenOff);
+	virtual void switchWrittenOffFilter(bool on = true);
+
+	virtual void update();
 private:
-	Item item;
-	QList<History> list;
+	Filter filter;
+	QList<Item> items;
 };
 
-class SortingSqlQueryModel : public QSqlQueryModel {
+struct HistoryRecord {
+	int id;
+	QDateTime changeTime;
+	int field;
+	QString oldValue;
+	QString newValue;
+};
+
+class HistoryModel : public QAbstractTableModel {
 	Q_OBJECT
-	Q_DISABLE_COPY(SortingSqlQueryModel)
+	Q_DISABLE_COPY(HistoryModel);
 public:
-	SortingSqlQueryModel(QObject *parent = 0) : QSqlQueryModel(parent) {
-		setQuery(Inventory::instance()->getQuery());
-	}
-	virtual ~SortingSqlQueryModel() {}
+	HistoryModel(int item, QObject * parent = 0);
+	virtual ~HistoryModel() {}
 
-	virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) {
-		setQuery(Inventory::instance()->getQuery(column, order));
-	}
+	virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+	virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+
+	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
+	virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
+private:
+	QList<HistoryRecord> records;
 };
 
+struct ItemGroup {
+	QString itemType;
+	int itemTypeId;
+	QString name;
+	int itemCount;
+	QString place;
+	int placeId;
+	int inn;
+	bool writtenOff;
+};
+
+class PrintableInventoryModel : public AbstractUpdatableTableModel {
+	Q_OBJECT
+	Q_DISABLE_COPY(PrintableInventoryModel);
+public:
+	PrintableInventoryModel(QObject * parent = 0);
+	virtual ~PrintableInventoryModel() {}
+
+	virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+	virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+
+	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
+	virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
+
+	virtual void setItemTypeFilter(Id itemType);
+	virtual void switchItemTypeFilter(bool on = true);
+	virtual void setPlaceFilter(Id place);
+	virtual void switchPlaceFilter(bool on = true);
+	virtual void setWrittenOffFilter(bool writtenOff);
+	virtual void switchWrittenOffFilter(bool on = true);
+
+	virtual void update();
+private:
+	QList<ItemGroup> groups;
+	Filter filter;
+};
+
+struct RefRecord {
+	Id id;
+	QString name;
+};
+
+struct RefType {
+	int type;
+	QString table;
+	QString foreignKey;
+};
+
+class ReferenceModel : public AbstractUpdatableTableModel {
+	Q_OBJECT
+	Q_DISABLE_COPY(ReferenceModel);
+public:
+	enum { INVALID = 0, ITEM_TYPES, PLACES, PERSONS, REF_TYPE_COUNT };
+
+	ReferenceModel(int newType, QObject * parent = 0);
+	virtual ~ReferenceModel() {}
+
+	virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+	virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+	virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+
+	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
+	virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
+	virtual bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex());
+	virtual bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex());
+
+	virtual Id idAt(int row) const;
+	virtual int rowOf(Id id) const;
+	int countOfItemsUsing(Id id);
+	int type() const;
+	virtual bool addMultiline(const QStringList & lines);
+
+	virtual void update();
+private:
+	QList<RefRecord> records;
+	RefType refType;
+};
+
+}

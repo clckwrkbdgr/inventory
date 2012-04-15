@@ -1,38 +1,31 @@
 #include <QtDebug>
-#include <QtGui/QStatusBar>
-#include <QtGui/QMenu>
 #include <QtCore/QSettings>
-#include <QtGui/QPrinter>
-#include <QtGui/QPrintDialog>
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
 #include <QtGui/QMessageBox>
-#include <QtGui/QPainter>
-#include <QtSql/QSqlError>
+#include <QtGui/QTextEdit>
+#include <QtGui/QFileDialog>
+#include <QtGui/QDialog>
+#include <QtGui/QDialogButtonBox>
 
-#include "inventory.h"
-#include "listdialog.h"
-#include "historydialog.h"
-#include "filterdialog.h"
-#include "printpreviewdialog.h"
 #include "mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+MainWindow::MainWindow(QWidget * parent)
+	: QMainWindow(parent)
+{
 	ui.setupUi(this);
-	connect(ui.actionAdd, SIGNAL(triggered()), this, SLOT(addItem()));
-	connect(ui.actionDeactivate, SIGNAL(triggered()), this, SLOT(deactivate()));
-	connect(ui.actionRemoveItem, SIGNAL(triggered()), this, SLOT(removeItem()));
-	connect(ui.actionPlaces, SIGNAL(triggered()), this, SLOT(editPlaces()));
-	connect(ui.actionItemTypes, SIGNAL(triggered()), this, SLOT(editItemTypes()));
-	connect(ui.actionFilter, SIGNAL(triggered()), this, SLOT(setFilter()));
-	connect(ui.actionHistory, SIGNAL(triggered()), this, SLOT(showHistory()));
-	connect(ui.actionPrint, SIGNAL(triggered()), this, SLOT(print()));
-	connect(ui.actionEdit, SIGNAL(triggered()), this, SLOT(editField()));
-	connect(ui.view, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(popupMenu(QPoint)));
+	tabs = new QTabBar();
+	tabIndex.MAIN    = tabs->addTab(tr("Main"));
+	tabIndex.PRINT   = tabs->addTab(tr("Print"));
+	tabIndex.TYPES   = tabs->addTab(tr("Item types"));
+	tabIndex.PLACES  = tabs->addTab(tr("Places"));
+	tabIndex.PERSONS = tabs->addTab(tr("Persons"));
 
-	itemMenu = new QMenu(tr("Item menu"), this);
-	itemMenu->addAction(ui.actionDeactivate);
-	itemMenu->addAction(ui.actionRemoveItem);
-	itemMenu->addSeparator();
-	itemMenu->addAction(ui.actionHistory);
+	QBoxLayout * box = static_cast<QBoxLayout*>(ui.centralwidget->layout());
+	if(box) {
+		box->insertWidget(0, tabs);
+	}
+	connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(setupTab(int)));
 
 	// Settings.
 	QSettings settings;
@@ -41,25 +34,53 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	if(settings.value("mainwindow/maximized", false).toBool())
 		setWindowState(Qt::WindowMaximized);
 
-	// Database.
-	try {
-		Inventory::open("inventory.db3");
-		model = new InventoryModel(this);
-		model->updateList(Inventory::instance()->items());
-	} catch(IDatabaseObject::DBErrorException e) {
-		QMessageBox::critical(this, tr("Error"), e.query.lastError().databaseText() + "\n" + e.query.lastError().driverText());
-		exit(1);
+	QString databaseLocation = settings.value("database/location", "").toString();
+	if(databaseLocation.isEmpty()) {
+		databaseLocation = QFileDialog::getSaveFileName(this, tr("Database location"),
+				QDir(QApplication::applicationDirPath()).absoluteFilePath("inventory.sqlite"),
+				tr("SQLite3 database files (*.sqlite);;All files (*.*)")
+				); 
 	}
 
-	ui.view->setModel(model);
-	ui.view->setItemDelegate(new InventoryDelegate(this));
-	ui.view->resizeColumnsToContents();
-	connect(model, SIGNAL(layoutChanged()), ui.view, SLOT(resizeColumnsToContents()));
-	connect(model, SIGNAL(modelReset()), ui.view, SLOT(resizeColumnsToContents()));
-	connect(model, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(resizeView(QModelIndex, QModelIndex)));
+	// App logic.
+	Inventory::Database::setDatabaseName(databaseLocation);
+	if(!Inventory::Database::reopen()) {
+		QMessageBox::critical(this, tr("Database"), tr("Cannot open database at path '%1'!").arg(Inventory::Database::databaseName()));
+		exit(1);
+	}
+	inventoryModel = new Inventory::InventoryModel();
+	printableModel = new Inventory::PrintableInventoryModel();
+	itemTypesModel = new Inventory::ReferenceModel(Inventory::ReferenceModel::ITEM_TYPES);
+	placesModel    = new Inventory::ReferenceModel(Inventory::ReferenceModel::PLACES);
+	personsModel   = new Inventory::ReferenceModel(Inventory::ReferenceModel::PERSONS);
+	connect(inventoryModel, SIGNAL(modelReset()), this, SLOT(resetView()));
+	connect(printableModel, SIGNAL(modelReset()), this, SLOT(resetView()));
+	connect(itemTypesModel, SIGNAL(modelReset()), this, SLOT(resetView()));
+	connect(placesModel,    SIGNAL(modelReset()), this, SLOT(resetView()));
+	connect(personsModel,   SIGNAL(modelReset()), this, SLOT(resetView()));
+
+	ui.listItemTypeFilter->setModel(itemTypesModel);
+	ui.listPlaceFilter->setModel(placesModel);
+
+	if(tabs->currentIndex() == tabIndex.MAIN) {
+		setupTab(tabIndex.MAIN);
+	} else {
+		tabs->setCurrentIndex(tabIndex.MAIN);
+	}
+
+	// Settings again.
+	ui.actionHideResponsiblePerson->setChecked     (settings.value("ui/responsiblepersonhidden", ui.actionHideResponsiblePerson->isChecked()).toBool());
+	ui.actionHideFilter           ->setChecked     (settings.value("filter/hidden",              ui.actionHideFilter           ->isChecked()).toBool());
+	ui.buttonUseItemTypeFilter    ->setChecked     (settings.value("filter/useitemtype",         ui.buttonUseItemTypeFilter    ->isChecked()).toBool());
+	ui.listItemTypeFilter         ->setCurrentIndex(settings.value("filter/itemtype",            ui.listItemTypeFilter         ->currentIndex()).toInt());
+	ui.buttonUsePlaceFilter       ->setChecked     (settings.value("filter/useplace",            ui.buttonUsePlaceFilter       ->isChecked()).toBool());
+	ui.listPlaceFilter            ->setCurrentIndex(settings.value("filter/place",               ui.listPlaceFilter            ->currentIndex()).toInt());
+	ui.buttonUseWrittenOffFilter  ->setChecked     (settings.value("filter/usewrittenoff",       ui.buttonUseWrittenOffFilter  ->isChecked()).toBool());
+	ui.listWrittenOffFilter       ->setCurrentIndex(settings.value("filter/writtenoff",          ui.listWrittenOffFilter       ->currentIndex()).toInt());
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
 	// Settings.
 	QSettings settings;
 	settings.setValue("mainwindow/maximized",
@@ -69,90 +90,205 @@ MainWindow::~MainWindow() {
 		settings.setValue("mainwindow/size", size());
 		settings.setValue("mainwindow/pos", pos());
 	}
+	settings.setValue("database/location", Inventory::Database::databaseName());
+
+	settings.setValue("ui/responsiblepersonhidden", ui.actionHideResponsiblePerson->isChecked());
+	settings.setValue("filter/hidden",              ui.actionHideFilter           ->isChecked());
+	settings.setValue("filter/useitemtype",         ui.buttonUseItemTypeFilter    ->isChecked());
+	settings.setValue("filter/itemtype",            ui.listItemTypeFilter         ->currentIndex());
+	settings.setValue("filter/useplace",            ui.buttonUsePlaceFilter       ->isChecked());
+	settings.setValue("filter/place",               ui.listPlaceFilter            ->currentIndex());
+	settings.setValue("filter/usewrittenoff",       ui.buttonUseWrittenOffFilter  ->isChecked());
+	settings.setValue("filter/writtenoff",          ui.listWrittenOffFilter       ->currentIndex());
 
 	// Database.
-	Inventory::close();
+	Inventory::Database::close();
 }
 
-void MainWindow::resizeView(const QModelIndex&, const QModelIndex&) {
+void MainWindow::on_actionHideResponsiblePerson_toggled(bool value)
+{
+	ui.view->setColumnHidden(inventoryModel->personColumnIndex(), (tabs->currentIndex() == tabIndex.MAIN) && value);
+}
+
+void MainWindow::setupTab(int index)
+{
+	ui.actionShowHistory ->setEnabled(index == tabIndex.MAIN);
+	ui.actionAddMultiline->setEnabled(index == tabIndex.TYPES || index == tabIndex.PLACES || index == tabIndex.PERSONS);
+	ui.actionAdd         ->setEnabled(index != tabIndex.PRINT);
+	ui.actionRemove      ->setEnabled(index != tabIndex.PRINT);
+	ui.actionHideFilter  ->setEnabled(index == tabIndex.MAIN || index == tabIndex.PRINT);
+
+	ui.filterBox->setVisible(ui.actionHideFilter->isEnabled() && !ui.actionHideFilter->isChecked());
+
+	on_actionHideResponsiblePerson_toggled(ui.actionHideResponsiblePerson->isChecked());
+
+	if(index == tabIndex.MAIN) {
+		ui.view->setItemDelegate(new Inventory::InventoryDelegate(this));
+	} else {
+		ui.view->setItemDelegate(new QItemDelegate(this));
+	}
+
+	if     (index == tabIndex.MAIN)    ui.view->setModel(inventoryModel);
+	else if(index == tabIndex.PRINT)   ui.view->setModel(printableModel);
+	else if(index == tabIndex.TYPES)   ui.view->setModel(itemTypesModel);
+	else if(index == tabIndex.PLACES)  ui.view->setModel(placesModel);
+	else if(index == tabIndex.PERSONS) ui.view->setModel(personsModel);
+	resetView(true);
+}
+
+void MainWindow::resetView(bool update)
+{
 	ui.view->resizeColumnsToContents();
 	ui.view->horizontalHeader()->setStretchLastSection(true);
-}
-
-void MainWindow::removeItem() {
-	if(QMessageBox::question(this, tr("Remove item"), tr("Do you really want to remove selected item?\n"
-							"All associated history also will be deleted."),
-							QMessageBox::Yes | QMessageBox::Cancel) == QMessageBox::Yes) {
-		model->removeRow(ui.view->currentIndex().row());
-	}
-}
-
-void MainWindow::addItem() {
-	model->insertRow(model->rowCount());
-}
-
-void MainWindow::deactivate() {
-	if(QMessageBox::question(this, tr("Deactivate item"), tr("Do you really want to deactivate selected item?"),
-							QMessageBox::Yes | QMessageBox::Cancel) == QMessageBox::Yes) {
-		QModelIndex index = model->index(ui.view->currentIndex().row(), 4); // 'Active' field.
-		model->setData(index, false, Qt::EditRole);
-	}
-}
-
-void MainWindow::editField() {
-	ui.view->edit(ui.view->currentIndex());
-}
-
-void MainWindow::editPlaces() {
-	ListDialog *dialog = new ListDialog(true, this);
-	dialog->exec();
-	delete dialog;
-}
-
-void MainWindow::editItemTypes() {
-	ListDialog *dialog = new ListDialog(false, this);
-	dialog->exec();
-	delete dialog;
-}
-
-void MainWindow::setFilter() {
-	FilterDialog *dialog = new FilterDialog(this);
-	dialog->setFilter(Inventory::getLastFilter());
-	if(dialog->exec()) {
-		try {
-			model->updateList(Inventory::instance()->filteredItems(dialog->filter()));
-		} catch(IIdObject::InvalidIdException e) {
-			QMessageBox::critical(this, tr("Error"), tr("Database invalid id exception!"));
-		} catch(IDatabaseObject::DBErrorException e) {
-			QMessageBox::critical(this, tr("Error"), e.query.lastError().databaseText() + "\n" + e.query.lastError().driverText());
+	if(update && ui.view->model()) {
+		Inventory::AbstractUpdatableTableModel * model = qobject_cast<Inventory::AbstractUpdatableTableModel *>(ui.view->model());
+		if(model) {
+			model->update();
 		}
 	}
-	delete dialog;
 }
 
-void MainWindow::showHistory() {
-	HistoryDialog *dialog = NULL;
+void MainWindow::on_actionShowHistory_triggered()
+{
+	if(ui.view->model() != inventoryModel)
+		return;
 
-	Item item(model->idAt(ui.view->currentIndex().row()));
-	dialog = new HistoryDialog(item, this);
-	dialog->exec(); 
-	delete dialog;
+	int row = ui.view->currentIndex().isValid() ? ui.view->currentIndex().row() : -1;
+	if(row < 0)
+		return;
+
+	Inventory::Id id = inventoryModel->idAt(row);
+	QScopedPointer<Inventory::HistoryModel> model(new Inventory::HistoryModel(id));
+
+	QDialog dialog(this);
+		QVBoxLayout * vbox = new QVBoxLayout();
+			QTableView * view = new QTableView();
+				view->setModel(&(*model));
+			vbox->addWidget(view);
+			QDialogButtonBox * buttons = new QDialogButtonBox(QDialogButtonBox::Close);
+				connect(buttons, SIGNAL(accepted()), &dialog, SLOT(accept()));
+				connect(buttons, SIGNAL(rejected()), &dialog, SLOT(reject()));
+			vbox->addWidget(buttons);
+	dialog.setLayout(vbox);
+	dialog.setSizeGripEnabled(true);
+	dialog.exec();
 }
 
-void MainWindow::print() {
-	PrintPreviewDialog *dialog = new PrintPreviewDialog(this);
-	dialog->exec();
-	delete dialog;
+void MainWindow::on_actionAddMultiline_triggered()
+{
+	if(tabs->currentIndex() != tabIndex.TYPES && tabs->currentIndex() != tabIndex.PLACES && tabs->currentIndex() != tabIndex.PERSONS)
+		return;
+
+	QDialog dialog(this);
+		QVBoxLayout * vbox = new QVBoxLayout();
+			QTextEdit * edit = new QTextEdit();
+			vbox->addWidget(edit);
+			QDialogButtonBox * buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+				connect(buttons, SIGNAL(accepted()), &dialog, SLOT(accept()));
+				connect(buttons, SIGNAL(rejected()), &dialog, SLOT(reject()));
+			vbox->addWidget(buttons);
+	dialog.setLayout(vbox);
+	dialog.setSizeGripEnabled(true);
+	if(dialog.exec() == QDialog::Accepted) {
+		QStringList lines = edit->toPlainText().split('\n');
+
+		Inventory::ReferenceModel * model = qobject_cast<Inventory::ReferenceModel *>(ui.view->model());
+		if(model) {
+			bool success = model->addMultiline(lines);
+			if(!success) {
+				QMessageBox::critical(this, tr("Add lines"), tr("Adding of lines failed!"));
+			}
+		}
+	}
 }
 
-void MainWindow::popupMenu(const QPoint &pos) {
-	try {
-		Item item(model->idAt(ui.view->currentIndex().row()));
-		ui.actionDeactivate->setEnabled(item.isActive());
-	} catch(IDatabaseObject::DBErrorException e) {
-		QMessageBox::critical(this, tr("Error"), e.query.lastError().databaseText() + "\n" + e.query.lastError().driverText());
+void MainWindow::on_actionPrintCSV_triggered()
+{
+	if(!ui.view->model())
+		return;
+
+	QString csvFileName = QFileDialog::getSaveFileName(this, tr("Save to CSV..."), 0, tr("CSV files (*.csv);;All files (*.*)"));
+	if(csvFileName.isEmpty())
+		return;
+
+	QFile file(csvFileName);
+	if(!file.open(QFile::Text | QFile::WriteOnly)) {
+		QMessageBox::critical(this, tr("Save to CSV"), tr("Cannot open file '%1' for write!").arg(file.fileName()));
+		return;
 	}
 
-	itemMenu->popup(ui.view->mapToGlobal(pos));
+	QTextStream out(&file);
+	QAbstractItemModel * model = ui.view->model();
+	for(int row = 0; row < model->rowCount(); ++row) {
+		QStringList cells;
+		for(int col = 0; col < model->columnCount(); ++col) {
+			QString text = model->data(model->index(row, col)).toString();
+			text.replace("\"", "\\\"");
+			text.append('"').prepend('"');
+			cells << text;
+		}
+		out << cells.join(", ") << endl;
+	}
+}
+
+void MainWindow::on_actionAdd_triggered()
+{
+	ui.view->model()->insertRow(ui.view->model()->rowCount());
+}
+
+void MainWindow::on_actionRemove_triggered()
+{
+	if(!ui.view->model())
+		return;
+
+	int row = ui.view->currentIndex().isValid() ? ui.view->currentIndex().row() : -1;
+	if(row < 0)
+		return;
+
+	bool removed = !ui.view->model()->removeRow(row);
+	if(removed) {
+		if(tabs->currentIndex() == tabIndex.TYPES || tabs->currentIndex() == tabIndex.PLACES || tabs->currentIndex() == tabIndex.PERSONS) {
+			QMessageBox::information(this, tr("Remove record"), tr("Cannot remove record. Probably, there are items that are using it."));
+		}
+	}
+}
+
+void MainWindow::on_buttonUseItemTypeFilter_toggled(bool value)
+{
+	inventoryModel->switchItemTypeFilter(value);
+	printableModel->switchItemTypeFilter(value);
+}
+
+void MainWindow::on_listItemTypeFilter_currentIndexChanged(int index)
+{
+	Inventory::Id value = itemTypesModel->idAt(index);
+	inventoryModel->setItemTypeFilter(value);
+	printableModel->setItemTypeFilter(value);
+}
+
+void MainWindow::on_buttonUsePlaceFilter_toggled(bool value)
+{
+	inventoryModel->switchPlaceFilter(value);
+	printableModel->switchPlaceFilter(value);
+}
+
+void MainWindow::on_listPlaceFilter_currentIndexChanged(int index)
+{
+	Inventory::Id value = placesModel->idAt(index);
+	inventoryModel->setPlaceFilter(value);
+	printableModel->setPlaceFilter(value);
+}
+
+void MainWindow::on_buttonUseWrittenOffFilter_toggled(bool value)
+{
+	inventoryModel->switchWrittenOffFilter(value);
+	printableModel->switchWrittenOffFilter(value);
+}
+
+void MainWindow::on_listWrittenOffFilter_currentIndexChanged(int index)
+{
+	bool value = (index == 1);
+	inventoryModel->setWrittenOffFilter(value);
+	printableModel->setWrittenOffFilter(value);
 }
 

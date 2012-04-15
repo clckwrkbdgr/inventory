@@ -1,38 +1,54 @@
 #pragma once
 
 #include <QtGui/QMainWindow>
+#include <QtGui/QTabBar>
 
-#include "ui_mainwindow.h"
 #include "models.h"
 
-class QMenu;
+#include "ui_mainwindow.h"
 
-// @todo: - some help within main window, stored in resources.
-// @todo: Добавить в inventory сохранение лога в файл по двойному нажатию C-d
+struct TabIndex {
+	int MAIN;
+	int PRINT;
+	int TYPES;
+	int PLACES;
+	int PERSONS;
+};
+
 class MainWindow : public QMainWindow {
-	Q_OBJECT
-	Q_DISABLE_COPY(MainWindow)
+	Q_OBJECT;
+	Q_DISABLE_COPY(MainWindow);
 public:
-	MainWindow(QWidget *parent = 0);
+	MainWindow(QWidget * parent = 0);
 	virtual ~MainWindow();
 
 public slots:
-	void addItem();
-	void removeItem();
-	void deactivate();
-	void editPlaces();
-	void editItemTypes();
-	void setFilter();
-	void showHistory();
-	void print();
-	void editField();
+	void setupTab(int index);
+	void resetView(bool update = false);
 
-	void popupMenu(const QPoint &pos);
+	void on_actionShowHistory_triggered();
+	void on_actionAddMultiline_triggered();
+	void on_actionPrintCSV_triggered();
+	void on_actionAdd_triggered();
+	void on_actionRemove_triggered();
+	void on_actionHideResponsiblePerson_toggled(bool);
 
-private slots:
-	void resizeView(const QModelIndex&, const QModelIndex&);
+	void on_buttonUseItemTypeFilter_toggled(bool);
+	void on_listItemTypeFilter_currentIndexChanged(int);
+	void on_buttonUsePlaceFilter_toggled(bool);
+	void on_listPlaceFilter_currentIndexChanged(int);
+	void on_buttonUseWrittenOffFilter_toggled(bool);
+	void on_listWrittenOffFilter_currentIndexChanged(int);
 private:
+	QString databaseLocation;
 	Ui::MainWindow ui;
-	QMenu *itemMenu;
-	InventoryModel *model;
+	QTabBar * tabs;
+	TabIndex tabIndex;
+	
+	Inventory::InventoryModel * inventoryModel;
+	Inventory::PrintableInventoryModel * printableModel;
+	Inventory::ReferenceModel * itemTypesModel;
+	Inventory::ReferenceModel * placesModel;
+	Inventory::ReferenceModel * personsModel;
 };
+
