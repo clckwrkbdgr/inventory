@@ -83,6 +83,7 @@ public:
 	virtual bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex());
 	virtual bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex());
 
+	int personColumnIndex() const;
 	virtual Id idAt(int row) const;
 	virtual void setItemTypeFilter(Id itemType);
 	virtual void switchItemTypeFilter(bool on = true);

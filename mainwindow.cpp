@@ -86,6 +86,11 @@ MainWindow::~MainWindow()
 	Inventory::Database::close();
 }
 
+void MainWindow::on_actionHideResponsiblePerson_toggled(bool value)
+{
+	ui.view->setColumnHidden(inventoryModel->personColumnIndex(), (tabs->currentIndex() == tabIndex.MAIN) && value);
+}
+
 void MainWindow::setupTab(int index)
 {
 	ui.actionShowHistory ->setEnabled(index == tabIndex.MAIN);
@@ -95,6 +100,8 @@ void MainWindow::setupTab(int index)
 	ui.actionHideFilter  ->setEnabled(index == tabIndex.MAIN || index == tabIndex.PRINT);
 
 	ui.filterBox->setVisible(ui.actionHideFilter->isEnabled() && !ui.actionHideFilter->isChecked());
+
+	on_actionHideResponsiblePerson_toggled(ui.actionHideResponsiblePerson->isChecked());
 
 	if     (index == tabIndex.MAIN)    ui.view->setModel(inventoryModel);
 	else if(index == tabIndex.PRINT)   ui.view->setModel(printableModel);

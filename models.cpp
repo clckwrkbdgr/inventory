@@ -233,6 +233,10 @@ void InventoryModel::update()
 }
 
 enum { ITEM_TYPE, ITEM_PLACE, ITEM_PERSON, ITEM_NAME, ITEM_INN, ITEM_WRITTEN_OFF, ITEM_UNDER_REPAIR, ITEM_CHECKED, ITEM_NOTE, ITEM_FIELD_COUNT };
+int InventoryModel::personColumnIndex() const
+{
+	return ITEM_PERSON;
+}
 
 Qt::ItemFlags InventoryModel::flags(const QModelIndex & index) const
 {
