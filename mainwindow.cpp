@@ -218,7 +218,18 @@ void MainWindow::on_actionPrintCSV_triggered()
 	}
 
 	QTextStream out(&file);
+	out.setCodec("UTF-8");
 	QAbstractItemModel * model = ui.view->model();
+
+	QStringList header;
+	for(int col = 0; col < model->columnCount(); ++col) {
+		QString text = model->headerData(col, Qt::Horizontal).toString();
+		text.replace("\"", "\\\"");
+		text.append('"').prepend('"');
+		header << text;
+	}
+	out << header.join(", ") << endl;
+
 	for(int row = 0; row < model->rowCount(); ++row) {
 		QStringList cells;
 		for(int col = 0; col < model->columnCount(); ++col) {
