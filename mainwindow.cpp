@@ -69,7 +69,7 @@ MainWindow::MainWindow(QWidget * parent)
 	}
 
 	// Settings again.
-	ui.actionHideResponsiblePerson->setChecked     (settings.value("ui/responsiblepersonhidden", ui.actionHideResponsiblePerson->isChecked()).toBool());
+	ui.actionHideColumns->setChecked     (settings.value("ui/responsiblepersonhidden", ui.actionHideColumns->isChecked()).toBool());
 	ui.actionHideFilter           ->setChecked     (settings.value("filter/hidden",              ui.actionHideFilter           ->isChecked()).toBool());
 	ui.buttonUseItemTypeFilter    ->setChecked     (settings.value("filter/useitemtype",         ui.buttonUseItemTypeFilter    ->isChecked()).toBool());
 	ui.listItemTypeFilter         ->setCurrentIndex(settings.value("filter/itemtype",            ui.listItemTypeFilter         ->currentIndex()).toInt());
@@ -92,7 +92,7 @@ MainWindow::~MainWindow()
 	}
 	settings.setValue("database/location", Inventory::Database::databaseName());
 
-	settings.setValue("ui/responsiblepersonhidden", ui.actionHideResponsiblePerson->isChecked());
+	settings.setValue("ui/responsiblepersonhidden", ui.actionHideColumns->isChecked());
 	settings.setValue("filter/hidden",              ui.actionHideFilter           ->isChecked());
 	settings.setValue("filter/useitemtype",         ui.buttonUseItemTypeFilter    ->isChecked());
 	settings.setValue("filter/itemtype",            ui.listItemTypeFilter         ->currentIndex());
@@ -105,9 +105,13 @@ MainWindow::~MainWindow()
 	Inventory::Database::close();
 }
 
-void MainWindow::on_actionHideResponsiblePerson_toggled(bool value)
+void MainWindow::on_actionHideColumns_toggled(bool value)
 {
-	ui.view->setColumnHidden(inventoryModel->personColumnIndex(), (tabs->currentIndex() == tabIndex.MAIN) && value);
+	QList<int> columns = inventoryModel->columnsToHide();
+	bool       hidden  = value && (tabs->currentIndex() == tabIndex.MAIN);
+	foreach(int column, columns) {
+		ui.view->setColumnHidden(column, hidden);
+	}
 }
 
 void MainWindow::setupTab(int index)
@@ -120,20 +124,21 @@ void MainWindow::setupTab(int index)
 
 	ui.filterBox->setVisible(ui.actionHideFilter->isEnabled() && !ui.actionHideFilter->isChecked());
 
-	on_actionHideResponsiblePerson_toggled(ui.actionHideResponsiblePerson->isChecked());
-
-	if(index == tabIndex.MAIN) {
-		ui.view->setItemDelegate(new Inventory::InventoryDelegate(this));
-	} else {
-		ui.view->setItemDelegate(new QItemDelegate(this));
-	}
-
 	if     (index == tabIndex.MAIN)    ui.view->setModel(inventoryModel);
 	else if(index == tabIndex.PRINT)   ui.view->setModel(printableModel);
 	else if(index == tabIndex.TYPES)   ui.view->setModel(itemTypesModel);
 	else if(index == tabIndex.PLACES)  ui.view->setModel(placesModel);
 	else if(index == tabIndex.PERSONS) ui.view->setModel(personsModel);
+
 	resetView(true);
+
+	if(index == tabIndex.MAIN) {
+		on_actionHideColumns_toggled(ui.actionHideColumns->isChecked());
+		ui.view->setItemDelegate(new Inventory::InventoryDelegate(this));
+	} else {
+		on_actionHideColumns_toggled(false);
+		ui.view->setItemDelegate(new QItemDelegate(this));
+	}
 }
 
 void MainWindow::resetView(bool update)

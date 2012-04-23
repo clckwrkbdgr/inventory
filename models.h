@@ -99,7 +99,7 @@ public:
 	virtual bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex());
 	virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 
-	int personColumnIndex() const;
+	QList<int> columnsToHide() const;
 	virtual Id idAt(int row) const;
 	virtual void setItemTypeFilter(Id itemType);
 	virtual void switchItemTypeFilter(bool on = true);

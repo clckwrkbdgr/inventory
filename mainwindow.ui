@@ -123,7 +123,7 @@
      <string>Main</string>
     </property>
     <addaction name="actionHideFilter"/>
-    <addaction name="actionHideResponsiblePerson"/>
+    <addaction name="actionHideColumns"/>
     <addaction name="actionPrintCSV"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -170,7 +170,7 @@
   </widget>
   <action name="actionShowHistory">
    <property name="text">
-    <string>Show history</string>
+    <string>Show history...</string>
    </property>
    <property name="toolTip">
     <string>Show history</string>
@@ -178,12 +178,12 @@
   </action>
   <action name="actionAddMultiline">
    <property name="text">
-    <string>Add multiline</string>
+    <string>Add multiline...</string>
    </property>
   </action>
   <action name="actionPrintCSV">
    <property name="text">
-    <string>Print CSV</string>
+    <string>Print CSV...</string>
    </property>
   </action>
   <action name="actionQuit">
@@ -212,12 +212,15 @@
     <string>Hide filter</string>
    </property>
   </action>
-  <action name="actionHideResponsiblePerson">
+  <action name="actionHideColumns">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Hide responsible person</string>
+    <string>Hide rare used columns</string>
+   </property>
+   <property name="toolTip">
+    <string>Hide rare used columns</string>
    </property>
   </action>
  </widget>
