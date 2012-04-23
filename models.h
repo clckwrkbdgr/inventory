@@ -97,6 +97,7 @@ public:
 	virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
 	virtual bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex());
 	virtual bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex());
+	virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 
 	int personColumnIndex() const;
 	virtual Id idAt(int row) const;
@@ -111,6 +112,10 @@ public:
 private:
 	Filter filter;
 	QList<Item> items;
+
+	bool sorted;
+	int sortColumn;
+	Qt::SortOrder sortOrder;
 };
 
 struct HistoryRecord {
@@ -170,10 +175,16 @@ public:
 	virtual void setWrittenOffFilter(bool writtenOff);
 	virtual void switchWrittenOffFilter(bool on = true);
 
+	virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
+
 	virtual void update();
 private:
 	QList<ItemGroup> groups;
 	Filter filter;
+
+	bool sorted;
+	int sortColumn;
+	Qt::SortOrder sortOrder;
 };
 
 struct RefRecord {

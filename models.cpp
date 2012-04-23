@@ -167,8 +167,11 @@ Filter::Filter()
 
 namespace Inventory { // InventoryModel
 
+enum { ITEM_TYPE, ITEM_PLACE, ITEM_PERSON, ITEM_NAME, ITEM_INN, ITEM_WRITTEN_OFF, ITEM_UNDER_REPAIR, ITEM_CHECKED, ITEM_NOTE, ITEM_FIELD_COUNT };
+
 InventoryModel::InventoryModel(QObject * parent)
-	: AbstractUpdatableTableModel(parent)
+	: AbstractUpdatableTableModel(parent),
+	sorted(false), sortColumn(0), sortOrder(Qt::AscendingOrder)
 {
 	update();
 }
@@ -197,6 +200,20 @@ void InventoryModel::update()
 	if(!whereClause.isEmpty()) {
 		whereClause = " WHERE " + whereClause;
 	}
+
+	QMap<int, QString> fields; {
+		fields[ITEM_TYPE]         = "ItemTypes.name";
+		fields[ITEM_PLACE]        = "Places.name";
+		fields[ITEM_PERSON]       = "Persons.name";
+		fields[ITEM_NAME]         = "Inventory.name";
+		fields[ITEM_INN]          = "inn";
+		fields[ITEM_WRITTEN_OFF]  = "writtenOff";
+		fields[ITEM_UNDER_REPAIR] = "underRepair";
+		fields[ITEM_CHECKED]      = "checked";
+		fields[ITEM_NOTE]         = "note";
+	}
+	QString sortClause = sorted ? QString(" ORDER BY %1 %2 ").arg(fields.value(sortColumn)).arg(sortOrder == Qt::AscendingOrder ? "ASC" : "DESC") : 0;
+
 	QSqlQuery query = Database::select(
 			" SELECT Inventory.id, "
 			"   itemType, ItemTypes.name, "
@@ -205,7 +222,8 @@ void InventoryModel::update()
 			"   Inventory.name, "
 			"   inn, writtenOff, underRepair, checked, note "
 			" FROM Inventory, ItemTypes, Places, Persons "
-			+ whereClause + 
+			+ whereClause 
+			+ sortClause + 
 			" ; ",
 			map
 			);
@@ -232,7 +250,6 @@ void InventoryModel::update()
 	endResetModel();
 }
 
-enum { ITEM_TYPE, ITEM_PLACE, ITEM_PERSON, ITEM_NAME, ITEM_INN, ITEM_WRITTEN_OFF, ITEM_UNDER_REPAIR, ITEM_CHECKED, ITEM_NOTE, ITEM_FIELD_COUNT };
 int InventoryModel::personColumnIndex() const
 {
 	return ITEM_PERSON;
@@ -502,6 +519,17 @@ bool InventoryModel::removeRows(int row, int count, const QModelIndex & /*parent
 	return true;
 }
 
+void InventoryModel::sort(int column, Qt::SortOrder order)
+{
+	if(column >= ITEM_FIELD_COUNT)
+		return;
+
+	sorted = true;
+	sortColumn = column;
+	sortOrder = order;
+	update();
+}
+
 Id InventoryModel::idAt(int row) const
 {
 	if(0 <= row && row < items.count()) {
@@ -683,7 +711,8 @@ int HistoryModel::columnCount(const QModelIndex & /*parent*/) const
 namespace Inventory { // PrintableInventoryModel
 
 PrintableInventoryModel::PrintableInventoryModel(QObject * parent)
-	: AbstractUpdatableTableModel(parent)
+	: AbstractUpdatableTableModel(parent),
+	sorted(false), sortColumn(0), sortOrder(Qt::AscendingOrder)
 {
 	update();
 }
@@ -709,6 +738,16 @@ void PrintableInventoryModel::update()
 		whereClause = " WHERE " + whereClause;
 	}
 
+	QMap<int, QString> fields; {
+		fields[0] = "itemType";
+		fields[1] = "name";
+		fields[2] = "itemCount";
+		fields[3] = "place";
+		fields[4] = "inn";
+		fields[5] = "writtenOff";
+	}
+	QString sortClause = sorted ? QString(" ORDER BY %1 %2 ").arg(fields.value(sortColumn)).arg(sortOrder == Qt::AscendingOrder ? "ASC" : "DESC") : 0;
+
 	QSqlQuery query = Database::select(
 			" SELECT "
 			"   itemType, "
@@ -720,7 +759,8 @@ void PrintableInventoryModel::update()
 			"   inn, "
 			"   writtenOff "
 			" FROM PrintableInventory "
-			+ whereClause + 
+			+ whereClause
+			+ sortClause + 
 			" ; ",
 			map
 			);
@@ -804,6 +844,17 @@ int PrintableInventoryModel::rowCount(const QModelIndex & /*parent*/) const
 int PrintableInventoryModel::columnCount(const QModelIndex & /*parent*/) const
 {
 	return 6;
+}
+
+void PrintableInventoryModel::sort(int column, Qt::SortOrder order)
+{
+	if(column >= ITEM_FIELD_COUNT)
+		return;
+
+	sorted = true;
+	sortColumn = column;
+	sortOrder = order;
+	update();
 }
 
 void PrintableInventoryModel::setItemTypeFilter(int itemType)
@@ -1108,8 +1159,17 @@ void InventoryDelegate::setEditorData(QWidget * editor, const QModelIndex &index
 		QItemDelegate::setEditorData(editor, index);
 		return;
 	}
+	int col = index.column();
+	if(col != ITEM_TYPE && col != ITEM_PLACE && col != ITEM_PERSON) {
+		QItemDelegate::setEditorData(editor, index);
+		return;
+	}
 	
 	QComboBox * comboBox = static_cast<QComboBox *>(editor);
+	if(!comboBox) {
+		QItemDelegate::setEditorData(editor, index);
+		return;
+	}
 	ReferenceModel * model = static_cast<ReferenceModel *>(comboBox->model());
 
 	Id id = index.model()->data(index, Qt::EditRole).toInt();
@@ -1122,10 +1182,16 @@ void InventoryDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 		QItemDelegate::setModelData(editor, model, index);
 		return;
 	}
+	int col = index.column();
+	if(col != ITEM_TYPE && col != ITEM_PLACE && col != ITEM_PERSON) {
+		QItemDelegate::setModelData(editor, model, index);
+		return;
+	}
 
 	QComboBox *comboBox = static_cast<QComboBox*>(editor);
 	ReferenceModel * refModel = static_cast<ReferenceModel*>(comboBox->model());
-	int id = refModel->idAt(comboBox->currentIndex());
+
+	Id id = refModel->idAt(comboBox->currentIndex());
 	model->setData(index, id, Qt::EditRole);
 }
 
