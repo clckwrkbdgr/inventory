@@ -139,6 +139,9 @@ public:
 
 	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
 	virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
+	virtual bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex());
+
+	virtual Id idAt(int row) const;
 private:
 	QList<HistoryRecord> records;
 };

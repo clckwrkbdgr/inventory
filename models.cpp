@@ -706,6 +706,35 @@ int HistoryModel::columnCount(const QModelIndex & /*parent*/) const
 	return 4;
 }
 
+Id HistoryModel::idAt(int row) const
+{
+	if(0 <= row && row < records.count()) {
+		return records[row].id;
+	}
+	return Id();
+}
+
+bool HistoryModel::removeRows(int row, int count, const QModelIndex & /*parent*/)
+{
+	if(count < 0)
+		return false;
+	if(count == 0)
+		return true;
+	if(count != 1)
+		return false;
+	if(row != rowCount() - 1)
+		return false;
+	
+	Database::Placeholders map;
+	map[":id"] = idAt(row);
+	Database::query("DELETE FROM History WHERE id = :id", map);
+
+	beginResetModel();
+	records.takeLast();
+	endResetModel();
+	return true;
+}
+
 }
 
 namespace Inventory { // PrintableInventoryModel

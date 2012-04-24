@@ -31,6 +31,7 @@ public slots:
 	void on_actionPrintCSV_triggered();
 	void on_actionAdd_triggered();
 	void on_actionRemove_triggered();
+	void on_actionUndo_triggered();
 	void on_actionHideColumns_toggled(bool);
 
 	void on_buttonUseItemTypeFilter_toggled(bool);

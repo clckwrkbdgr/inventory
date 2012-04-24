@@ -132,9 +132,12 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="actionUndo"/>
+    <addaction name="separator"/>
     <addaction name="actionAdd"/>
-    <addaction name="actionAddMultiline"/>
     <addaction name="actionRemove"/>
+    <addaction name="separator"/>
+    <addaction name="actionAddMultiline"/>
    </widget>
    <widget class="QMenu" name="menuItems">
     <property name="title">
@@ -162,9 +165,10 @@
    <addaction name="actionShowHistory"/>
    <addaction name="actionPrintCSV"/>
    <addaction name="separator"/>
-   <addaction name="actionAddMultiline"/>
    <addaction name="actionAdd"/>
    <addaction name="actionRemove"/>
+   <addaction name="actionUndo"/>
+   <addaction name="actionAddMultiline"/>
    <addaction name="separator"/>
    <addaction name="actionHideFilter"/>
   </widget>
@@ -221,6 +225,11 @@
    </property>
    <property name="toolTip">
     <string>Hide rare used columns</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>Undo</string>
    </property>
   </action>
  </widget>

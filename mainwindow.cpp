@@ -121,6 +121,7 @@ void MainWindow::setupTab(int index)
 	ui.actionAdd         ->setEnabled(index != tabIndex.PRINT);
 	ui.actionRemove      ->setEnabled(index != tabIndex.PRINT);
 	ui.actionHideFilter  ->setEnabled(index == tabIndex.MAIN || index == tabIndex.PRINT);
+	ui.actionUndo        ->setEnabled(index == tabIndex.MAIN);
 
 	ui.filterBox->setVisible(ui.actionHideFilter->isEnabled() && !ui.actionHideFilter->isChecked());
 
@@ -149,6 +150,35 @@ void MainWindow::resetView(bool update)
 		Inventory::AbstractUpdatableTableModel * model = qobject_cast<Inventory::AbstractUpdatableTableModel *>(ui.view->model());
 		if(model) {
 			model->update();
+		}
+	}
+}
+
+void MainWindow::on_actionUndo_triggered()
+{
+	if(ui.view->model() != inventoryModel)
+		return;
+
+	int row = ui.view->currentIndex().isValid() ? ui.view->currentIndex().row() : -1;
+	if(row < 0)
+		return;
+
+	Inventory::Id id = inventoryModel->idAt(row);
+	QScopedPointer<Inventory::HistoryModel> model(new Inventory::HistoryModel(id));
+	if(model->rowCount() == 0)
+		return;
+
+	QString message = tr("Are you sure want to undo this change?") + "\n";
+	int lastChangeRow = model->rowCount() - 1;
+	message += tr("Change time: %1").arg(model->data(model->index(lastChangeRow, 0)).toString()) + "\n";
+	message += tr("Field name: %1").arg(model->data(model->index(lastChangeRow, 1)).toString()) + "\n";
+	message += tr("Old value: %1").arg(model->data(model->index(lastChangeRow, 2)).toString()) + "\n";
+	message += tr("New value: %1").arg(model->data(model->index(lastChangeRow, 3)).toString()) + "\n";
+
+	if(QMessageBox::question(this, tr("Undo change"), message, QMessageBox::Yes | QMessageBox::Cancel) == QMessageBox::Yes) {
+		bool ok = model->removeRow(lastChangeRow);
+		if(ok) {
+			inventoryModel->update();
 		}
 	}
 }
