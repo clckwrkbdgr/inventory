@@ -1,4 +1,5 @@
 TARGET = inventory
+VERSION = 2.0.0
 DESTDIR = bin
 CONFIG = uic qt release warn_on
 QT += sql

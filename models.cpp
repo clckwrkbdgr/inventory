@@ -617,10 +617,10 @@ QString unfoldHistoryValue(int field, const QString & value)
 }
 
 HistoryModel::HistoryModel(int item, QObject * parent)
-	: QAbstractTableModel(parent)
+	: QAbstractTableModel(parent), itemId(item)
 {
 	Database::Placeholders map;
-	map[":item"] = item;
+	map[":item"] = itemId;
 	QSqlQuery query = Database::select(
 			" SELECT id, changeTime, field, oldValue, newValue "
 			" FROM History "
@@ -629,11 +629,13 @@ HistoryModel::HistoryModel(int item, QObject * parent)
 	records.clear();
 	while(query.next()) {
 		HistoryRecord rec;
-		rec.id         = query.value(0).toInt();
-		rec.changeTime = QDateTime::fromString(query.value(1).toString(), Qt::ISODate);
-		rec.field      = query.value(2).toInt();
-		rec.oldValue   = unfoldHistoryValue(rec.field, query.value(3).toString());
-		rec.newValue   = unfoldHistoryValue(rec.field, query.value(4).toString());
+		rec.id          = query.value(0).toInt();
+		rec.changeTime  = QDateTime::fromString(query.value(1).toString(), Qt::ISODate);
+		rec.field       = query.value(2).toInt();
+		rec.rawOldValue = query.value(3);
+		rec.rawNewValue = query.value(4);
+		rec.oldValue    = unfoldHistoryValue(rec.field, query.value(3).toString());
+		rec.newValue    = unfoldHistoryValue(rec.field, query.value(4).toString());
 		records << rec;
 	}
 }
@@ -725,6 +727,26 @@ bool HistoryModel::removeRows(int row, int count, const QModelIndex & /*parent*/
 	if(row != rowCount() - 1)
 		return false;
 	
+	QString fieldName = "note";
+	switch(records[row].field) {
+		case HISTORY_TYPE:         fieldName = "itemType";          break;
+		case HISTORY_PLACE:        fieldName = "place";             break;
+		case HISTORY_PERSON:       fieldName = "responsiblePerson"; break;
+		case HISTORY_NAME:         fieldName = "name";              break;
+		case HISTORY_INN:          fieldName = "inn";               break;
+		case HISTORY_WRITTEN_OFF:  fieldName = "writtenOff";        break;
+		case HISTORY_UNDER_REPAIR: fieldName = "underRepair";       break;
+		case HISTORY_CHECKED:      fieldName = "checked";           break;
+		case HISTORY_NOTE:         fieldName = "note";              break;
+		default: fieldName = "note";
+	}
+	Database::Placeholders values;
+	values[":value"] = records[row].rawOldValue;
+	values[":id"]    = itemId;
+	qDebug() << values;
+	Database::query("UPDATE Inventory SET " + fieldName + " = :value WHERE id = :id; ", values);
+
+
 	Database::Placeholders map;
 	map[":id"] = idAt(row);
 	Database::query("DELETE FROM History WHERE id = :id", map);

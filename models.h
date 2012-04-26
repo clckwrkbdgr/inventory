@@ -122,6 +122,7 @@ struct HistoryRecord {
 	int id;
 	QDateTime changeTime;
 	int field;
+	QVariant rawOldValue, rawNewValue;
 	QString oldValue;
 	QString newValue;
 };
@@ -130,7 +131,7 @@ class HistoryModel : public QAbstractTableModel {
 	Q_OBJECT
 	Q_DISABLE_COPY(HistoryModel);
 public:
-	HistoryModel(int item, QObject * parent = 0);
+	HistoryModel(Id item, QObject * parent = 0);
 	virtual ~HistoryModel() {}
 
 	virtual Qt::ItemFlags flags(const QModelIndex & index) const;
@@ -143,6 +144,7 @@ public:
 
 	virtual Id idAt(int row) const;
 private:
+	Id itemId;
 	QList<HistoryRecord> records;
 };
 
