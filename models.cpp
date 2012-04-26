@@ -250,11 +250,6 @@ void InventoryModel::update()
 	endResetModel();
 }
 
-QList<int> InventoryModel::columnsToHide() const
-{
-	return QList<int>() << ITEM_PERSON << ITEM_UNDER_REPAIR << ITEM_CHECKED;
-}
-
 Qt::ItemFlags InventoryModel::flags(const QModelIndex & index) const
 {
 	if(index.row() < 0 || rowCount() <= index.row())

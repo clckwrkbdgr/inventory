@@ -69,7 +69,6 @@ MainWindow::MainWindow(QWidget * parent)
 	}
 
 	// Settings again.
-	ui.actionHideColumns->setChecked     (settings.value("ui/responsiblepersonhidden", ui.actionHideColumns->isChecked()).toBool());
 	ui.actionHideFilter           ->setChecked     (settings.value("filter/hidden",              ui.actionHideFilter           ->isChecked()).toBool());
 	ui.buttonUseItemTypeFilter    ->setChecked     (settings.value("filter/useitemtype",         ui.buttonUseItemTypeFilter    ->isChecked()).toBool());
 	ui.listItemTypeFilter         ->setCurrentIndex(settings.value("filter/itemtype",            ui.listItemTypeFilter         ->currentIndex()).toInt());
@@ -77,6 +76,14 @@ MainWindow::MainWindow(QWidget * parent)
 	ui.listPlaceFilter            ->setCurrentIndex(settings.value("filter/place",               ui.listPlaceFilter            ->currentIndex()).toInt());
 	ui.buttonUseWrittenOffFilter  ->setChecked     (settings.value("filter/usewrittenoff",       ui.buttonUseWrittenOffFilter  ->isChecked()).toBool());
 	ui.listWrittenOffFilter       ->setCurrentIndex(settings.value("filter/writtenoff",          ui.listWrittenOffFilter       ->currentIndex()).toInt());
+
+	QStringList hiddenColumnList = settings.value("ui/hiddencolumns").toString().split(",");
+	foreach(QString column, hiddenColumnList) {
+		QAction * action = columnAction(column.toInt() - 1);
+		if(action) {
+			action->setChecked(true);
+		}
+	}
 }
 
 MainWindow::~MainWindow()
@@ -92,7 +99,6 @@ MainWindow::~MainWindow()
 	}
 	settings.setValue("database/location", Inventory::Database::databaseName());
 
-	settings.setValue("ui/responsiblepersonhidden", ui.actionHideColumns->isChecked());
 	settings.setValue("filter/hidden",              ui.actionHideFilter           ->isChecked());
 	settings.setValue("filter/useitemtype",         ui.buttonUseItemTypeFilter    ->isChecked());
 	settings.setValue("filter/itemtype",            ui.listItemTypeFilter         ->currentIndex());
@@ -101,17 +107,86 @@ MainWindow::~MainWindow()
 	settings.setValue("filter/usewrittenoff",       ui.buttonUseWrittenOffFilter  ->isChecked());
 	settings.setValue("filter/writtenoff",          ui.listWrittenOffFilter       ->currentIndex());
 
+	QStringList hiddenColumnList;
+	foreach(int column, hiddenColumns) {
+		hiddenColumnList << QString::number(column + 1);
+	}
+	settings.setValue("ui/hiddencolumns", hiddenColumnList.join(","));
+
 	// Database.
 	Inventory::Database::close();
 }
 
-void MainWindow::on_actionHideColumns_toggled(bool value)
+QAction * MainWindow::columnAction(int column)
 {
-	QList<int> columns = inventoryModel->columnsToHide();
-	bool       hidden  = value && (tabs->currentIndex() == tabIndex.MAIN);
-	foreach(int column, columns) {
-		ui.view->setColumnHidden(column, hidden);
+	switch(column) {
+		case 0 : return ui.actionHideItemType;
+		case 1 : return ui.actionHideItemPlace;
+		case 2 : return ui.actionHideResponsiblePerson;
+		case 3 : return ui.actionHideItemName;
+		case 4 : return ui.actionHideINN;
+		case 5 : return ui.actionHideWritingOff;
+		case 6 : return ui.actionHideRepairState;
+		case 7 : return ui.actionHideCheckedItemState;
+		case 8 : return ui.actionHideNote;
+		default: break;
 	}
+	return NULL;
+}
+
+void MainWindow::on_actionHideItemType_toggled(bool hidden)
+{
+	hideColumn(0, hidden);
+}
+
+void MainWindow::on_actionHideItemPlace_toggled(bool hidden)
+{
+	hideColumn(1, hidden);
+}
+
+void MainWindow::on_actionHideResponsiblePerson_toggled(bool hidden)
+{
+	hideColumn(2, hidden);
+}
+
+void MainWindow::on_actionHideItemName_toggled(bool hidden)
+{
+	hideColumn(3, hidden);
+}
+
+void MainWindow::on_actionHideINN_toggled(bool hidden)
+{
+	hideColumn(4, hidden);
+}
+
+void MainWindow::on_actionHideWritingOff_toggled(bool hidden)
+{
+	hideColumn(5, hidden);
+}
+
+void MainWindow::on_actionHideRepairState_toggled(bool hidden)
+{
+	hideColumn(6, hidden);
+}
+
+void MainWindow::on_actionHideCheckedItemState_toggled(bool hidden)
+{
+	hideColumn(7, hidden);
+}
+
+void MainWindow::on_actionHideNote_toggled(bool hidden)
+{
+	hideColumn(8, hidden);
+}
+
+void MainWindow::hideColumn(int column, bool hidden)
+{
+	if(hidden) {
+		hiddenColumns += column;
+	} else {
+		hiddenColumns -= column;
+	}
+	ui.view->setColumnHidden(column, hidden);
 }
 
 void MainWindow::setupTab(int index)
@@ -133,11 +208,16 @@ void MainWindow::setupTab(int index)
 
 	resetView(true);
 
+	for(int column = 0; column < ui.view->model()->columnCount(); ++column) {
+		if(index == tabIndex.MAIN && hiddenColumns.contains(column)) {
+			ui.view->setColumnHidden(column, true);
+		} else {
+			ui.view->setColumnHidden(column, false);
+		}
+	}
 	if(index == tabIndex.MAIN) {
-		on_actionHideColumns_toggled(ui.actionHideColumns->isChecked());
 		ui.view->setItemDelegate(new Inventory::InventoryDelegate(this));
 	} else {
-		on_actionHideColumns_toggled(false);
 		ui.view->setItemDelegate(new QItemDelegate(this));
 	}
 }

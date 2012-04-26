@@ -22,7 +22,7 @@ public:
 	MainWindow(QWidget * parent = 0);
 	virtual ~MainWindow();
 
-public slots:
+private slots:
 	void setupTab(int index);
 	void resetView(bool update = false);
 
@@ -32,7 +32,6 @@ public slots:
 	void on_actionAdd_triggered();
 	void on_actionRemove_triggered();
 	void on_actionUndo_triggered();
-	void on_actionHideColumns_toggled(bool);
 
 	void on_buttonUseItemTypeFilter_toggled(bool);
 	void on_listItemTypeFilter_currentIndexChanged(int);
@@ -40,16 +39,30 @@ public slots:
 	void on_listPlaceFilter_currentIndexChanged(int);
 	void on_buttonUseWrittenOffFilter_toggled(bool);
 	void on_listWrittenOffFilter_currentIndexChanged(int);
+
+    void on_actionHideItemType_toggled(bool);
+    void on_actionHideItemPlace_toggled(bool);
+    void on_actionHideResponsiblePerson_toggled(bool);
+    void on_actionHideItemName_toggled(bool);
+    void on_actionHideINN_toggled(bool);
+    void on_actionHideWritingOff_toggled(bool);
+    void on_actionHideRepairState_toggled(bool);
+    void on_actionHideCheckedItemState_toggled(bool);
+    void on_actionHideNote_toggled(bool);
 private:
 	QString databaseLocation;
 	Ui::MainWindow ui;
 	QTabBar * tabs;
 	TabIndex tabIndex;
+	QSet<int> hiddenColumns;
 	
 	Inventory::InventoryModel * inventoryModel;
 	Inventory::PrintableInventoryModel * printableModel;
 	Inventory::ReferenceModel * itemTypesModel;
 	Inventory::ReferenceModel * placesModel;
 	Inventory::ReferenceModel * personsModel;
+
+	QAction * columnAction(int);
+	void hideColumn(int column, bool hidden);
 };
 

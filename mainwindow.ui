@@ -123,7 +123,6 @@
      <string>Main</string>
     </property>
     <addaction name="actionHideFilter"/>
-    <addaction name="actionHideColumns"/>
     <addaction name="actionPrintCSV"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -145,9 +144,24 @@
     </property>
     <addaction name="actionShowHistory"/>
    </widget>
+   <widget class="QMenu" name="menuColumns">
+    <property name="title">
+     <string>Columns</string>
+    </property>
+    <addaction name="actionHideItemType"/>
+    <addaction name="actionHideItemPlace"/>
+    <addaction name="actionHideResponsiblePerson"/>
+    <addaction name="actionHideItemName"/>
+    <addaction name="actionHideINN"/>
+    <addaction name="actionHideWritingOff"/>
+    <addaction name="actionHideRepairState"/>
+    <addaction name="actionHideCheckedItemState"/>
+    <addaction name="actionHideNote"/>
+   </widget>
    <addaction name="menuMain"/>
    <addaction name="menuEdit"/>
    <addaction name="menuItems"/>
+   <addaction name="menuColumns"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -216,20 +230,81 @@
     <string>Hide filter</string>
    </property>
   </action>
-  <action name="actionHideColumns">
+  <action name="actionUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+  </action>
+  <action name="actionHideItemType">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Hide rare used columns</string>
-   </property>
-   <property name="toolTip">
-    <string>Hide rare used columns</string>
+    <string>Hide item type</string>
    </property>
   </action>
-  <action name="actionUndo">
+  <action name="actionHideItemPlace">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Undo</string>
+    <string>Hide item place</string>
+   </property>
+  </action>
+  <action name="actionHideResponsiblePerson">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hide responsible person</string>
+   </property>
+  </action>
+  <action name="actionHideItemName">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hide item name</string>
+   </property>
+  </action>
+  <action name="actionHideINN">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hide INN</string>
+   </property>
+  </action>
+  <action name="actionHideWritingOff">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hide writing off</string>
+   </property>
+  </action>
+  <action name="actionHideRepairState">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hide repair state</string>
+   </property>
+  </action>
+  <action name="actionHideCheckedItemState">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hide checked item state</string>
+   </property>
+  </action>
+  <action name="actionHideNote">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hide note</string>
    </property>
   </action>
  </widget>

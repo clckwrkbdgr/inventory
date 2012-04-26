@@ -4,90 +4,90 @@
 <context>
     <name>Inventory::HistoryModel</name>
     <message>
-        <location filename="models.cpp" line="610"/>
-        <location filename="models.cpp" line="667"/>
+        <location filename="models.cpp" line="605"/>
+        <location filename="models.cpp" line="664"/>
         <source>Written off</source>
         <translation>Списан</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="610"/>
+        <location filename="models.cpp" line="605"/>
         <source>Present</source>
         <translation>В наличии</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="611"/>
-        <location filename="models.cpp" line="668"/>
+        <location filename="models.cpp" line="606"/>
+        <location filename="models.cpp" line="665"/>
         <source>Under repair</source>
         <translation>В ремонте</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="611"/>
+        <location filename="models.cpp" line="606"/>
         <source>Working</source>
         <translation>Работает</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="612"/>
-        <location filename="models.cpp" line="669"/>
+        <location filename="models.cpp" line="607"/>
+        <location filename="models.cpp" line="666"/>
         <source>Checked</source>
         <translation>Проверен</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="612"/>
+        <location filename="models.cpp" line="607"/>
         <source>Not checked</source>
         <translation>Не проверен</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="662"/>
+        <location filename="models.cpp" line="659"/>
         <source>Item type</source>
         <translation>Тип предмета</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="663"/>
+        <location filename="models.cpp" line="660"/>
         <source>Place</source>
         <translation>Место</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="664"/>
+        <location filename="models.cpp" line="661"/>
         <source>Responsible person</source>
         <translation>Ответственное лицо</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="665"/>
+        <location filename="models.cpp" line="662"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="666"/>
+        <location filename="models.cpp" line="663"/>
         <source>INN</source>
         <translation>ИНН</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="670"/>
+        <location filename="models.cpp" line="667"/>
         <source>Note</source>
         <translation>Примечание</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="671"/>
+        <location filename="models.cpp" line="668"/>
         <source>Unknown</source>
         <translation>Неизвестно</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="690"/>
+        <location filename="models.cpp" line="687"/>
         <source>Change time</source>
         <translation>Время изменения</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="691"/>
+        <location filename="models.cpp" line="688"/>
         <source>Field name</source>
         <translation>Название поля</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="692"/>
+        <location filename="models.cpp" line="689"/>
         <source>Old value</source>
         <translation>Старое значение</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="693"/>
+        <location filename="models.cpp" line="690"/>
         <source>New value</source>
         <translation>Новое значение</translation>
     </message>
@@ -95,50 +95,50 @@
 <context>
     <name>Inventory::InventoryModel</name>
     <message>
-        <location filename="models.cpp" line="321"/>
-        <location filename="models.cpp" line="442"/>
+        <location filename="models.cpp" line="316"/>
+        <location filename="models.cpp" line="437"/>
         <source>Written off</source>
         <translation>Списан</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="322"/>
-        <location filename="models.cpp" line="443"/>
+        <location filename="models.cpp" line="317"/>
+        <location filename="models.cpp" line="438"/>
         <source>Under repair</source>
         <translation>В ремонте</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="323"/>
-        <location filename="models.cpp" line="444"/>
+        <location filename="models.cpp" line="318"/>
+        <location filename="models.cpp" line="439"/>
         <source>Checked</source>
         <translation>Проверен</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="437"/>
+        <location filename="models.cpp" line="432"/>
         <source>Item type</source>
         <translation>Тип предмета</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="438"/>
+        <location filename="models.cpp" line="433"/>
         <source>Place</source>
         <translation>Место</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="439"/>
+        <location filename="models.cpp" line="434"/>
         <source>Responsible person</source>
         <translation>Ответственное лицо</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="440"/>
+        <location filename="models.cpp" line="435"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="441"/>
+        <location filename="models.cpp" line="436"/>
         <source>INN</source>
         <translation>ИНН</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="445"/>
+        <location filename="models.cpp" line="440"/>
         <source>Note</source>
         <translation>Примечание</translation>
     </message>
@@ -146,33 +146,33 @@
 <context>
     <name>Inventory::PrintableInventoryModel</name>
     <message>
-        <location filename="models.cpp" line="842"/>
-        <location filename="models.cpp" line="862"/>
+        <location filename="models.cpp" line="859"/>
+        <location filename="models.cpp" line="879"/>
         <source>Written off</source>
         <translation>Списан</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="857"/>
+        <location filename="models.cpp" line="874"/>
         <source>Item type</source>
         <translation>Тип предмета</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="858"/>
+        <location filename="models.cpp" line="875"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="859"/>
+        <location filename="models.cpp" line="876"/>
         <source>Count</source>
         <translation>Количество</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="860"/>
+        <location filename="models.cpp" line="877"/>
         <source>Place</source>
         <translation>Место</translation>
     </message>
     <message>
-        <location filename="models.cpp" line="861"/>
+        <location filename="models.cpp" line="878"/>
         <source>INN</source>
         <translation>ИНН</translation>
     </message>
@@ -180,7 +180,7 @@
 <context>
     <name>Inventory::ReferenceModel</name>
     <message>
-        <location filename="models.cpp" line="1044"/>
+        <location filename="models.cpp" line="1061"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
@@ -229,77 +229,121 @@
         <translation>Главное</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="133"/>
+        <location filename="mainwindow.ui" line="132"/>
         <source>Edit</source>
         <translation>Правка</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="144"/>
+        <location filename="mainwindow.ui" line="143"/>
         <source>Items</source>
         <translation>Предметы</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="155"/>
+        <location filename="mainwindow.ui" line="149"/>
+        <source>Columns</source>
+        <translation>Столбцы</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="169"/>
         <source>toolBar</source>
         <translation>Панель инструментов</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="177"/>
+        <location filename="mainwindow.ui" line="191"/>
         <source>Show history...</source>
         <translation>История...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="180"/>
+        <location filename="mainwindow.ui" line="194"/>
         <source>Show history</source>
         <translation>История</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="185"/>
+        <location filename="mainwindow.ui" line="199"/>
         <source>Add multiline...</source>
         <oldsource>Add multiline</oldsource>
         <translation>Добавить несколько строк...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="190"/>
+        <location filename="mainwindow.ui" line="204"/>
         <source>Print CSV...</source>
         <oldsource>Print CSV</oldsource>
         <translation>Печать в CSV файл...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="195"/>
+        <location filename="mainwindow.ui" line="209"/>
         <source>Quit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="200"/>
+        <location filename="mainwindow.ui" line="214"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="205"/>
+        <location filename="mainwindow.ui" line="219"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="213"/>
-        <location filename="mainwindow.ui" line="216"/>
+        <location filename="mainwindow.ui" line="227"/>
+        <location filename="mainwindow.ui" line="230"/>
         <source>Hide filter</source>
         <translation>Спрятать фильтр</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="224"/>
-        <location filename="mainwindow.ui" line="227"/>
-        <source>Hide rare used columns</source>
-        <translation>Спрятать редкоспользуемые столбцы</translation>
+        <location filename="mainwindow.ui" line="267"/>
+        <source>Hide item name</source>
+        <translation>Спрятать наименование предмета</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="232"/>
+        <location filename="mainwindow.ui" line="275"/>
+        <source>Hide INN</source>
+        <translation>Спрятать ИНН</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="283"/>
+        <source>Hide writing off</source>
+        <translation>Спрятать списание</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="291"/>
+        <source>Hide repair state</source>
+        <translation>Спрятать ремонт</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="299"/>
+        <source>Hide checked item state</source>
+        <translation>Спрятать проверку</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="307"/>
+        <source>Hide note</source>
+        <translation>Спрятать примечание</translation>
+    </message>
+    <message>
+        <source>Hide rare used columns</source>
+        <translation type="obsolete">Спрятать редкоспользуемые столбцы</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="235"/>
         <source>Undo</source>
         <translation>Отменить</translation>
     </message>
     <message>
+        <location filename="mainwindow.ui" line="243"/>
+        <source>Hide item type</source>
+        <translation>Спрятать тип предмета</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="251"/>
+        <source>Hide item place</source>
+        <translation>Спрятать расположение предмета</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="259"/>
         <source>Hide responsible person</source>
-        <translation type="obsolete">Спрятать столбец &quot;Ответственное лицо&quot;</translation>
+        <translation>Спрятать Ответственное лицо</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="19"/>
@@ -342,72 +386,72 @@
         <translation>Невозможно открыть базу данных по пути &apos;%1&apos;!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="170"/>
+        <location filename="mainwindow.cpp" line="251"/>
         <source>Are you sure want to undo this change?</source>
         <translation>Вы действительно хотите отменить это изменение?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="172"/>
+        <location filename="mainwindow.cpp" line="253"/>
         <source>Change time: %1</source>
         <translation>Время: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="173"/>
+        <location filename="mainwindow.cpp" line="254"/>
         <source>Field name: %1</source>
         <translation>Поле: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="174"/>
+        <location filename="mainwindow.cpp" line="255"/>
         <source>Old value: %1</source>
         <translation>Старое значение: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="175"/>
+        <location filename="mainwindow.cpp" line="256"/>
         <source>New value: %1</source>
         <translation>Новое значение: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="177"/>
+        <location filename="mainwindow.cpp" line="258"/>
         <source>Undo change</source>
         <translation>Отменить изменение</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="233"/>
+        <location filename="mainwindow.cpp" line="314"/>
         <source>Add lines</source>
         <translation>Добавить строки</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="233"/>
+        <location filename="mainwindow.cpp" line="314"/>
         <source>Adding of lines failed!</source>
         <translation>Ошибка при добавлении строк!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="244"/>
+        <location filename="mainwindow.cpp" line="325"/>
         <source>Save to CSV...</source>
         <translation>Сохранить в CSV файл...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="244"/>
+        <location filename="mainwindow.cpp" line="325"/>
         <source>CSV files (*.csv);;All files (*.*)</source>
         <translation>Файлы CSV (*.csv);;Все файлы (*.*)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="250"/>
+        <location filename="mainwindow.cpp" line="331"/>
         <source>Save to CSV</source>
         <translation>Сохранить в CSV файл</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="250"/>
+        <location filename="mainwindow.cpp" line="331"/>
         <source>Cannot open file &apos;%1&apos; for write!</source>
         <translation>Невозможно открыть файл &apos;%1&apos; для записи!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="296"/>
+        <location filename="mainwindow.cpp" line="377"/>
         <source>Remove record</source>
         <translation>Удалить запись</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="296"/>
+        <location filename="mainwindow.cpp" line="377"/>
         <source>Cannot remove record. Probably, there are items that are using it.</source>
         <translation>Невозможно удалить запись. Возможно, её ещё используют некоторые предметы.</translation>
     </message>
