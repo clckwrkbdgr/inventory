@@ -81,7 +81,7 @@ MainWindow::MainWindow(QWidget * parent)
 	foreach(QString column, hiddenColumnList) {
 		QAction * action = columnAction(column.toInt() - 1);
 		if(action) {
-			action->setChecked(true);
+			action->setChecked(false);
 		}
 	}
 }
@@ -120,73 +120,74 @@ MainWindow::~MainWindow()
 QAction * MainWindow::columnAction(int column)
 {
 	switch(column) {
-		case 0 : return ui.actionHideItemType;
-		case 1 : return ui.actionHideItemPlace;
-		case 2 : return ui.actionHideResponsiblePerson;
-		case 3 : return ui.actionHideItemName;
-		case 4 : return ui.actionHideINN;
-		case 5 : return ui.actionHideWritingOff;
-		case 6 : return ui.actionHideRepairState;
-		case 7 : return ui.actionHideCheckedItemState;
-		case 8 : return ui.actionHideNote;
+		case 0 : return ui.actionShowItemType;
+		case 1 : return ui.actionShowItemPlace;
+		case 2 : return ui.actionShowResponsiblePerson;
+		case 3 : return ui.actionShowItemName;
+		case 4 : return ui.actionShowINN;
+		case 5 : return ui.actionShowWritingOff;
+		case 6 : return ui.actionShowRepairState;
+		case 7 : return ui.actionShowCheckedItemState;
+		case 8 : return ui.actionShowNote;
 		default: break;
 	}
 	return NULL;
 }
 
-void MainWindow::on_actionHideItemType_toggled(bool hidden)
+void MainWindow::on_actionShowItemType_toggled(bool visible)
 {
-	hideColumn(0, hidden);
+	setColumnVisibility(0, visible);
 }
 
-void MainWindow::on_actionHideItemPlace_toggled(bool hidden)
+void MainWindow::on_actionShowItemPlace_toggled(bool visible)
 {
-	hideColumn(1, hidden);
+	setColumnVisibility(1, visible);
 }
 
-void MainWindow::on_actionHideResponsiblePerson_toggled(bool hidden)
+void MainWindow::on_actionShowResponsiblePerson_toggled(bool visible)
 {
-	hideColumn(2, hidden);
+	setColumnVisibility(2, visible);
 }
 
-void MainWindow::on_actionHideItemName_toggled(bool hidden)
+void MainWindow::on_actionShowItemName_toggled(bool visible)
 {
-	hideColumn(3, hidden);
+	setColumnVisibility(3, visible);
 }
 
-void MainWindow::on_actionHideINN_toggled(bool hidden)
+void MainWindow::on_actionShowINN_toggled(bool visible)
 {
-	hideColumn(4, hidden);
+	setColumnVisibility(4, visible);
 }
 
-void MainWindow::on_actionHideWritingOff_toggled(bool hidden)
+void MainWindow::on_actionShowWritingOff_toggled(bool visible)
 {
-	hideColumn(5, hidden);
+	setColumnVisibility(5, visible);
 }
 
-void MainWindow::on_actionHideRepairState_toggled(bool hidden)
+void MainWindow::on_actionShowRepairState_toggled(bool visible)
 {
-	hideColumn(6, hidden);
+	setColumnVisibility(6, visible);
 }
 
-void MainWindow::on_actionHideCheckedItemState_toggled(bool hidden)
+void MainWindow::on_actionShowCheckedItemState_toggled(bool visible)
 {
-	hideColumn(7, hidden);
+	setColumnVisibility(7, visible);
 }
 
-void MainWindow::on_actionHideNote_toggled(bool hidden)
+void MainWindow::on_actionShowNote_toggled(bool visible)
 {
-	hideColumn(8, hidden);
+	setColumnVisibility(8, visible);
 }
 
-void MainWindow::hideColumn(int column, bool hidden)
+void MainWindow::setColumnVisibility(int column, bool visible)
 {
-	if(hidden) {
-		hiddenColumns += column;
-	} else {
+	if(visible) {
 		hiddenColumns -= column;
+	} else {
+		hiddenColumns += column;
 	}
-	ui.view->setColumnHidden(column, hidden);
+	ui.view->setColumnHidden(column, !visible);
+	resetView(false);
 }
 
 void MainWindow::setupTab(int index)
@@ -209,11 +210,8 @@ void MainWindow::setupTab(int index)
 	resetView(true);
 
 	for(int column = 0; column < ui.view->model()->columnCount(); ++column) {
-		if(index == tabIndex.MAIN && hiddenColumns.contains(column)) {
-			ui.view->setColumnHidden(column, true);
-		} else {
-			ui.view->setColumnHidden(column, false);
-		}
+		bool hidden = (index == tabIndex.MAIN && hiddenColumns.contains(column));
+		ui.view->setColumnHidden(column, hidden);
 	}
 	if(index == tabIndex.MAIN) {
 		ui.view->setItemDelegate(new Inventory::InventoryDelegate(this));
@@ -276,6 +274,7 @@ void MainWindow::on_actionShowHistory_triggered()
 	QScopedPointer<Inventory::HistoryModel> model(new Inventory::HistoryModel(id));
 
 	QDialog dialog(this);
+		dialog.setWindowTitle(tr("History"));
 		QVBoxLayout * vbox = new QVBoxLayout();
 			QTableView * view = new QTableView();
 				view->setModel(&(*model));

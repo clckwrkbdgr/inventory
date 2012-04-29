@@ -199,6 +199,7 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="55"/>
+        <location filename="mainwindow.ui" line="246"/>
         <source>Item type</source>
         <translation>Тип предмета</translation>
     </message>
@@ -292,34 +293,113 @@
         <translation>Спрятать фильтр</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="267"/>
-        <source>Hide item name</source>
-        <translation>Спрятать наименование предмета</translation>
+        <location filename="mainwindow.ui" line="249"/>
+        <source>Show item type</source>
+        <translation>Показать тип предмета</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="275"/>
-        <source>Hide INN</source>
-        <translation>Спрятать ИНН</translation>
+        <location filename="mainwindow.ui" line="260"/>
+        <source>Item place</source>
+        <translation>Расположение</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="283"/>
-        <source>Hide writing off</source>
-        <translation>Спрятать списание</translation>
+        <location filename="mainwindow.ui" line="263"/>
+        <source>Show item place</source>
+        <translation>Показать расположение предмета</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="274"/>
+        <source>Responsible person</source>
+        <translation>Ответственное лицо</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="277"/>
+        <source>Show responsible person</source>
+        <translation>Показать ответственное лицо</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="288"/>
+        <source>Item name</source>
+        <translation>Наименование предмета</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="291"/>
+        <source>Show item name</source>
+        <translation>Показать наименование предмета</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="302"/>
+        <source>INN</source>
+        <translation>ИНН</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="305"/>
+        <source>Show INN</source>
+        <translation>Показать ИНН</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="316"/>
+        <source>Writing off</source>
+        <translation>Наличие/списание</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="319"/>
+        <source>Show writing off</source>
+        <translation>Показать списание</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="330"/>
+        <source>Repair state</source>
+        <translation>Состояние ремонта</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="333"/>
+        <source>Show repair state</source>
+        <translation>Показать ремонт</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="344"/>
+        <source>Checked item state</source>
+        <translation>Состояние проверки</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="347"/>
+        <source>Show checked item state</source>
+        <translation>Показать проверку</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="358"/>
+        <source>Note</source>
+        <translation>Примечание</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="361"/>
+        <source>Show note</source>
+        <translation>Показать примечание</translation>
+    </message>
+    <message>
+        <source>Hide item name</source>
+        <translation type="obsolete">Спрятать наименование предмета</translation>
+    </message>
+    <message>
+        <source>Hide INN</source>
+        <translation type="obsolete">Спрятать ИНН</translation>
+    </message>
+    <message>
+        <source>Hide writing off</source>
+        <translation type="obsolete">Спрятать списание</translation>
+    </message>
+    <message>
         <source>Hide repair state</source>
-        <translation>Спрятать ремонт</translation>
+        <translation type="obsolete">Спрятать ремонт</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="299"/>
         <source>Hide checked item state</source>
-        <translation>Спрятать проверку</translation>
+        <translation type="obsolete">Спрятать проверку</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="307"/>
         <source>Hide note</source>
-        <translation>Спрятать примечание</translation>
+        <translation type="obsolete">Спрятать примечание</translation>
     </message>
     <message>
         <source>Hide rare used columns</source>
@@ -331,19 +411,16 @@
         <translation>Отменить</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="243"/>
         <source>Hide item type</source>
-        <translation>Спрятать тип предмета</translation>
+        <translation type="obsolete">Спрятать тип предмета</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="251"/>
         <source>Hide item place</source>
-        <translation>Спрятать расположение предмета</translation>
+        <translation type="obsolete">Спрятать расположение предмета</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="259"/>
         <source>Hide responsible person</source>
-        <translation>Спрятать Ответственное лицо</translation>
+        <translation type="obsolete">Спрятать Ответственное лицо</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="19"/>
@@ -386,72 +463,77 @@
         <translation>Невозможно открыть базу данных по пути &apos;%1&apos;!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="251"/>
+        <location filename="mainwindow.cpp" line="249"/>
         <source>Are you sure want to undo this change?</source>
         <translation>Вы действительно хотите отменить это изменение?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="253"/>
+        <location filename="mainwindow.cpp" line="251"/>
         <source>Change time: %1</source>
         <translation>Время: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="254"/>
+        <location filename="mainwindow.cpp" line="252"/>
         <source>Field name: %1</source>
         <translation>Поле: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="255"/>
+        <location filename="mainwindow.cpp" line="253"/>
         <source>Old value: %1</source>
         <translation>Старое значение: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="256"/>
+        <location filename="mainwindow.cpp" line="254"/>
         <source>New value: %1</source>
         <translation>Новое значение: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="258"/>
+        <location filename="mainwindow.cpp" line="256"/>
         <source>Undo change</source>
         <translation>Отменить изменение</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="314"/>
+        <location filename="mainwindow.cpp" line="277"/>
+        <source>History</source>
+        <translation>История</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="313"/>
         <source>Add lines</source>
         <translation>Добавить строки</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="314"/>
+        <location filename="mainwindow.cpp" line="313"/>
         <source>Adding of lines failed!</source>
         <translation>Ошибка при добавлении строк!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="325"/>
+        <location filename="mainwindow.cpp" line="324"/>
         <source>Save to CSV...</source>
         <translation>Сохранить в CSV файл...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="325"/>
+        <location filename="mainwindow.cpp" line="324"/>
         <source>CSV files (*.csv);;All files (*.*)</source>
         <translation>Файлы CSV (*.csv);;Все файлы (*.*)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="331"/>
+        <location filename="mainwindow.cpp" line="330"/>
         <source>Save to CSV</source>
         <translation>Сохранить в CSV файл</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="331"/>
+        <location filename="mainwindow.cpp" line="330"/>
         <source>Cannot open file &apos;%1&apos; for write!</source>
         <translation>Невозможно открыть файл &apos;%1&apos; для записи!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="377"/>
+        <location filename="mainwindow.cpp" line="376"/>
         <source>Remove record</source>
         <translation>Удалить запись</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="377"/>
+        <location filename="mainwindow.cpp" line="376"/>
         <source>Cannot remove record. Probably, there are items that are using it.</source>
         <translation>Невозможно удалить запись. Возможно, её ещё используют некоторые предметы.</translation>
     </message>

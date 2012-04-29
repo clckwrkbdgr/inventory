@@ -40,15 +40,15 @@ private slots:
 	void on_buttonUseWrittenOffFilter_toggled(bool);
 	void on_listWrittenOffFilter_currentIndexChanged(int);
 
-    void on_actionHideItemType_toggled(bool);
-    void on_actionHideItemPlace_toggled(bool);
-    void on_actionHideResponsiblePerson_toggled(bool);
-    void on_actionHideItemName_toggled(bool);
-    void on_actionHideINN_toggled(bool);
-    void on_actionHideWritingOff_toggled(bool);
-    void on_actionHideRepairState_toggled(bool);
-    void on_actionHideCheckedItemState_toggled(bool);
-    void on_actionHideNote_toggled(bool);
+    void on_actionShowItemType_toggled(bool);
+    void on_actionShowItemPlace_toggled(bool);
+    void on_actionShowResponsiblePerson_toggled(bool);
+    void on_actionShowItemName_toggled(bool);
+    void on_actionShowINN_toggled(bool);
+    void on_actionShowWritingOff_toggled(bool);
+    void on_actionShowRepairState_toggled(bool);
+    void on_actionShowCheckedItemState_toggled(bool);
+    void on_actionShowNote_toggled(bool);
 private:
 	QString databaseLocation;
 	Ui::MainWindow ui;
@@ -63,6 +63,6 @@ private:
 	Inventory::ReferenceModel * personsModel;
 
 	QAction * columnAction(int);
-	void hideColumn(int column, bool hidden);
+	void setColumnVisibility(int column, bool visible);
 };
 

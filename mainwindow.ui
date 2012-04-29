@@ -148,15 +148,15 @@
     <property name="title">
      <string>Columns</string>
     </property>
-    <addaction name="actionHideItemType"/>
-    <addaction name="actionHideItemPlace"/>
-    <addaction name="actionHideResponsiblePerson"/>
-    <addaction name="actionHideItemName"/>
-    <addaction name="actionHideINN"/>
-    <addaction name="actionHideWritingOff"/>
-    <addaction name="actionHideRepairState"/>
-    <addaction name="actionHideCheckedItemState"/>
-    <addaction name="actionHideNote"/>
+    <addaction name="actionShowItemType"/>
+    <addaction name="actionShowItemPlace"/>
+    <addaction name="actionShowResponsiblePerson"/>
+    <addaction name="actionShowItemName"/>
+    <addaction name="actionShowINN"/>
+    <addaction name="actionShowWritingOff"/>
+    <addaction name="actionShowRepairState"/>
+    <addaction name="actionShowCheckedItemState"/>
+    <addaction name="actionShowNote"/>
    </widget>
    <addaction name="menuMain"/>
    <addaction name="menuEdit"/>
@@ -235,76 +235,130 @@
     <string>Undo</string>
    </property>
   </action>
-  <action name="actionHideItemType">
+  <action name="actionShowItemType">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Hide item type</string>
+    <string>Item type</string>
+   </property>
+   <property name="toolTip">
+    <string>Show item type</string>
    </property>
   </action>
-  <action name="actionHideItemPlace">
+  <action name="actionShowItemPlace">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Hide item place</string>
+    <string>Item place</string>
+   </property>
+   <property name="toolTip">
+    <string>Show item place</string>
    </property>
   </action>
-  <action name="actionHideResponsiblePerson">
+  <action name="actionShowResponsiblePerson">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Hide responsible person</string>
+    <string>Responsible person</string>
+   </property>
+   <property name="toolTip">
+    <string>Show responsible person</string>
    </property>
   </action>
-  <action name="actionHideItemName">
+  <action name="actionShowItemName">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Hide item name</string>
+    <string>Item name</string>
+   </property>
+   <property name="toolTip">
+    <string>Show item name</string>
    </property>
   </action>
-  <action name="actionHideINN">
+  <action name="actionShowINN">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Hide INN</string>
+    <string>INN</string>
+   </property>
+   <property name="toolTip">
+    <string>Show INN</string>
    </property>
   </action>
-  <action name="actionHideWritingOff">
+  <action name="actionShowWritingOff">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Hide writing off</string>
+    <string>Writing off</string>
+   </property>
+   <property name="toolTip">
+    <string>Show writing off</string>
    </property>
   </action>
-  <action name="actionHideRepairState">
+  <action name="actionShowRepairState">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Hide repair state</string>
+    <string>Repair state</string>
+   </property>
+   <property name="toolTip">
+    <string>Show repair state</string>
    </property>
   </action>
-  <action name="actionHideCheckedItemState">
+  <action name="actionShowCheckedItemState">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Hide checked item state</string>
+    <string>Checked item state</string>
+   </property>
+   <property name="toolTip">
+    <string>Show checked item state</string>
    </property>
   </action>
-  <action name="actionHideNote">
+  <action name="actionShowNote">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Hide note</string>
+    <string>Note</string>
+   </property>
+   <property name="toolTip">
+    <string>Show note</string>
    </property>
   </action>
  </widget>
