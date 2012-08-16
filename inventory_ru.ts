@@ -199,7 +199,7 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="55"/>
-        <location filename="mainwindow.ui" line="246"/>
+        <location filename="mainwindow.ui" line="248"/>
         <source>Item type</source>
         <translation>Тип предмета</translation>
     </message>
@@ -230,152 +230,157 @@
         <translation>Главное</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="132"/>
+        <location filename="mainwindow.ui" line="134"/>
         <source>Edit</source>
         <translation>Правка</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="143"/>
+        <location filename="mainwindow.ui" line="145"/>
         <source>Items</source>
         <translation>Предметы</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="149"/>
+        <location filename="mainwindow.ui" line="151"/>
         <source>Columns</source>
         <translation>Столбцы</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="169"/>
+        <location filename="mainwindow.ui" line="171"/>
         <source>toolBar</source>
         <translation>Панель инструментов</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="191"/>
+        <location filename="mainwindow.ui" line="193"/>
         <source>Show history...</source>
         <translation>История...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="194"/>
+        <location filename="mainwindow.ui" line="196"/>
         <source>Show history</source>
         <translation>История</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="199"/>
+        <location filename="mainwindow.ui" line="201"/>
         <source>Add multiline...</source>
         <oldsource>Add multiline</oldsource>
         <translation>Добавить несколько строк...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="204"/>
+        <location filename="mainwindow.ui" line="206"/>
         <source>Print CSV...</source>
         <oldsource>Print CSV</oldsource>
         <translation>Печать в CSV файл...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="209"/>
+        <location filename="mainwindow.ui" line="211"/>
         <source>Quit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="214"/>
+        <location filename="mainwindow.ui" line="216"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="219"/>
+        <location filename="mainwindow.ui" line="221"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="227"/>
-        <location filename="mainwindow.ui" line="230"/>
+        <location filename="mainwindow.ui" line="229"/>
+        <location filename="mainwindow.ui" line="232"/>
         <source>Hide filter</source>
         <translation>Спрятать фильтр</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="249"/>
+        <location filename="mainwindow.ui" line="251"/>
         <source>Show item type</source>
         <translation>Показать тип предмета</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="260"/>
+        <location filename="mainwindow.ui" line="262"/>
         <source>Item place</source>
         <translation>Расположение</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="263"/>
+        <location filename="mainwindow.ui" line="265"/>
         <source>Show item place</source>
         <translation>Показать расположение предмета</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="274"/>
+        <location filename="mainwindow.ui" line="276"/>
         <source>Responsible person</source>
         <translation>Ответственное лицо</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="277"/>
+        <location filename="mainwindow.ui" line="279"/>
         <source>Show responsible person</source>
         <translation>Показать ответственное лицо</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="288"/>
+        <location filename="mainwindow.ui" line="290"/>
         <source>Item name</source>
         <translation>Наименование предмета</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="291"/>
+        <location filename="mainwindow.ui" line="293"/>
         <source>Show item name</source>
         <translation>Показать наименование предмета</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="302"/>
+        <location filename="mainwindow.ui" line="304"/>
         <source>INN</source>
         <translation>ИНН</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="305"/>
+        <location filename="mainwindow.ui" line="307"/>
         <source>Show INN</source>
         <translation>Показать ИНН</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="316"/>
+        <location filename="mainwindow.ui" line="318"/>
         <source>Writing off</source>
         <translation>Наличие/списание</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="319"/>
+        <location filename="mainwindow.ui" line="321"/>
         <source>Show writing off</source>
         <translation>Показать списание</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="330"/>
+        <location filename="mainwindow.ui" line="332"/>
         <source>Repair state</source>
         <translation>Состояние ремонта</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="333"/>
+        <location filename="mainwindow.ui" line="335"/>
         <source>Show repair state</source>
         <translation>Показать ремонт</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="344"/>
+        <location filename="mainwindow.ui" line="346"/>
         <source>Checked item state</source>
         <translation>Состояние проверки</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="347"/>
+        <location filename="mainwindow.ui" line="349"/>
         <source>Show checked item state</source>
         <translation>Показать проверку</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="358"/>
+        <location filename="mainwindow.ui" line="360"/>
         <source>Note</source>
         <translation>Примечание</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="361"/>
+        <location filename="mainwindow.ui" line="363"/>
         <source>Show note</source>
         <translation>Показать примечание</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="368"/>
+        <source>Change database</source>
+        <translation>Указать базу данных</translation>
     </message>
     <message>
         <source>Hide item name</source>
@@ -406,7 +411,7 @@
         <translation type="obsolete">Спрятать редкоспользуемые столбцы</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="235"/>
+        <location filename="mainwindow.ui" line="237"/>
         <source>Undo</source>
         <translation>Отменить</translation>
     </message>
@@ -444,96 +449,100 @@
     </message>
     <message>
         <location filename="mainwindow.cpp" line="39"/>
+        <location filename="mainwindow.cpp" line="139"/>
         <source>Database location</source>
         <translation>Расположение базы данных</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="41"/>
+        <location filename="mainwindow.cpp" line="141"/>
         <source>SQLite3 database files (*.sqlite);;All files (*.*)</source>
         <translation>Файлы баз данных SQLite3 (*.sqlite);;Все файлы (*.*)</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="48"/>
+        <location filename="mainwindow.cpp" line="151"/>
         <source>Database</source>
         <translation>База данных</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="48"/>
+        <location filename="mainwindow.cpp" line="151"/>
         <source>Cannot open database at path &apos;%1&apos;!</source>
         <translation>Невозможно открыть базу данных по пути &apos;%1&apos;!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="249"/>
+        <location filename="mainwindow.cpp" line="269"/>
         <source>Are you sure want to undo this change?</source>
         <translation>Вы действительно хотите отменить это изменение?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="251"/>
+        <location filename="mainwindow.cpp" line="271"/>
         <source>Change time: %1</source>
         <translation>Время: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="252"/>
+        <location filename="mainwindow.cpp" line="272"/>
         <source>Field name: %1</source>
         <translation>Поле: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="253"/>
+        <location filename="mainwindow.cpp" line="273"/>
         <source>Old value: %1</source>
         <translation>Старое значение: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="254"/>
+        <location filename="mainwindow.cpp" line="274"/>
         <source>New value: %1</source>
         <translation>Новое значение: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="256"/>
+        <location filename="mainwindow.cpp" line="276"/>
         <source>Undo change</source>
         <translation>Отменить изменение</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="277"/>
+        <location filename="mainwindow.cpp" line="297"/>
         <source>History</source>
         <translation>История</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="313"/>
+        <location filename="mainwindow.cpp" line="333"/>
         <source>Add lines</source>
         <translation>Добавить строки</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="313"/>
+        <location filename="mainwindow.cpp" line="333"/>
         <source>Adding of lines failed!</source>
         <translation>Ошибка при добавлении строк!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="324"/>
+        <location filename="mainwindow.cpp" line="344"/>
         <source>Save to CSV...</source>
         <translation>Сохранить в CSV файл...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="324"/>
+        <location filename="mainwindow.cpp" line="344"/>
         <source>CSV files (*.csv);;All files (*.*)</source>
         <translation>Файлы CSV (*.csv);;Все файлы (*.*)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="330"/>
+        <location filename="mainwindow.cpp" line="350"/>
         <source>Save to CSV</source>
         <translation>Сохранить в CSV файл</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="330"/>
+        <location filename="mainwindow.cpp" line="350"/>
         <source>Cannot open file &apos;%1&apos; for write!</source>
         <translation>Невозможно открыть файл &apos;%1&apos; для записи!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="376"/>
+        <location filename="mainwindow.cpp" line="396"/>
         <source>Remove record</source>
         <translation>Удалить запись</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="376"/>
+        <location filename="mainwindow.cpp" line="396"/>
         <source>Cannot remove record. Probably, there are items that are using it.</source>
         <translation>Невозможно удалить запись. Возможно, её ещё используют некоторые предметы.</translation>
     </message>

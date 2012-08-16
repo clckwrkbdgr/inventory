@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget * parent)
 	if(databaseLocation.isEmpty()) {
 		databaseLocation = QFileDialog::getSaveFileName(this, tr("Database location"),
 				QDir(QApplication::applicationDirPath()).absoluteFilePath("inventory.sqlite"),
-				tr("SQLite3 database files (*.sqlite);;All files (*.*)")
+				tr("SQLite3 database files (*.sqlite);;All files (*.*)"), 0, QFileDialog::DontConfirmOverwrite
 				); 
 	}
 
@@ -132,6 +132,26 @@ QAction * MainWindow::columnAction(int column)
 		default: break;
 	}
 	return NULL;
+}
+
+void MainWindow::on_actionChangeDB_triggered()
+{
+	QString newDatabaseLocation = QFileDialog::getSaveFileName(this, tr("Database location"),
+			QDir(QApplication::applicationDirPath()).absoluteFilePath("inventory.sqlite"),
+			tr("SQLite3 database files (*.sqlite);;All files (*.*)"), 0, QFileDialog::DontConfirmOverwrite
+			); 
+
+	if(newDatabaseLocation.isEmpty())
+		return;
+
+	databaseLocation = newDatabaseLocation;
+	Inventory::Database::close();
+	Inventory::Database::setDatabaseName(databaseLocation);
+	if(!Inventory::Database::reopen()) {
+		QMessageBox::critical(this, tr("Database"), tr("Cannot open database at path '%1'!").arg(Inventory::Database::databaseName()));
+		exit(1);
+	}
+	resetView(true);
 }
 
 void MainWindow::on_actionShowItemType_toggled(bool visible)
