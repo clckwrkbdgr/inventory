@@ -10,6 +10,14 @@
 
 #include "mainwindow.h"
 
+QString getDatabaseFromWorkDir() {
+	QDir wd = QDir::current();
+	QStringList entries = wd.entryList(QStringList() << "*.sqlite", QDir::Files);
+	if(entries.count() != 1)
+		return QString();
+	return wd.absoluteFilePath(entries.first());
+}
+
 MainWindow::MainWindow(QWidget * parent)
 	: QMainWindow(parent)
 {
@@ -34,12 +42,15 @@ MainWindow::MainWindow(QWidget * parent)
 	if(settings.value("mainwindow/maximized", false).toBool())
 		setWindowState(Qt::WindowMaximized);
 
-	QString databaseLocation = settings.value("database/location", "").toString();
+	QString databaseLocation = getDatabaseFromWorkDir();
 	if(databaseLocation.isEmpty()) {
 		databaseLocation = QFileDialog::getSaveFileName(this, tr("Database location"),
 				QDir(QApplication::applicationDirPath()).absoluteFilePath("inventory.sqlite"),
 				tr("SQLite3 database files (*.sqlite);;All files (*.*)"), 0, QFileDialog::DontConfirmOverwrite
 				); 
+		if(databaseLocation.isEmpty()) {
+			exit(0);
+		}
 	}
 
 	// App logic.
@@ -97,7 +108,6 @@ MainWindow::~MainWindow()
 		settings.setValue("mainwindow/size", size());
 		settings.setValue("mainwindow/pos", pos());
 	}
-	settings.setValue("database/location", Inventory::Database::databaseName());
 
 	settings.setValue("filter/hidden",              ui.actionHideFilter           ->isChecked());
 	settings.setValue("filter/useitemtype",         ui.buttonUseItemTypeFilter    ->isChecked());
