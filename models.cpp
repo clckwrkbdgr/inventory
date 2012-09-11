@@ -1,4 +1,5 @@
 #include <QtDebug>
+#include <QtGui/QStringListModel>
 
 #include "models.h"
 
@@ -258,7 +259,7 @@ Qt::ItemFlags InventoryModel::flags(const QModelIndex & index) const
 		return Qt::NoItemFlags;
 
 	Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
-	static QList<int> checkableFields = QList<int>() << ITEM_WRITTEN_OFF << ITEM_UNDER_REPAIR << ITEM_CHECKED;
+	static QList<int> checkableFields = QList<int>() << ITEM_UNDER_REPAIR << ITEM_CHECKED;
 	if(checkableFields.contains(index.column())) {
 		result |= Qt::ItemIsUserCheckable;
 	}
@@ -374,7 +375,6 @@ bool InventoryModel::setData(const QModelIndex & index, const QVariant & value, 
 	if(role == Qt::CheckStateRole) {
 		const Item & item = items[index.row()];
 		switch(index.column()) {
-			case ITEM_WRITTEN_OFF:  updateField(item.id, "writtenOff",  HISTORY_WRITTEN_OFF,  item.writtenOff,  value == Qt::Checked); break;
 			case ITEM_UNDER_REPAIR: updateField(item.id, "underRepair", HISTORY_UNDER_REPAIR, item.underRepair, value == Qt::Checked); break;
 			case ITEM_CHECKED:      updateField(item.id, "checked",     HISTORY_CHECKED,      item.checked,     value == Qt::Checked); break;
 			default: return false;
@@ -382,6 +382,7 @@ bool InventoryModel::setData(const QModelIndex & index, const QVariant & value, 
 	} else if(role == Qt::EditRole) {
 		const Item & item = items[index.row()];
 		switch(index.column()) {
+			case ITEM_WRITTEN_OFF:  updateField(item.id, "writtenOff",  HISTORY_WRITTEN_OFF,  QString(int(item.writtenOff)),  value.toString()); break;
 			case ITEM_TYPE:
 				if(!foreignIdExists("ItemTypes", value.toInt()))
 					return false;
@@ -1186,16 +1187,25 @@ QWidget* InventoryDelegate::createEditor(QWidget *parent, const QStyleOptionView
 		return QItemDelegate::createEditor(parent, option, index);
 
 	int refType = ReferenceModel::INVALID;
+	bool isWrittenOffRef = false;
 	switch(index.column()) {
-		case ITEM_TYPE  : refType = ReferenceModel::ITEM_TYPES; break;
-		case ITEM_PLACE : refType = ReferenceModel::PLACES; break;
-		case ITEM_PERSON: refType = ReferenceModel::PERSONS; break;
+		case ITEM_TYPE       : refType = ReferenceModel::ITEM_TYPES; break;
+		case ITEM_PLACE      : refType = ReferenceModel::PLACES;     break;
+		case ITEM_PERSON     : refType = ReferenceModel::PERSONS;    break;
+		case ITEM_WRITTEN_OFF: isWrittenOffRef = true;               break;
 		default: return QItemDelegate::createEditor(parent, option, index);
 	}
 
 	QComboBox * comboBox = new QComboBox(parent);
-	ReferenceModel * model = new ReferenceModel(refType, comboBox);
-	comboBox->setModel(model);
+	if(isWrittenOffRef) {
+		QStringList values = QStringList() << tr("Present") << tr("Written off");
+		QStringListModel * model = new QStringListModel(comboBox);
+		model->setStringList(values);
+		comboBox->setModel(model);
+	} else {
+		ReferenceModel * model = new ReferenceModel(refType, comboBox);
+		comboBox->setModel(model);
+	}
 	return comboBox;
 }
 
@@ -1206,7 +1216,7 @@ void InventoryDelegate::setEditorData(QWidget * editor, const QModelIndex &index
 		return;
 	}
 	int col = index.column();
-	if(col != ITEM_TYPE && col != ITEM_PLACE && col != ITEM_PERSON) {
+	if(col != ITEM_WRITTEN_OFF && col != ITEM_TYPE && col != ITEM_PLACE && col != ITEM_PERSON) {
 		QItemDelegate::setEditorData(editor, index);
 		return;
 	}
@@ -1216,10 +1226,18 @@ void InventoryDelegate::setEditorData(QWidget * editor, const QModelIndex &index
 		QItemDelegate::setEditorData(editor, index);
 		return;
 	}
-	ReferenceModel * model = static_cast<ReferenceModel *>(comboBox->model());
 
-	Id id = index.model()->data(index, Qt::EditRole).toInt();
-	comboBox->setCurrentIndex(model->rowOf(id));
+	bool isWrittenOffRef = col == ITEM_WRITTEN_OFF;
+	if(isWrittenOffRef) {
+		bool isWrittenOff = index.model()->data(index, Qt::CheckStateRole).toInt() == Qt::Checked;
+		int state = (int)isWrittenOff;
+		qDebug() << state;
+		comboBox->setCurrentIndex(state);
+	} else {
+		ReferenceModel * model = static_cast<ReferenceModel *>(comboBox->model());
+		Id id = index.model()->data(index, Qt::EditRole).toInt();
+		comboBox->setCurrentIndex(model->rowOf(id));
+	}
 }
 
 void InventoryDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
@@ -1229,16 +1247,20 @@ void InventoryDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 		return;
 	}
 	int col = index.column();
-	if(col != ITEM_TYPE && col != ITEM_PLACE && col != ITEM_PERSON) {
+	if(col != ITEM_WRITTEN_OFF && col != ITEM_TYPE && col != ITEM_PLACE && col != ITEM_PERSON) {
 		QItemDelegate::setModelData(editor, model, index);
 		return;
 	}
 
 	QComboBox *comboBox = static_cast<QComboBox*>(editor);
-	ReferenceModel * refModel = static_cast<ReferenceModel*>(comboBox->model());
-
-	Id id = refModel->idAt(comboBox->currentIndex());
-	model->setData(index, id, Qt::EditRole);
+	bool isWrittenOffRef = col == ITEM_WRITTEN_OFF;
+	if(isWrittenOffRef) {
+		model->setData(index, comboBox->currentIndex(), Qt::EditRole);
+	} else {
+		ReferenceModel * refModel = static_cast<ReferenceModel*>(comboBox->model());
+		Id id = refModel->idAt(comboBox->currentIndex());
+		model->setData(index, id, Qt::EditRole);
+	}
 }
 
 void InventoryDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &) const
