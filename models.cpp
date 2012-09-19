@@ -990,7 +990,7 @@ void ReferenceModel::update()
 	QSqlQuery query = Database::select(
 			" SELECT id, name "
 			" FROM " + refType.table + " "
-			" ; "
+			" ORDER BY name ASC; "
 			);
 
 	beginResetModel();

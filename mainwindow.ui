@@ -122,8 +122,6 @@
     <property name="title">
      <string>Main</string>
     </property>
-    <addaction name="actionChangeDB"/>
-    <addaction name="separator"/>
     <addaction name="actionHideFilter"/>
     <addaction name="actionPrintCSV"/>
     <addaction name="separator"/>
@@ -361,11 +359,6 @@
    </property>
    <property name="toolTip">
     <string>Show note</string>
-   </property>
-  </action>
-  <action name="actionChangeDB">
-   <property name="text">
-    <string>Change database</string>
    </property>
   </action>
  </widget>
