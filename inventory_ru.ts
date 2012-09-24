@@ -545,12 +545,22 @@
         <translation>Невозможно открыть файл &apos;%1&apos; для записи!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="386"/>
+        <location filename="mainwindow.cpp" line="384"/>
+        <source>Remove item</source>
+        <translation>Удаление предмета</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="384"/>
+        <source>Are you sure want to remove this item?</source>
+        <translation>Вы действительно хотите удалить выбранный предмет?</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="393"/>
         <source>Remove record</source>
         <translation>Удалить запись</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="386"/>
+        <location filename="mainwindow.cpp" line="393"/>
         <source>Cannot remove record. Probably, there are items that are using it.</source>
         <translation>Невозможно удалить запись. Возможно, её ещё используют некоторые предметы.</translation>
     </message>

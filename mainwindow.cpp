@@ -380,6 +380,13 @@ void MainWindow::on_actionRemove_triggered()
 	if(row < 0)
 		return;
 
+	bool isSureToRemove = QMessageBox::question(
+			this, tr("Remove item"), tr("Are you sure want to remove this item?"),
+			QMessageBox::Yes | QMessageBox::Cancel
+			) == QMessageBox::Yes;
+	if(!isSureToRemove)
+		return;
+
 	bool removed = !ui.view->model()->removeRow(row);
 	if(removed) {
 		if(tabs->currentIndex() == tabIndex.TYPES || tabs->currentIndex() == tabIndex.PLACES || tabs->currentIndex() == tabIndex.PERSONS) {
