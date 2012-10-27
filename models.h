@@ -107,6 +107,10 @@ public:
 	virtual void setWrittenOffFilter(bool writtenOff);
 	virtual void switchWrittenOffFilter(bool on = true);
 
+	void switchAllWrittenOff(bool on = true);
+	void switchAllRepair(bool on = true);
+	void switchAllChecked(bool on = true);
+
 	virtual void update();
 private:
 	Filter filter;

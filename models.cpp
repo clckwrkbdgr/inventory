@@ -570,6 +570,28 @@ void InventoryModel::switchWrittenOffFilter(bool on)
 	update();
 }
 
+void InventoryModel::switchAllWrittenOff(bool on)
+{
+	for(int row = 0; row < rowCount(); ++row) {
+		setData(index(row, ITEM_WRITTEN_OFF), on ? "1" : "0");
+	}
+}
+
+void InventoryModel::switchAllRepair(bool on)
+{
+	for(int row = 0; row < rowCount(); ++row) {
+		setData(index(row, ITEM_UNDER_REPAIR), on ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
+		qDebug() << row;
+	}
+}
+
+void InventoryModel::switchAllChecked(bool on)
+{
+	for(int row = 0; row < rowCount(); ++row) {
+		setData(index(row, ITEM_CHECKED), on ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
+	}
+}
+
 }
 
 namespace Inventory { // HistoryModel

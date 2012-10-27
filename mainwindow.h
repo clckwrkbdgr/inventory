@@ -49,6 +49,13 @@ private slots:
     void on_actionShowRepairState_toggled(bool);
     void on_actionShowCheckedItemState_toggled(bool);
     void on_actionShowNote_toggled(bool);
+
+	void on_actionSwitchWrittenOffOn_triggered();
+	void on_actionSwitchWrittenOffOff_triggered();
+	void on_actionSwitchRepairOn_triggered();
+	void on_actionSwitchRepairOff_triggered();
+	void on_actionSwitchCheckedOn_triggered();
+	void on_actionSwitchCheckedOff_triggered();
 private:
 	QString databaseLocation;
 	Ui::MainWindow ui;
