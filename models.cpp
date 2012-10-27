@@ -739,7 +739,6 @@ bool HistoryModel::removeRows(int row, int count, const QModelIndex & /*parent*/
 	Database::Placeholders values;
 	values[":value"] = records[row].rawOldValue;
 	values[":id"]    = itemId;
-	qDebug() << values;
 	Database::query("UPDATE Inventory SET " + fieldName + " = :value WHERE id = :id; ", values);
 
 
@@ -1231,7 +1230,6 @@ void InventoryDelegate::setEditorData(QWidget * editor, const QModelIndex &index
 	if(isWrittenOffRef) {
 		bool isWrittenOff = index.model()->data(index, Qt::CheckStateRole).toInt() == Qt::Checked;
 		int state = (int)isWrittenOff;
-		qDebug() << state;
 		comboBox->setCurrentIndex(state);
 	} else {
 		ReferenceModel * model = static_cast<ReferenceModel *>(comboBox->model());

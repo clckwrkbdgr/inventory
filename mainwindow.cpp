@@ -347,6 +347,9 @@ void MainWindow::on_actionPrintCSV_triggered()
 
 	QStringList header;
 	for(int col = 0; col < model->columnCount(); ++col) {
+		if(ui.view->isColumnHidden(col))
+			continue;
+
 		QString text = model->headerData(col, Qt::Horizontal).toString();
 		text.replace("\"", "\\\"");
 		text.append('"').prepend('"');
@@ -357,6 +360,9 @@ void MainWindow::on_actionPrintCSV_triggered()
 	for(int row = 0; row < model->rowCount(); ++row) {
 		QStringList cells;
 		for(int col = 0; col < model->columnCount(); ++col) {
+			if(ui.view->isColumnHidden(col))
+				continue;
+
 			QString text = model->data(model->index(row, col)).toString();
 			text.replace("\"", "\\\"");
 			text.append('"').prepend('"');
