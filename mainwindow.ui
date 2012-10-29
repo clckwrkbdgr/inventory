@@ -157,25 +157,13 @@
     <addaction name="actionShowRepairState"/>
     <addaction name="actionShowCheckedItemState"/>
     <addaction name="actionShowNote"/>
-   </widget>
-   <widget class="QMenu" name="menuAutochecks">
-    <property name="title">
-     <string>Autochecks</string>
-    </property>
-    <addaction name="actionSwitchWrittenOffOn"/>
-    <addaction name="actionSwitchWrittenOffOff"/>
     <addaction name="separator"/>
-    <addaction name="actionSwitchRepairOn"/>
-    <addaction name="actionSwitchRepairOff"/>
-    <addaction name="separator"/>
-    <addaction name="actionSwitchCheckedOn"/>
     <addaction name="actionSwitchCheckedOff"/>
    </widget>
    <addaction name="menuMain"/>
    <addaction name="menuEdit"/>
    <addaction name="menuItems"/>
    <addaction name="menuColumns"/>
-   <addaction name="menuAutochecks"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -373,31 +361,6 @@
    </property>
    <property name="toolTip">
     <string>Show note</string>
-   </property>
-  </action>
-  <action name="actionSwitchWrittenOffOn">
-   <property name="text">
-    <string>Switch &quot;Written off&quot; on</string>
-   </property>
-  </action>
-  <action name="actionSwitchWrittenOffOff">
-   <property name="text">
-    <string>Switch &quot;Written off&quot; off</string>
-   </property>
-  </action>
-  <action name="actionSwitchRepairOn">
-   <property name="text">
-    <string>Switch &quot;Repair&quot; on</string>
-   </property>
-  </action>
-  <action name="actionSwitchRepairOff">
-   <property name="text">
-    <string>Switch &quot;Repair&quot; off</string>
-   </property>
-  </action>
-  <action name="actionSwitchCheckedOn">
-   <property name="text">
-    <string>Switch &quot;Checked&quot; on</string>
    </property>
   </action>
   <action name="actionSwitchCheckedOff">

@@ -440,31 +440,6 @@ void MainWindow::on_listWrittenOffFilter_currentIndexChanged(int index)
 	printableModel->setWrittenOffFilter(value);
 }
 
-void MainWindow::on_actionSwitchWrittenOffOn_triggered()
-{
-	inventoryModel->switchAllWrittenOff(true);
-}
-
-void MainWindow::on_actionSwitchWrittenOffOff_triggered()
-{
-	inventoryModel->switchAllWrittenOff(false);
-}
-
-void MainWindow::on_actionSwitchRepairOn_triggered()
-{
-	inventoryModel->switchAllRepair(true);
-}
-
-void MainWindow::on_actionSwitchRepairOff_triggered()
-{
-	inventoryModel->switchAllRepair(false);
-}
-
-void MainWindow::on_actionSwitchCheckedOn_triggered()
-{
-	inventoryModel->switchAllChecked(true);
-}
-
 void MainWindow::on_actionSwitchCheckedOff_triggered()
 {
 	inventoryModel->switchAllChecked(false);
