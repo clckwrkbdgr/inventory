@@ -7,6 +7,7 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QDialog>
 #include <QtGui/QDialogButtonBox>
+#include <QtGui/QProgressDialog>
 
 #include "mainwindow.h"
 
@@ -442,6 +443,11 @@ void MainWindow::on_listWrittenOffFilter_currentIndexChanged(int index)
 
 void MainWindow::on_actionSwitchCheckedOff_triggered()
 {
+	QProgressDialog progress(tr("Switching off 'Checked off' marks..."), tr("Cancel"),  0, inventoryModel->rowCount(), this);
+	progress.setWindowModality(Qt::WindowModal);
+	progress.setMinimumDuration(0);
+	connect(inventoryModel, SIGNAL(switchingProcessUpdated(int)), &progress, SLOT(setValue(int)));
 	inventoryModel->switchAllChecked(false);
+	progress.setValue(inventoryModel->rowCount());
 }
 

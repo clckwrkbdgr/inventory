@@ -589,6 +589,7 @@ void InventoryModel::switchAllChecked(bool on)
 {
 	for(int row = 0; row < rowCount(); ++row) {
 		setData(index(row, ITEM_CHECKED), on ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
+		emit switchingProcessUpdated(row);
 	}
 }
 

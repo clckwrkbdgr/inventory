@@ -112,6 +112,8 @@ public:
 	void switchAllChecked(bool on = true);
 
 	virtual void update();
+signals:
+	void switchingProcessUpdated(int i);
 private:
 	Filter filter;
 	QList<Item> items;
