@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget * parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
+	ui.view->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
+
 	tabs = new QTabBar();
 	tabIndex.MAIN    = tabs->addTab(tr("Main"));
 	tabIndex.PRINT   = tabs->addTab(tr("Print"));
