@@ -23,7 +23,17 @@ MainWindow::MainWindow(QWidget * parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
-	ui.view->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
+	// Dirty hack: subclassed tableview added instead of original ui.view.
+	view = new EnterTableView();
+	QBoxLayout * box = static_cast<QBoxLayout*>(ui.centralwidget->layout());
+	if(box) {
+		box->insertWidget(0, view);
+		ui.view->hide();
+	} else {
+		view = ui.view;
+	}
+
+	view->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
 
 	tabs = new QTabBar();
 	tabIndex.MAIN    = tabs->addTab(tr("Main"));
@@ -32,7 +42,6 @@ MainWindow::MainWindow(QWidget * parent)
 	tabIndex.PLACES  = tabs->addTab(tr("Places"));
 	tabIndex.PERSONS = tabs->addTab(tr("Persons"));
 
-	QBoxLayout * box = static_cast<QBoxLayout*>(ui.centralwidget->layout());
 	if(box) {
 		box->insertWidget(0, tabs);
 	}
@@ -199,7 +208,7 @@ void MainWindow::setColumnVisibility(int column, bool visible)
 	} else {
 		hiddenColumns += column;
 	}
-	ui.view->setColumnHidden(column, !visible);
+	view->setColumnHidden(column, !visible);
 	resetView(false);
 }
 
@@ -214,31 +223,31 @@ void MainWindow::setupTab(int index)
 
 	ui.filterBox->setVisible(ui.actionHideFilter->isEnabled() && !ui.actionHideFilter->isChecked());
 
-	if     (index == tabIndex.MAIN)    ui.view->setModel(inventoryModel);
-	else if(index == tabIndex.PRINT)   ui.view->setModel(printableModel);
-	else if(index == tabIndex.TYPES)   ui.view->setModel(itemTypesModel);
-	else if(index == tabIndex.PLACES)  ui.view->setModel(placesModel);
-	else if(index == tabIndex.PERSONS) ui.view->setModel(personsModel);
+	if     (index == tabIndex.MAIN)    view->setModel(inventoryModel);
+	else if(index == tabIndex.PRINT)   view->setModel(printableModel);
+	else if(index == tabIndex.TYPES)   view->setModel(itemTypesModel);
+	else if(index == tabIndex.PLACES)  view->setModel(placesModel);
+	else if(index == tabIndex.PERSONS) view->setModel(personsModel);
 
 	resetView(true);
 
-	for(int column = 0; column < ui.view->model()->columnCount(); ++column) {
+	for(int column = 0; column < view->model()->columnCount(); ++column) {
 		bool hidden = (index == tabIndex.MAIN && hiddenColumns.contains(column));
-		ui.view->setColumnHidden(column, hidden);
+		view->setColumnHidden(column, hidden);
 	}
 	if(index == tabIndex.MAIN) {
-		ui.view->setItemDelegate(new Inventory::InventoryDelegate(this));
+		view->setItemDelegate(new Inventory::InventoryDelegate(this));
 	} else {
-		ui.view->setItemDelegate(new QItemDelegate(this));
+		view->setItemDelegate(new QItemDelegate(this));
 	}
 }
 
 void MainWindow::resetView(bool update)
 {
-	ui.view->resizeColumnsToContents();
-	ui.view->horizontalHeader()->setStretchLastSection(true);
-	if(update && ui.view->model()) {
-		Inventory::AbstractUpdatableTableModel * model = qobject_cast<Inventory::AbstractUpdatableTableModel *>(ui.view->model());
+	view->resizeColumnsToContents();
+	view->horizontalHeader()->setStretchLastSection(true);
+	if(update && view->model()) {
+		Inventory::AbstractUpdatableTableModel * model = qobject_cast<Inventory::AbstractUpdatableTableModel *>(view->model());
 		if(model) {
 			model->update();
 		}
@@ -247,10 +256,10 @@ void MainWindow::resetView(bool update)
 
 void MainWindow::on_actionUndo_triggered()
 {
-	if(ui.view->model() != inventoryModel)
+	if(view->model() != inventoryModel)
 		return;
 
-	int row = ui.view->currentIndex().isValid() ? ui.view->currentIndex().row() : -1;
+	int row = view->currentIndex().isValid() ? view->currentIndex().row() : -1;
 	if(row < 0)
 		return;
 
@@ -276,10 +285,10 @@ void MainWindow::on_actionUndo_triggered()
 
 void MainWindow::on_actionShowHistory_triggered()
 {
-	if(ui.view->model() != inventoryModel)
+	if(view->model() != inventoryModel)
 		return;
 
-	int row = ui.view->currentIndex().isValid() ? ui.view->currentIndex().row() : -1;
+	int row = view->currentIndex().isValid() ? view->currentIndex().row() : -1;
 	if(row < 0)
 		return;
 
@@ -319,7 +328,7 @@ void MainWindow::on_actionAddMultiline_triggered()
 	if(dialog.exec() == QDialog::Accepted) {
 		QStringList lines = edit->toPlainText().split('\n');
 
-		Inventory::ReferenceModel * model = qobject_cast<Inventory::ReferenceModel *>(ui.view->model());
+		Inventory::ReferenceModel * model = qobject_cast<Inventory::ReferenceModel *>(view->model());
 		if(model) {
 			bool success = model->addMultiline(lines);
 			if(!success) {
@@ -331,7 +340,7 @@ void MainWindow::on_actionAddMultiline_triggered()
 
 void MainWindow::on_actionPrintCSV_triggered()
 {
-	if(!ui.view->model())
+	if(!view->model())
 		return;
 
 	QString csvFileName = QFileDialog::getSaveFileName(this, tr("Save to CSV..."), 0, tr("CSV files (*.csv);;All files (*.*)"));
@@ -346,11 +355,11 @@ void MainWindow::on_actionPrintCSV_triggered()
 
 	QTextStream out(&file);
 	out.setCodec("UTF-8");
-	QAbstractItemModel * model = ui.view->model();
+	QAbstractItemModel * model = view->model();
 
 	QStringList header;
 	for(int col = 0; col < model->columnCount(); ++col) {
-		if(ui.view->isColumnHidden(col))
+		if(view->isColumnHidden(col))
 			continue;
 
 		QString text = model->headerData(col, Qt::Horizontal).toString();
@@ -363,7 +372,7 @@ void MainWindow::on_actionPrintCSV_triggered()
 	for(int row = 0; row < model->rowCount(); ++row) {
 		QStringList cells;
 		for(int col = 0; col < model->columnCount(); ++col) {
-			if(ui.view->isColumnHidden(col))
+			if(view->isColumnHidden(col))
 				continue;
 
 			QString text = model->data(model->index(row, col)).toString();
@@ -377,15 +386,15 @@ void MainWindow::on_actionPrintCSV_triggered()
 
 void MainWindow::on_actionAdd_triggered()
 {
-	ui.view->model()->insertRow(ui.view->model()->rowCount());
+	view->model()->insertRow(view->model()->rowCount());
 }
 
 void MainWindow::on_actionRemove_triggered()
 {
-	if(!ui.view->model())
+	if(!view->model())
 		return;
 
-	int row = ui.view->currentIndex().isValid() ? ui.view->currentIndex().row() : -1;
+	int row = view->currentIndex().isValid() ? view->currentIndex().row() : -1;
 	if(row < 0)
 		return;
 
@@ -396,7 +405,7 @@ void MainWindow::on_actionRemove_triggered()
 	if(!isSureToRemove)
 		return;
 
-	bool removed = !ui.view->model()->removeRow(row);
+	bool removed = !view->model()->removeRow(row);
 	if(removed) {
 		if(tabs->currentIndex() == tabIndex.TYPES || tabs->currentIndex() == tabIndex.PLACES || tabs->currentIndex() == tabIndex.PERSONS) {
 			QMessageBox::information(this, tr("Remove record"), tr("Cannot remove record. Probably, there are items that are using it."));

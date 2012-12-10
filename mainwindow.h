@@ -2,6 +2,8 @@
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QTabBar>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QTableView>
 
 #include "models.h"
 
@@ -13,6 +15,28 @@ struct TabIndex {
 	int TYPES;
 	int PLACES;
 	int PERSONS;
+};
+
+class EnterTableView : public QTableView {
+	Q_OBJECT
+	Q_DISABLE_COPY(EnterTableView)
+public:
+	EnterTableView(QWidget * parent = 0) : QTableView(parent) {}
+	virtual ~EnterTableView() {}
+protected:
+	virtual void keyPressEvent(QKeyEvent * event) {
+		if(state() != QAbstractItemView::EditingState) {
+			switch(event->key()) {
+				case Qt::Key_Enter:
+				case Qt::Key_Return:
+					edit(currentIndex());
+					break;
+				default:
+					break;
+			}
+		}
+		QTableView::keyPressEvent(event);
+	}
 };
 
 class MainWindow : public QMainWindow {
@@ -52,6 +76,7 @@ private slots:
 
 	void on_actionSwitchCheckedOff_triggered();
 private:
+	QTableView * view;
 	QString databaseLocation;
 	Ui::MainWindow ui;
 	QTabBar * tabs;
