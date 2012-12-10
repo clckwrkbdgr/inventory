@@ -27,6 +27,11 @@ MainWindow::MainWindow(QWidget * parent)
 	view = new EnterTableView();
 	QBoxLayout * box = static_cast<QBoxLayout*>(ui.centralwidget->layout());
 	if(box) {
+		view->setSortingEnabled(true);
+		view->verticalHeader()->hide();
+		view->horizontalHeader()->show();
+		view->horizontalHeader()->setStretchLastSection(true);
+		view->setSelectionMode(QAbstractItemView::SingleSelection);
 		box->insertWidget(0, view);
 		ui.view->hide();
 	} else {
