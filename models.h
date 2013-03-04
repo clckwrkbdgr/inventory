@@ -114,6 +114,7 @@ public:
 	virtual void update();
 signals:
 	void switchingProcessUpdated(int i);
+	void preparedToUpdate();
 private:
 	Filter filter;
 	QList<Item> items;

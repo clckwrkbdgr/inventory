@@ -82,6 +82,7 @@ MainWindow::MainWindow(QWidget * parent)
 	placesModel    = new Inventory::ReferenceModel(Inventory::ReferenceModel::PLACES);
 	personsModel   = new Inventory::ReferenceModel(Inventory::ReferenceModel::PERSONS);
 	connect(inventoryModel, SIGNAL(modelReset()), this, SLOT(resetView()));
+	connect(inventoryModel, SIGNAL(preparedToUpdate()), this, SLOT(saveCurrentIndex()));
 	connect(printableModel, SIGNAL(modelReset()), this, SLOT(resetView()));
 	connect(itemTypesModel, SIGNAL(modelReset()), this, SLOT(resetView()));
 	connect(placesModel,    SIGNAL(modelReset()), this, SLOT(resetView()));
@@ -247,6 +248,10 @@ void MainWindow::setupTab(int index)
 	}
 }
 
+void MainWindow::saveCurrentIndex() {
+	oldIndex = QPoint(view->currentIndex().column(), view->currentIndex().row());
+}
+
 void MainWindow::resetView(bool update)
 {
 	view->resizeColumnsToContents();
@@ -255,6 +260,14 @@ void MainWindow::resetView(bool update)
 		Inventory::AbstractUpdatableTableModel * model = qobject_cast<Inventory::AbstractUpdatableTableModel *>(view->model());
 		if(model) {
 			model->update();
+		}
+	}
+	if(view->model() && oldIndex.x() > -1 && oldIndex.y() > -1) {
+		bool xOk = oldIndex.x() < view->model()->columnCount();
+		bool yOk = oldIndex.y() < view->model()->rowCount();
+		if(xOk && yOk) {
+			view->setCurrentIndex(view->model()->index(oldIndex.y(), oldIndex.x()));
+			view->setFocus(Qt::OtherFocusReason);
 		}
 	}
 }

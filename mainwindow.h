@@ -47,6 +47,7 @@ public:
 	virtual ~MainWindow();
 
 private slots:
+	void saveCurrentIndex();
 	void setupTab(int index);
 	void resetView(bool update = false);
 
@@ -82,6 +83,7 @@ private:
 	QTabBar * tabs;
 	TabIndex tabIndex;
 	QSet<int> hiddenColumns;
+	QPoint oldIndex;
 	
 	Inventory::InventoryModel * inventoryModel;
 	Inventory::PrintableInventoryModel * printableModel;

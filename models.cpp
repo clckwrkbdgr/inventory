@@ -229,6 +229,7 @@ void InventoryModel::update()
 			map
 			);
 
+	emit preparedToUpdate();
 	beginResetModel();
 	items.clear();
 	while(query.next()) {
