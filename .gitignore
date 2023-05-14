@@ -2,6 +2,7 @@
 *.swp
 
 # Build
+.qmake.stash
 Makefile
 tmp/
 bin/
