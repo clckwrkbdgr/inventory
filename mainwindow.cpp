@@ -1,15 +1,41 @@
-#include <QtDebug>
-#include <QtCore/QSettings>
-#include <QtCore/QFile>
-#include <QtCore/QTextStream>
+#include "mainwindow.h"
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QProgressDialog>
+#include <QtCore/QSettings>
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
+#include <QtDebug>
+#include <memory>
 
-#include "mainwindow.h"
+/** Returns location of main state config file.
+ * Depends on OS:
+ * - Windows: %APPDATA%/<orgname>/<appname>.cfg
+ * - *nix: ${XDG_STATE_HOME:-$HOME/.state}/<orgname>/<appname>.cfg
+ */
+QString get_state_file()
+{
+#ifdef _WIN32
+	static QDir main_state_dir(getenv("APPDATA"));
+#else
+	QDir main_state_dir;
+	static const char * xdg_state_home = getenv("XDG_STATE_HOME");
+	if(xdg_state_home) {
+		main_state_dir = QDir(xdg_state_home);
+	} else {
+		static const char * homedir = getenv("HOME");
+		main_state_dir = QDir(homedir);
+		main_state_dir.mkpath(".state");
+		main_state_dir = QDir(main_state_dir.absoluteFilePath(".state"));
+	}
+#endif
+	main_state_dir.mkpath(QApplication::organizationName());
+	QDir state_dir(main_state_dir.absoluteFilePath(QApplication::organizationName()));
+	return state_dir.absoluteFilePath(QApplication::applicationName() + ".cfg");
+}
 
 QString getDatabaseFromWorkDir() {
 	QDir wd = QDir::current();
@@ -52,8 +78,14 @@ MainWindow::MainWindow(QWidget * parent)
 	}
 	connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(setupTab(int)));
 
+	// Check legacy settings...
+	std::unique_ptr<QSettings> settings_ptr(new QSettings("antifin", "inventory")); // Legacy location.
+	if(!settings_ptr->value("mainwindow/maximized").isValid()) {
+		settings_ptr.reset(new QSettings(get_state_file(), QSettings::IniFormat));
+	}
+
 	// Settings.
-	QSettings settings;
+	QSettings & settings = *settings_ptr;
 	resize(settings.value("mainwindow/size", size()).toSize());
 	move(settings.value("mainwindow/pos", pos()).toPoint());
 	if(settings.value("mainwindow/maximized", false).toBool())
@@ -117,8 +149,14 @@ MainWindow::MainWindow(QWidget * parent)
 
 MainWindow::~MainWindow()
 {
+    // Drop legacy settings.
+	QSettings legacy_settings("antifin", "inventory");
+	if(legacy_settings.value("mainwindow/maximized").isValid()) {
+        legacy_settings.clear();
+    }
+
 	// Settings.
-	QSettings settings;
+    QSettings settings(get_state_file(), QSettings::IniFormat);
 	settings.setValue("mainwindow/maximized",
 			windowState().testFlag(Qt::WindowMaximized));
 	if(!windowState().testFlag(Qt::WindowMaximized))
