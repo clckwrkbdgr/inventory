@@ -1,8 +1,8 @@
 TARGET = inventory
 VERSION = 2.1.0
 DESTDIR = bin
-CONFIG = uic qt release warn_on
-QT += sql
+CONFIG += uic release warn_on
+QT += widgets sql
 
 OBJECTS_DIR = tmp
 MOC_DIR = tmp

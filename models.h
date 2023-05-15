@@ -6,8 +6,8 @@
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 #include <QtCore/QStringList>
-#include <QtGui/QComboBox>
-#include <QtGui/QItemDelegate>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QItemDelegate>
 
 namespace Inventory {
 

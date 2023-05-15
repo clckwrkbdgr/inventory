@@ -2,12 +2,12 @@
 #include <QtCore/QSettings>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
-#include <QtGui/QMessageBox>
-#include <QtGui/QTextEdit>
-#include <QtGui/QFileDialog>
-#include <QtGui/QDialog>
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QProgressDialog>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QTextEdit>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QProgressDialog>
 
 #include "mainwindow.h"
 

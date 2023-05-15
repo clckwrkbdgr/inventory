@@ -1,5 +1,5 @@
 #include <QtDebug>
-#include <QtGui/QStringListModel>
+#include <QtCore/QStringListModel>
 
 #include "models.h"
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QtGui/QMainWindow>
-#include <QtGui/QTabBar>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QTabBar>
 #include <QtGui/QKeyEvent>
-#include <QtGui/QTableView>
+#include <QtWidgets/QTableView>
 
 #include "models.h"
 
