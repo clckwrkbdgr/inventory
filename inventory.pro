@@ -13,3 +13,8 @@ TRANSLATIONS = inventory_ru.ts
 FORMS += mainwindow.ui
 HEADERS = models.h mainwindow.h
 SOURCES = main.cpp models.cpp mainwindow.cpp
+
+runAction.target = run
+runAction.depends = all
+runAction.commands = bin/inventory
+QMAKE_EXTRA_TARGETS += runAction
