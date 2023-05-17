@@ -51,6 +51,7 @@ private slots:
 	void setupTab(int index);
 	void resetView(bool update = false);
 
+	void on_actionOpenDatabase_triggered();
 	void on_actionShowHistory_triggered();
 	void on_actionAddMultiline_triggered();
 	void on_actionPrintCSV_triggered();
@@ -93,5 +94,6 @@ private:
 
 	QAction * columnAction(int);
 	void setColumnVisibility(int column, bool visible);
+	QString openDatabaseFile();
 };
 

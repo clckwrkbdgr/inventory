@@ -93,10 +93,7 @@ MainWindow::MainWindow(QWidget * parent)
 
 	QString databaseLocation = getDatabaseFromWorkDir();
 	if(databaseLocation.isEmpty()) {
-		databaseLocation = QFileDialog::getSaveFileName(this, tr("Database location"),
-				QDir(QApplication::applicationDirPath()).absoluteFilePath("inventory.sqlite"),
-				tr("SQLite3 database files (*.sqlite);;All files (*.*)"), 0, QFileDialog::DontConfirmOverwrite
-				); 
+		databaseLocation = openDatabaseFile();
 		if(databaseLocation.isEmpty()) {
 			exit(0);
 		}
@@ -149,14 +146,14 @@ MainWindow::MainWindow(QWidget * parent)
 
 MainWindow::~MainWindow()
 {
-    // Drop legacy settings.
+	// Drop legacy settings.
 	QSettings legacy_settings("antifin", "inventory");
 	if(legacy_settings.value("mainwindow/maximized").isValid()) {
-        legacy_settings.clear();
-    }
+		legacy_settings.clear();
+	}
 
 	// Settings.
-    QSettings settings(get_state_file(), QSettings::IniFormat);
+	QSettings settings(get_state_file(), QSettings::IniFormat);
 	settings.setValue("mainwindow/maximized",
 			windowState().testFlag(Qt::WindowMaximized));
 	if(!windowState().testFlag(Qt::WindowMaximized))
@@ -181,6 +178,17 @@ MainWindow::~MainWindow()
 
 	// Database.
 	Inventory::Database::close();
+}
+
+QString MainWindow::openDatabaseFile()
+{
+	QString databaseLocation = QFileDialog::getSaveFileName(this,
+			tr("Database location"),
+			QDir(QApplication::applicationDirPath()).absoluteFilePath("inventory.sqlite"),
+			tr("SQLite3 database files (*.sqlite);;All files (*.*)"),
+			0, QFileDialog::DontConfirmOverwrite
+			);
+	return databaseLocation;
 }
 
 QAction * MainWindow::columnAction(int column)
@@ -337,6 +345,25 @@ void MainWindow::on_actionUndo_triggered()
 			inventoryModel->update();
 		}
 	}
+}
+
+void MainWindow::on_actionOpenDatabase_triggered()
+{
+	QString databaseLocation = openDatabaseFile();
+	if(databaseLocation.isEmpty()) {
+		return;
+	}
+	Inventory::Database::close();
+	Inventory::Database::setDatabaseName(databaseLocation);
+	if(!Inventory::Database::reopen()) {
+		QMessageBox::critical(this, tr("Database"), tr("Cannot open database at path '%1'!").arg(Inventory::Database::databaseName()));
+		exit(1);
+	}
+	inventoryModel->update();
+	printableModel->update();
+	itemTypesModel->update();
+	placesModel->update();
+	personsModel->update();
 }
 
 void MainWindow::on_actionShowHistory_triggered()
