@@ -91,7 +91,15 @@ MainWindow::MainWindow(QWidget * parent)
 	if(settings.value("mainwindow/maximized", false).toBool())
 		setWindowState(Qt::WindowMaximized);
 
-	QString databaseLocation = getDatabaseFromWorkDir();
+	bool open_last_database = settings.value("db/open_last_database", false).toBool();
+	ui.actionOpenLastDB->setChecked(open_last_database);
+
+	QString databaseLocation;
+	if(open_last_database) {
+		databaseLocation = settings.value("db/last_opened", QString()).toString();
+	} else {
+		databaseLocation = getDatabaseFromWorkDir();
+	}
 	if(databaseLocation.isEmpty()) {
 		databaseLocation = openDatabaseFile();
 		if(databaseLocation.isEmpty()) {
@@ -101,6 +109,7 @@ MainWindow::MainWindow(QWidget * parent)
 
 	// App logic.
 	Inventory::Database::setDatabaseName(databaseLocation);
+	settings.setValue("db/last_opened", databaseLocation);
 	if(!Inventory::Database::reopen()) {
 		QMessageBox::critical(this, tr("Database"), tr("Cannot open database at path '%1'!").arg(Inventory::Database::databaseName()));
 		exit(1);
@@ -162,6 +171,8 @@ MainWindow::~MainWindow()
 		settings.setValue("mainwindow/pos", pos());
 	}
 
+	settings.setValue("db/last_opened", Inventory::Database::databaseName());
+
 	settings.setValue("filter/hidden",              ui.actionHideFilter           ->isChecked());
 	settings.setValue("filter/useitemtype",         ui.buttonUseItemTypeFilter    ->isChecked());
 	settings.setValue("filter/itemtype",            ui.listItemTypeFilter         ->currentIndex());
@@ -189,6 +200,12 @@ QString MainWindow::openDatabaseFile()
 			0, QFileDialog::DontConfirmOverwrite
 			);
 	return databaseLocation;
+}
+
+void MainWindow::on_actionOpenLastDB_toggled(bool value)
+{
+	QSettings settings(get_state_file(), QSettings::IniFormat);
+	settings.setValue("db/open_last_database", value);
 }
 
 QAction * MainWindow::columnAction(int column)

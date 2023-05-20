@@ -52,6 +52,7 @@ private slots:
 	void resetView(bool update = false);
 
 	void on_actionOpenDatabase_triggered();
+	void on_actionOpenLastDB_toggled(bool);
 	void on_actionShowHistory_triggered();
 	void on_actionAddMultiline_triggered();
 	void on_actionPrintCSV_triggered();

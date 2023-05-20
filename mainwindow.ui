@@ -123,6 +123,7 @@
      <string>Main</string>
     </property>
     <addaction name="actionOpenDatabase"/>
+    <addaction name="actionOpenLastDB"/>
     <addaction name="separator"/>
     <addaction name="actionHideFilter"/>
     <addaction name="actionPrintCSV"/>
@@ -382,6 +383,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionOpenLastDB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Open last DB on start</string>
+   </property>
+   <property name="toolTip">
+    <string>Always open last DB on start</string>
    </property>
   </action>
  </widget>
