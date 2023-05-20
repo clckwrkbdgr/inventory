@@ -10,7 +10,8 @@ int main(int argc, char ** argv)
 	app.setApplicationName("qinventory");
 
 	QTranslator translator;
-	translator.load(QString("%1_%2").arg(app.applicationName()).arg(QLocale::system().name()));
+	translator.load(QString("%1_%2").arg(app.applicationName()).arg(QLocale::system().name()),
+			QApplication::applicationDirPath());
 	app.installTranslator(&translator);
 
 	MainWindow wnd;
