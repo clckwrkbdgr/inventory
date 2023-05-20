@@ -1,5 +1,5 @@
 TARGET = inventory
-VERSION = 2.1.0
+VERSION = 3.0.0
 DESTDIR = bin
 CONFIG += uic release warn_on
 QT += widgets sql
