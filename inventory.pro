@@ -9,7 +9,7 @@ MOC_DIR = tmp
 RCC_DIR = tmp
 UI_DIR = tmp
 
-TRANSLATIONS = inventory_ru.ts
+TRANSLATIONS = inventory_ru.ts inventory_uk.ts
 FORMS += mainwindow.ui
 HEADERS = models.h mainwindow.h
 SOURCES = main.cpp models.cpp mainwindow.cpp
