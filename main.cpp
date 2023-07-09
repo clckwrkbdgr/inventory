@@ -10,8 +10,13 @@ int main(int argc, char ** argv)
 	app.setApplicationName("qinventory");
 
 	QTranslator translator;
-	translator.load(QString("%1_%2").arg(app.applicationName()).arg(QLocale::system().name()),
-			QApplication::applicationDirPath());
+	QString translation_name = QString("%1_%2")
+		.arg(app.applicationName())
+		.arg(QLocale::system().name());
+	if(!translator.load(translation_name, QApplication::applicationDirPath())) {
+		QString system_path = "/usr/local/share/clckwrkbdgr-inventory";
+		translator.load(translation_name, system_path);
+	}
 	app.installTranslator(&translator);
 
 	MainWindow wnd;
